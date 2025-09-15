@@ -2,8 +2,8 @@
 // Created by Tobias Sharman on 11/09/2025.
 //
 
-#ifndef SIMULATION_PROGRAM_UNIT_UTILITIES_H
-#define SIMULATION_PROGRAM_UNIT_UTILITIES_H
+#ifndef PHYSICS_SIMULATION_PROGRAM_UNIT_UTILITIES_H
+#define PHYSICS_SIMULATION_PROGRAM_UNIT_UTILITIES_H
 
 #include <utility>
 #include <vector>
@@ -12,9 +12,14 @@
 #include <unordered_map>
 
 struct Dimension {
-    std::map<std::string,int> exponents; // e.g. {{"M",1},{"L",2},{"T",-2}}
+    std::map<std::string,int> exponents;
+
+    // Default constructor
+    Dimension() = default;
+
+    // Initializer list constructor
     Dimension(const std::initializer_list<std::pair<const std::string,int>> init)
-    : exponents(init) {}
+        : exponents(init) {}
 
     static Dimension dimensionless() { return {}; }
 
@@ -41,6 +46,7 @@ struct Dimension {
     }
 };
 
+
 struct UnitInfo {
     double scale{};       // Factor relative to SI (For use in units like eV)
     Dimension dimension;  // Dimension type based on SI
@@ -49,7 +55,7 @@ struct UnitInfo {
 inline std::string UTF8_CHAR(const std::string& s, size_t& i) {
     const unsigned char c = s[i];
     size_t len = 1;
-    if ((c & 0xE0) == 0xC0) len = 2;
+    if ((c & 0xE0) == 0xC0) len = 2; // Checks for byte length
     else if ((c & 0xF0) == 0xE0) len = 3;
     else if ((c & 0xF8) == 0xF0) len = 4;
     std::string res = s.substr(i, len);
@@ -59,9 +65,9 @@ inline std::string UTF8_CHAR(const std::string& s, size_t& i) {
 
 inline int UNICODE_DIGIT_VALUE(const std::string& s) {
     static const std::unordered_map<std::string,int> superscripts = {
-        {"⁰",0},{"¹",1},{"²",2},{"³",3},{"⁴",4},
-        {"⁵",5},{"⁶",6},{"⁷",7},{"⁸",8},{"⁹",9},
-        {"⁻",-1} // negative sign
+        {"⁰", 0},{"¹", 1},{"²", 2},{"³", 3},{"⁴", 4},
+        {"⁵", 5},{"⁶", 6},{"⁷", 7},{"⁸", 8},{"⁹", 9},
+        {"⁻", -1} // negative sign
     };
     const auto it = superscripts.find(s);
     return (it != superscripts.end()) ? it->second : -2; // -2 = not a superscript
@@ -134,4 +140,4 @@ inline void multiplyUnit(UnitInfo& result, const UnitInfo& u, const int exp=1) {
     result.dimension = (exp>0) ? result.dimension + d : result.dimension - d;
 }
 
-#endif //SIMULATION_PROGRAM_UNIT_UTILITIES_H
+#endif //PHYSICS_SIMULATION_PROGRAM_UNIT_UTILITIES_H

@@ -4,8 +4,8 @@
 
 // Position and transforms are all about the centre of the above object
 
-#ifndef SIMULATION_PROGRAM_OBJECT_H
-#define SIMULATION_PROGRAM_OBJECT_H
+#ifndef PHYSICS_SIMULATION_PROGRAM_OBJECT_H
+#define PHYSICS_SIMULATION_PROGRAM_OBJECT_H
 
 #include "vector.h"
 #include "matrix.h"
@@ -103,4 +103,4 @@ std::shared_ptr<T> construct(Args&&... args) {
 }
 
 
-#endif //SIMULATION_PROGRAM_OBJECT_H
+#endif //PHYSICS_SIMULATION_PROGRAM_OBJECT_H

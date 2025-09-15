@@ -2,8 +2,8 @@
 // Created by Tobias Sharman on 13/09/2025.
 //
 
-#ifndef SIMULATION_PROGRAM_BASE_DATABASE_H
-#define SIMULATION_PROGRAM_BASE_DATABASE_H
+#ifndef BASE_DATABASE_H
+#define BASE_DATABASE_H
 
 #include "binary_file_IO.h"  // Include BinaryIO namespace
 
@@ -150,4 +150,4 @@ public:
     static inline std::vector<DBEntry> db_;
 };
 
-#endif //SIMULATION_PROGRAM_BASE_DATABASE_H
+#endif //BASE_DATABASE_H

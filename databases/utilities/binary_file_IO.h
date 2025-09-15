@@ -2,8 +2,9 @@
 // Created by Tobias Sharman on 13/09/2025.
 //
 
-#ifndef SIMULATION_PROGRAM_BINARY_FILE_IO_H
-#define SIMULATION_PROGRAM_BINARY_FILE_IO_H
+#ifndef BINARY_FILE_IO_H
+#define BINARY_FILE_IO_H
+
 #include <fstream>
 #include <string>
 #include <cstdint>
@@ -62,4 +63,4 @@ namespace BinaryIO {
 
 }
 
-#endif //SIMULATION_PROGRAM_BINARY_FILE_IO_H
+#endif //BINARY_FILE_IO_H

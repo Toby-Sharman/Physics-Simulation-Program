@@ -2,8 +2,8 @@
 // Created by Tobias Sharman on 08/09/2025.
 //
 
-#ifndef SIMULATION_PROGRAM_POINT_H
-#define SIMULATION_PROGRAM_POINT_H
+#ifndef PHYSICS_SIMULATION_PROGRAM_POINT_H
+#define PHYSICS_SIMULATION_PROGRAM_POINT_H
 
 #include "vector.h"
 
@@ -24,4 +24,4 @@ class Point : public Object {
     // double bounding_radius_{0.0f};
 };
 
-#endif //SIMULATION_PROGRAM_POINT_H
+#endif //PHYSICS_SIMULATION_PROGRAM_POINT_H

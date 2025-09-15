@@ -3,8 +3,9 @@
 //
 //TODO: Improve
 
-#ifndef SIMULATION_PROGRAM_ROTATION_HELPERS_H
-#define SIMULATION_PROGRAM_ROTATION_HELPERS_H
+#ifndef PHYSICS_SIMULATION_PROGRAM_ROTATION_HELPERS_H
+#define PHYSICS_SIMULATION_PROGRAM_ROTATION_HELPERS_H
+
 #include "matrix.h"
 #include "vector.h"
 
@@ -81,4 +82,4 @@ inline Matrix<double,3,3> chainRotations3x3(const std::vector<std::tuple<double,
     return R;
 }
 
-#endif //SIMULATION_PROGRAM_ROTATION_HELPERS_H
+#endif //PHYSICS_SIMULATION_PROGRAM_ROTATION_HELPERS_H

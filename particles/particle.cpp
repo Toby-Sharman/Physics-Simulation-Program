@@ -48,23 +48,23 @@ Particle::Particle(
 {}
 
 // Getters
-std::string Particle::get_particle_type() const { return m_particle_type; }
-double Particle::get_rest_mass() const { return m_rest_mass; }
-double Particle::get_charge() const { return m_charge; }
-double Particle::get_spin() const { return m_spin; }
-const Vector<4>& Particle::get_position() const { return m_position; }
-const Vector<4>& Particle::get_momentum() const { return m_momentum; }
-const Vector<3>& Particle::get_polarisation() const { return m_polarisation; }
+std::string Particle::getParticleType() const { return m_particle_type; }
+double Particle::getRestMass() const { return m_rest_mass; }
+double Particle::getCharge() const { return m_charge; }
+double Particle::getSpin() const { return m_spin; }
+const Vector<4>& Particle::getPosition() const { return m_position; }
+const Vector<4>& Particle::getMomentum() const { return m_momentum; }
+const Vector<3>& Particle::getPolarisation() const { return m_polarisation; }
 
 
 // Setters
-void Particle::set_particle_type(const std::string& particle_type) { m_particle_type = particle_type; }
-void Particle::set_rest_mass(double rest_mass) { m_rest_mass = rest_mass; }
-void Particle::set_charge(double charge) { m_charge = charge; }
-void Particle::set_spin(double spin) { m_spin = spin; }
-void Particle::set_position(const Vector<4>& position) { m_position = position; } // TODO: Extend initial assignment label handling to setter functions
-void Particle::set_momentum(const Vector<4>& momentum) { m_momentum = momentum; }
-void Particle::set_polarisation(const Vector<3>& polarisation) { m_polarisation = polarisation; }
+void Particle::setParticleType(const std::string& particle_type) { m_particle_type = particle_type; }
+void Particle::setRestMass(double rest_mass) { m_rest_mass = rest_mass; }
+void Particle::setCharge(double charge) { m_charge = charge; }
+void Particle::setSpin(double spin) { m_spin = spin; }
+void Particle::setPosition(const Vector<4>& position) { m_position = position; } // TODO: Extend initial assignment label handling to setter functions
+void Particle::setMomentum(const Vector<4>& momentum) { m_momentum = momentum; }
+void Particle::setPolarisation(const Vector<3>& polarisation) { m_polarisation = polarisation; }
 
 // Print function
 void Particle::print() const {
@@ -82,6 +82,6 @@ void Particle::print() const {
 
 // Lorentz factor
 double Particle::gamma() const {
-    if (is_massless()) return 1.0; // Not used for photons
+    if (isMassless()) return 1.0; // Not used for photons
     return m_momentum[0] / m_rest_mass; // assuming units c=1
 }

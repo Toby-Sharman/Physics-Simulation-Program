@@ -6,14 +6,13 @@
 // Description: Declarations for the Particles module                                             //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#ifndef PARTICLES_H
-#define PARTICLES_H
+#ifndef PHYSICS_SIMULATION_PROGRAM_PARTICLES_H
+#define PHYSICS_SIMULATION_PROGRAM_PARTICLES_H
 
 #include "globals.h"
 
 #include "vector.h"
 
-#include <iostream>
 #include <string>
 
 class Particle {
@@ -30,23 +29,23 @@ class Particle {
         );
 
     // Getters
-    [[nodiscard]] std::string get_particle_type() const;
-    [[nodiscard]] double get_rest_mass() const;
-    [[nodiscard]] double get_charge() const;
-    [[nodiscard]] double get_spin() const;
-    [[nodiscard]] const Vector<4>& get_position() const;
-    [[nodiscard]] const Vector<4>& get_momentum() const;
-    [[nodiscard]] const Vector<3>& get_polarisation() const;
+    [[nodiscard]] std::string getParticleType() const;
+    [[nodiscard]] double getRestMass() const;
+    [[nodiscard]] double getCharge() const;
+    [[nodiscard]] double getSpin() const;
+    [[nodiscard]] const Vector<4>& getPosition() const;
+    [[nodiscard]] const Vector<4>& getMomentum() const;
+    [[nodiscard]] const Vector<3>& getPolarisation() const;
 
 
     // Setters
-    void set_particle_type(const std::string& particle_type);
-    void set_rest_mass(double rest_mass);
-    void set_charge(double charge);
-    void set_spin(double spin);
-    void set_position(const Vector<4>& position);
-    void set_momentum(const Vector<4>& momentum);
-    void set_polarisation(const Vector<3>& polarisation);
+    void setParticleType(const std::string& particle_type);
+    void setRestMass(double rest_mass);
+    void setCharge(double charge);
+    void setSpin(double spin);
+    void setPosition(const Vector<4>& position);
+    void setMomentum(const Vector<4>& momentum);
+    void setPolarisation(const Vector<3>& polarisation);
 
     // Print function
     void print() const;
@@ -57,7 +56,7 @@ class Particle {
     [[nodiscard]] double gamma() const;
 
     // Check for if the particle is massless or practically massless
-    [[nodiscard]] bool is_massless() const { return std::abs(m_rest_mass) <= Globals::Constant::MASSLESS_TOLERANCE; }
+    [[nodiscard]] bool isMassless() const { return std::abs(m_rest_mass) <= Globals::Constant::MASSLESS_TOLERANCE; }
 
     private:
     std::string m_particle_type;
@@ -69,4 +68,4 @@ class Particle {
     Vector<3> m_polarisation; // (P_x, P_y, P_z)
 };
 
-#endif //PARTICLES_H
+#endif //PHYSICS_SIMULATION_PROGRAM_PARTICLES_H

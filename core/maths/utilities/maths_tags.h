@@ -2,8 +2,8 @@
 // Created by Tobias Sharman on 10/09/2025.
 //
 
-#ifndef SIMULATION_PROGRAM_MATHS_TAGS_H
-#define SIMULATION_PROGRAM_MATHS_TAGS_H
+#ifndef PHYSICS_SIMULATION_PROGRAM_MATHS_TAGS_H
+#define PHYSICS_SIMULATION_PROGRAM_MATHS_TAGS_H
 
 #include <vector>
 #include <string>
@@ -23,4 +23,4 @@ struct Units {
     Units(const std::initializer_list<std::string> list) : values(list) {}
 };
 
-#endif //SIMULATION_PROGRAM_MATHS_TAGS_H
+#endif //PHYSICS_SIMULATION_PROGRAM_MATHS_TAGS_H

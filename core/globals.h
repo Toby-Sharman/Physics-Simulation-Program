@@ -2,8 +2,10 @@
 // Created by Tobias Sharman on 01/09/2025.
 //
 
-#ifndef SIMULATION_PROGRAM_GLOBALS_H
-#define SIMULATION_PROGRAM_GLOBALS_H
+#ifndef PHYSICS_SIMULATION_PROGRAM_GLOBALS_H
+#define PHYSICS_SIMULATION_PROGRAM_GLOBALS_H
+
+#include <string>
 
 class Globals {
     public:
@@ -14,7 +16,9 @@ class Globals {
 
     struct Constant {
         // Compile-time constants
-        static constexpr double TIME_STEP = 1;                                // Seconds
+        static constexpr std::string FILENAME_PREFIX = "Energies";            // Data output file name prefix (in form prefix[run#]
+
+        static constexpr double TIME_STEP = 1e-8;                             // Seconds
         static constexpr double MASSLESS_TOLERANCE = 0;                       // Massless tolerance
 
         static constexpr double C = 299792458;                                // Speed of light
@@ -43,4 +47,4 @@ private:
     Globals() = default;  // Private constructor
 };
 
-#endif //SIMULATION_PROGRAM_GLOBALS_H
+#endif //PHYSICS_SIMULATION_PROGRAM_GLOBALS_H

@@ -2,8 +2,8 @@
 // Created by Tobias Sharman on 10/09/2025.
 //
 
-#ifndef SIMULATION_PROGRAM_OBJECT_TYPES_H
-#define SIMULATION_PROGRAM_OBJECT_TYPES_H
+#ifndef PHYSICS_SIMULATION_PROGRAM_OBJECT_TYPES_H
+#define PHYSICS_SIMULATION_PROGRAM_OBJECT_TYPES_H
 
 // Forward declaration should minimally improve compile time
 class Box;
@@ -26,4 +26,4 @@ struct ObjectTypeName<Box> {
 //     static constexpr const char* name = "Point";
 // };
 
-#endif //SIMULATION_PROGRAM_OBJECT_TYPES_H
+#endif //PHYSICS_SIMULATION_PROGRAM_OBJECT_TYPES_H

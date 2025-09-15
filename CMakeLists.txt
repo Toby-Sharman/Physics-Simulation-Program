@@ -33,6 +33,7 @@ add_executable(Simulation_program
         physics/fields/field_solver.cpp
         physics/fields/field_boundary_handling.cpp
         simulation/step.cpp
+        simulation/data-collection/particle_collection.cpp
 )
 
 # Include directories
@@ -43,8 +44,8 @@ set(PROJECT_INCLUDE_DIR
         core/maths
         core/maths/utilities
         databases
-        databases/material_data
-        databases/particle_data
+        databases/material-data
+        databases/particle-data
         databases/utilities
         objects
         objects/utilities
@@ -52,8 +53,13 @@ set(PROJECT_INCLUDE_DIR
         physics
         physics/fields
         simulation
+        simulation/data-collection
 )
 target_include_directories(Simulation_program PRIVATE ${PROJECT_INCLUDE_DIR})
+
+# Create Output directory in build directory
+file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/Output")
+
 target_link_libraries(Simulation_program PRIVATE nlohmann_json::nlohmann_json)
 
 # -------------------------
@@ -118,9 +124,9 @@ endforeach()
 add_custom_target(generate_databases ALL DEPENDS ${BIN_FILES})
 
 # Define the include guard name
-set(CONFIG_INCLUDE_GUARD "SIMULATION_PROGRAM_CONFIG_H")
+set(CONFIG_INCLUDE_GUARD "PHYSICS_SIMULATION_PROGRAM_CONFIG_H")
 
-# Write config.h with include guard - Would be better to write with \n but it looks messy to read
+# Write config.h with include guard - Could be better to write with \n but it the below is more legible
 file(WRITE "${CONFIG_FILE}"
 "#ifndef ${CONFIG_INCLUDE_GUARD}
 #define ${CONFIG_INCLUDE_GUARD}
@@ -129,5 +135,5 @@ ${DB_PATH_DEFINES}
 #endif // ${CONFIG_INCLUDE_GUARD}"
 )
 
-# Include config in case it ends up in am odd directory or isn't included in the standard directory list
+# Include config in case it ends up in an odd directory or isn't included in the standard directory list
 target_include_directories(Simulation_program PRIVATE "${CONFIG_DIR}")

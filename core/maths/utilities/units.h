@@ -4,8 +4,8 @@
 
 // Exponent handling is limited to integers otherwise handling is spotty
 
-#ifndef SIMULATION_PROGRAM_UNITS_H
-#define SIMULATION_PROGRAM_UNITS_H
+#ifndef PHYSICS_SIMULATION_PROGRAM_UNITS_H
+#define PHYSICS_SIMULATION_PROGRAM_UNITS_H
 
 #include "globals.h"
 
@@ -106,4 +106,4 @@ inline UnitInfo parseUnits(const std::string& units) {
     return result;
 }
 
-#endif //SIMULATION_PROGRAM_UNITS_H
+#endif //PHYSICS_SIMULATION_PROGRAM_UNITS_H

@@ -4,22 +4,22 @@
 
 #include "vector.h"
 
+#include "particle_collection.h"
+
 #include "step.h"
 
-#include <iostream>
 #include <cmath>
 
-void step(Particle& p, const double dt) {
+void step(const std::shared_ptr<Box>& collectionBox, const std::string& filename, Particle& p, const double dt) {
     /*
      * dt default to TIME_STEP
      * Works on assumption c = 1
      */
-    if (p.is_massless()) {
+    if (p.isMassless()) {
         // Photon: move at speed c=1 along momentum direction
         // Probably needless overcomplication but want to ensure that the program is robust
-        std::cout << "MASSLESS\n";
-        const Vector<4> momentum = p.get_momentum();
-        const Vector<4> initial_position = p.get_position();
+        const Vector<4> momentum = p.getMomentum();
+        const Vector<4> initial_position = p.getPosition();
         Vector<4> final_position{};
         const double p_norm = std::sqrt(momentum[1] * momentum[1] +
                                   momentum[2] * momentum[2] +
@@ -30,18 +30,16 @@ void step(Particle& p, const double dt) {
             final_position[i] = initial_position[i] + (momentum[i] / p_norm) * dt * Globals::Constant::C;
         }
         final_position[0] = initial_position[0] + dt;
-        p.set_position(final_position);
+        p.setPosition(final_position);
     } else {
         // Massive particle
-        std::cout << "MASSIVE\n";
-        const Vector<4> initial_position = p.get_position();
+        const Vector<4> initial_position = p.getPosition();
         Vector<4> final_position{};
         for (int i = 1; i < 4; ++i) {
-            std::cout << p.get_momentum()[i] / p.get_momentum()[0] << ",";
-            final_position[i] = initial_position[i] + (p.get_momentum()[i] / p.get_momentum()[0]) * dt * Globals::Constant::C;
+            final_position[i] = initial_position[i] + (p.getMomentum()[i] / p.getMomentum()[0]) * dt * Globals::Constant::C;
         }
-        std::cout << "\n";
         final_position[0] = initial_position[0] + dt;
-        p.set_position(final_position);
+        p.setPosition(final_position);
     }
+    logEnergyIfInside(p, *collectionBox, filename);
 }

@@ -2,8 +2,8 @@
 // // Created by Tobias Sharman on 03/09/2025.
 // //
 //
-// #ifndef SIMULATION_PROGRAM_SPHERE_H
-// #define SIMULATION_PROGRAM_SPHERE_H
+// #ifndef PHYSICS_SIMULATION_PROGRAM_SPHERE_H
+// #define PHYSICS_SIMULATION_PROGRAM_SPHERE_H
 //
 // #include "Vector.h"
 //
@@ -26,4 +26,4 @@
 //     // double bounding_radius_{0.0f};
 // };
 //
-// #endif //SIMULATION_PROGRAM_SPHERE_H
+// #endif //PHYSICS_SIMULATION_PROGRAM_SPHERE_H

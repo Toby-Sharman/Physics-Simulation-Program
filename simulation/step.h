@@ -2,13 +2,12 @@
 // Created by Tobias Sharman on 01/09/2025.
 //
 
-#ifndef STEP_H
-#define STEP_H
+#ifndef PHYSICS_SIMULATION_PROGRAM_STEP_H
+#define PHYSICS_SIMULATION_PROGRAM_STEP_H
 
 #include "globals.h"
 #include "particle.h"
 
+void step(const std::shared_ptr<Box>& collectionBox, const std::string& filename, Particle& p, double dt = Globals::Constant::TIME_STEP);
 
-void step(Particle& p, double dt = Globals::Constant::TIME_STEP);
-
-#endif //STEP_H
+#endif //PHYSICS_SIMULATION_PROGRAM_STEP_H
