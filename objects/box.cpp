@@ -1,0 +1,26 @@
+//
+// Created by Tobias Sharman on 03/09/2025.
+//
+
+#include "box.h"
+
+#include <iostream>
+#include <format>
+#include <cmath>
+
+void Box::setSizeFromParameters(const Vector<3>& dimensions) {
+    size_ = Vector<3>{{dimensions[0], dimensions[1], dimensions[2]}};
+    // bounding_radius_ = std::sqrt(size_[0]*size_[0] + size_[1]*size_[1] + size_[2]*size_[2])/2.0f;
+}
+
+bool Box::containsPoint(const Vector<3>& world_point) const {
+    Vector<3> local = worldToLocal(world_point);
+
+    return std::abs(local[0]) <= size_[0]/2 &&
+           std::abs(local[1]) <= size_[1]/2 &&
+           std::abs(local[2]) <= size_[2]/2;
+}
+
+std::string Box::getSizeDescription() const {
+    return std::format("| Size = ({}, {}, {})", size_[0], size_[1], size_[2]);
+}

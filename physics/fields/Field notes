@@ -1,0 +1,32 @@
+Base
+    Uniform Applied Field
+        Define a global H or B vector ✅ Done a B field and H field from it
+
+    Assigning Material Properties
+        Store relative permeability or actual permeability ✅ Stored relative permeability in material db
+
+    Find what object a point is in
+        Implement on a shape by shape basis functions for contains point ✅ Box is properly implemented, sphere needs fixing
+        Allow to take both local and world coordinates???
+        Return all parent objects
+
+    Field superposition
+        If objects are very close may be weird
+        Have a min value for distance???
+
+Nice to have
+    Boundary Continuity
+
+    Define magnetic fields from objects
+
+    Shape/demagnetisation effects??? - Don't know too much on how works
+
+Should be very hard to implement
+    Material Saturation
+
+    Irregular shapes
+        Not really needed for main use case of this project
+
+    Dynamic effects
+        Eddy currents
+        Hysteresis

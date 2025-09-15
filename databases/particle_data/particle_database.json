@@ -1,0 +1,8 @@
+{
+  "photon": {
+    "charge": 0
+  },
+  "electron": {
+    "charge": -1
+  }
+}

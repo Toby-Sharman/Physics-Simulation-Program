@@ -1,0 +1,11 @@
+{
+  "vacuum": {
+    "relativePermeability": 1.0
+  },
+  "air": {
+    "relativePermeability": 1.00000037
+  },
+  "glass": {
+    "relativePermeability": 1.05
+  }
+}
