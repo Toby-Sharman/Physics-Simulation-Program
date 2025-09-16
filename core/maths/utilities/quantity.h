@@ -11,7 +11,7 @@
 struct Quantity {
     double value = 0.0;
     std::string unit;
-    double asDouble() const { return value; }
+    [[nodiscard]] double asDouble() const { return value; }
 };
 
 #endif //QUANTITY_H
