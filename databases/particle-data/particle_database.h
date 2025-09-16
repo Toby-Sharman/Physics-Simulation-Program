@@ -7,14 +7,25 @@
 
 #include "base_database.h"
 
-class ParticleDB : public BaseDB<ParticleDB> {
-public:
-    static double getCharge(const std::string& particle) {
-        return getProperty(particle, "charge");
+struct ParticleDB : BaseDB<ParticleDB> {
+    static std::string getSymbol(const std::string& particle) {
+        return getStringProperty(particle, "symbol");
     }
 
-    static double getMass(const std::string& particle) {
-        return getProperty(particle, "mass");
+    static Quantity getRestMass(const std::string& particle) {
+        return getQuantity(particle, "rest mass");
+    }
+
+    static double getCharge(const std::string& particle) {
+        return getNumericProperty(particle, "charge");
+    }
+
+    static double getSpin(const std::string& particle) {
+        return getNumericProperty(particle, "spin");
+    }
+
+    static std::string getParticleType(const std::string& particle) {
+        return getStringProperty(particle, "particle type");
     }
 };
 
