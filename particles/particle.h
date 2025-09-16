@@ -19,17 +19,24 @@ class Particle {
     public:
     Particle();
     Particle(
-        std::string  particle_name,
-        double rest_mass, // In MeV/c^2
+        std::string particle_name,
+        std::string symbol,
+        double rest_mass,
         double charge,
         double spin,
-        const Vector<4>& position, // (ct, x, y, z) In Mev^-1, MeV/c
-        const Vector<4>& momentum, // (E/c, p_x, p_y, p_z) In MeV
+        const Vector<4>& position, // (ct, x, y, z)
+        const Vector<4>& momentum, // (E/c, p_x, p_y, p_z)
         const Vector<3>& polarisation // (P_x, P_y, P_z)
         );
+    explicit Particle(
+        const std::string& particle_name,
+        const Vector<4>& position = Vector<4>(),
+        const Vector<4>& momentum = Vector<4>(),
+        const Vector<3>& polarisation = Vector<3>());
 
     // Getters
     [[nodiscard]] std::string getParticleName() const;
+    [[nodiscard]] std::string getSymbol() const;
     [[nodiscard]] double getRestMass() const;
     [[nodiscard]] double getCharge() const;
     [[nodiscard]] double getSpin() const;
@@ -40,6 +47,7 @@ class Particle {
 
     // Setters
     void setParticleName(const std::string& particle_type);
+    void setSymbol(const std::string& symbol);
     void setRestMass(double rest_mass);
     void setCharge(double charge);
     void setSpin(double spin);
@@ -60,7 +68,8 @@ class Particle {
 
     private:
     std::string m_particle_Name;
-    double m_rest_mass; // In eV
+    std::string m_symbol;
+    double m_rest_mass;
     double m_charge;
     double m_spin;
     Vector<4> m_position; // (ct, x, y, z)

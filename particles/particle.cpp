@@ -5,14 +5,12 @@
 // Last Modified: 29/08/2025                                                                      //
 // Description:   Implementation of the Particles module                                          //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-//
-// TODO: Shift all particle attributes with units to vector data type
-// TODO: Change particle labelling to units not type, i.e. m not x, y, or z
-// TODO: Could shift trivial getters and setters to in just header (with inline)
+
+#include "particle.h"
 
 #include "vector.h"
 
-#include "particle.h"
+#include "particle_database.h"
 
 #include <iostream>
 #include <string>
@@ -32,6 +30,7 @@ Particle::Particle()
 // Parameterized constructor
 Particle::Particle(
     std::string particle_name,
+    std::string symbol,
     double rest_mass,
     double charge,
     double spin,
@@ -39,16 +38,34 @@ Particle::Particle(
     const Vector<4>& momentum,
     const Vector<3>& polarisation)
 : m_particle_Name(std::move(particle_name)),
+  m_symbol(std::move(symbol)),
   m_rest_mass(rest_mass),
   m_charge(charge),
   m_spin(spin),
-  m_position(position), // TODO: Add auto label assignment if unspecified - will require two functions one with just data and one for data and values, also have check for if allowed values are of the correct type
+  m_position(position),
   m_momentum(momentum),
   m_polarisation(polarisation)
 {}
 
+// Auto constructor using database functions
+Particle::Particle(const std::string& particle_name,
+                   const Vector<4>& position,
+                   const Vector<4>& momentum,
+                   const Vector<3>& polarisation)
+: m_particle_Name(particle_name),
+  m_position(position),
+  m_momentum(momentum),
+  m_polarisation(polarisation)
+{
+    m_symbol = ParticleDB::getSymbol(particle_name);
+    m_rest_mass = ParticleDB::getRestMass(particle_name).asDouble();
+    m_charge = ParticleDB::getCharge(particle_name);
+    m_spin = ParticleDB::getSpin(particle_name);
+}
+
 // Getters
 std::string Particle::getParticleName() const { return m_particle_Name; }
+std::string Particle::getSymbol() const { return m_symbol; }
 double Particle::getRestMass() const { return m_rest_mass; }
 double Particle::getCharge() const { return m_charge; }
 double Particle::getSpin() const { return m_spin; }
@@ -59,10 +76,11 @@ const Vector<3>& Particle::getPolarisation() const { return m_polarisation; }
 
 // Setters
 void Particle::setParticleName(const std::string& particle_type) { m_particle_Name = particle_type; }
+void Particle::setSymbol(const std::string& symbol) { m_symbol = symbol; }
 void Particle::setRestMass(double rest_mass) { m_rest_mass = rest_mass; }
 void Particle::setCharge(double charge) { m_charge = charge; }
 void Particle::setSpin(double spin) { m_spin = spin; }
-void Particle::setPosition(const Vector<4>& position) { m_position = position; } // TODO: Extend initial assignment label handling to setter functions
+void Particle::setPosition(const Vector<4>& position) { m_position = position; }
 void Particle::setMomentum(const Vector<4>& momentum) { m_momentum = momentum; }
 void Particle::setPolarisation(const Vector<3>& polarisation) { m_polarisation = polarisation; }
 
