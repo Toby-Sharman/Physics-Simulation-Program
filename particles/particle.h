@@ -19,7 +19,7 @@ class Particle {
     public:
     Particle();
     Particle(
-        std::string  particle_type,
+        std::string  particle_name,
         double rest_mass, // In MeV/c^2
         double charge,
         double spin,
@@ -29,7 +29,7 @@ class Particle {
         );
 
     // Getters
-    [[nodiscard]] std::string getParticleType() const;
+    [[nodiscard]] std::string getParticleName() const;
     [[nodiscard]] double getRestMass() const;
     [[nodiscard]] double getCharge() const;
     [[nodiscard]] double getSpin() const;
@@ -39,7 +39,7 @@ class Particle {
 
 
     // Setters
-    void setParticleType(const std::string& particle_type);
+    void setParticleName(const std::string& particle_type);
     void setRestMass(double rest_mass);
     void setCharge(double charge);
     void setSpin(double spin);
@@ -59,7 +59,7 @@ class Particle {
     [[nodiscard]] bool isMassless() const { return std::abs(m_rest_mass) <= Globals::Constant::MASSLESS_TOLERANCE; }
 
     private:
-    std::string m_particle_type;
+    std::string m_particle_Name;
     double m_rest_mass; // In eV
     double m_charge;
     double m_spin;

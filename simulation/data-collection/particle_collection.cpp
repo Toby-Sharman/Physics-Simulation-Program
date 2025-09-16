@@ -21,7 +21,7 @@ void logEnergyIfInside(const Particle& p, const Box& box, const std::string& bas
         // Static map: track next file number per particle type
         static std::map<std::string, int> fileCounter;
 
-        const std::string& type = p.getParticleType();
+        const std::string& type = p.getParticleName();
 
         // If this particle type hasn't been logged yet, create a new numbered file
         if (!fileMap.contains(type)) {

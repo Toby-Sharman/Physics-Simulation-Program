@@ -20,7 +20,7 @@
 
 // Default constructor with proper physics labels
 Particle::Particle()
-: m_particle_type("Unknown"),
+: m_particle_Name("Unknown"),
   m_rest_mass(0.0),
   m_charge(0.0),
   m_spin(0.0),
@@ -31,14 +31,14 @@ Particle::Particle()
 
 // Parameterized constructor
 Particle::Particle(
-    std::string particle_type,
+    std::string particle_name,
     double rest_mass,
     double charge,
     double spin,
     const Vector<4>& position,
     const Vector<4>& momentum,
     const Vector<3>& polarisation)
-: m_particle_type(std::move(particle_type)),
+: m_particle_Name(std::move(particle_name)),
   m_rest_mass(rest_mass),
   m_charge(charge),
   m_spin(spin),
@@ -48,7 +48,7 @@ Particle::Particle(
 {}
 
 // Getters
-std::string Particle::getParticleType() const { return m_particle_type; }
+std::string Particle::getParticleName() const { return m_particle_Name; }
 double Particle::getRestMass() const { return m_rest_mass; }
 double Particle::getCharge() const { return m_charge; }
 double Particle::getSpin() const { return m_spin; }
@@ -58,7 +58,7 @@ const Vector<3>& Particle::getPolarisation() const { return m_polarisation; }
 
 
 // Setters
-void Particle::setParticleType(const std::string& particle_type) { m_particle_type = particle_type; }
+void Particle::setParticleName(const std::string& particle_type) { m_particle_Name = particle_type; }
 void Particle::setRestMass(double rest_mass) { m_rest_mass = rest_mass; }
 void Particle::setCharge(double charge) { m_charge = charge; }
 void Particle::setSpin(double spin) { m_spin = spin; }
@@ -68,7 +68,7 @@ void Particle::setPolarisation(const Vector<3>& polarisation) { m_polarisation =
 
 // Print function
 void Particle::print() const {
-    std::cout << "Particle Type: " << m_particle_type << "\n";
+    std::cout << "Particle Type: " << m_particle_Name << "\n";
     std::cout << "Rest Mass: " << m_rest_mass << "\n";
     std::cout << "Charge: " << m_charge << "\n";
     std::cout << "Spin: " << m_spin << "\n";
