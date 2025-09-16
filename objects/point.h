@@ -19,8 +19,7 @@ class Point : public Object {
     std::string getSizeDescription() const override;
 
     private:
-    Vector<1> size_ = Vector<1>{{0}};
-    Vector<3> position_;
+    Vector<1> m_size = Vector<1>{{0}};
     // double bounding_radius_{0.0f};
 };
 

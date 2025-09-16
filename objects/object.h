@@ -50,7 +50,7 @@ class Object : public std::enable_shared_from_this<Object> {
     std::shared_ptr<T> addChild(Args&&... args) {
         auto child = construct<T>(std::forward<Args>(args)...); // Constructor is below
         child->parent_ = shared_from_this();
-        children_.push_back(child);
+        m_children.push_back(child);
         return child;
     }
 
@@ -63,12 +63,12 @@ class Object : public std::enable_shared_from_this<Object> {
     // Set size from params not included as it can take a variety of inputs depending on object type
 
     protected:
-    std::string name_;
-    std::string type_;
-    std::string material_;
-    Matrix<double,4,4> transformation_;
-    std::weak_ptr<Object> parent_;
-    std::vector<std::shared_ptr<Object>> children_;
+    std::string m_name;
+    std::string m_type;
+    std::string m_material;
+    Matrix<double,4,4> m_transformation;
+    std::weak_ptr<Object> m_parent;
+    std::vector<std::shared_ptr<Object>> m_children;
 };
 
 // Templated helper: create child in place with constructor arguments

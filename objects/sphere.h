@@ -22,7 +22,7 @@
 //     virtual void describe_self(int indent) const override;
 //
 // private:
-//     Vector<1> radius_{1.0f};  // Using Vector<1> for consistency
+//     Vector<1> m_radius{1.0f};  // Using Vector<1> for consistency
 //     // double bounding_radius_{0.0f};
 // };
 //

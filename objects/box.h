@@ -18,7 +18,7 @@ protected:
 
 
 private:
-    Vector<3> size_;  // Using your Vector<3> class
+    Vector<3> m_size;  // Using your Vector<3> class
     // double bounding_radius_{0.0f};
 };
 
