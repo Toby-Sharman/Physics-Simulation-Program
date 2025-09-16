@@ -7,6 +7,7 @@
 
 #include "globals.h"
 #include "particle.h"
+#include "box.h"
 
 void step(const std::shared_ptr<Box>& collectionBox, Particle& p, double dt = Globals::Constant::TIME_STEP);
 
