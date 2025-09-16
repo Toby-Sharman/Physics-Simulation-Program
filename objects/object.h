@@ -49,7 +49,7 @@ class Object : public std::enable_shared_from_this<Object> {
     template<typename T, typename... Args>
     std::shared_ptr<T> addChild(Args&&... args) {
         auto child = construct<T>(std::forward<Args>(args)...); // Constructor is below
-        child->parent_ = shared_from_this();
+        child->m_parent = shared_from_this();
         m_children.push_back(child);
         return child;
     }
