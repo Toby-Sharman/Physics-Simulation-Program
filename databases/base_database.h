@@ -33,15 +33,14 @@ struct DBEntry {
 template <typename Derived>
 class BaseDB {
 public:
-
     // Load from binary file
     static void loadFromBinary(const std::string& filename) {
-        db_.clear();
+        m_db.clear();
         std::ifstream in(filename, std::ios::binary);
         if (!in)
             throw std::runtime_error(std::format("Cannot open database file '{}'", filename));
 
-        // Step 1: read unit table
+        // Read unit table
         uint16_t numUnits;
         if (!BinaryIO::read(in, numUnits))
             throw std::runtime_error("Failed to read number of units");
@@ -50,7 +49,7 @@ public:
             if (!BinaryIO::readString(in, unitTable[i]))
                 throw std::runtime_error("Failed to read unit string");
 
-        // Step 2: read entries
+        // Read entries
         while (true) {
             DBEntry entry;
             if (!BinaryIO::readString(in, entry.name)) break; // EOF
@@ -111,7 +110,7 @@ public:
                 entry.properties.push_back(std::move(prop));
             }
 
-            db_.push_back(std::move(entry));
+            m_db.push_back(std::move(entry));
         }
     }
 
@@ -120,30 +119,30 @@ public:
         std::ofstream out(filename, std::ios::binary);
         if (!out) throw std::runtime_error(std::format("Cannot open file '{}'", filename));
 
-        // Step 1: collect unique units
+        // Collect unique units
         std::unordered_map<std::string, uint16_t> unitIndexMap;
         std::vector<std::string> unitTable;
 
-        for (const auto&[name, properties] : db_) {
+        for (const auto&[name, properties] : m_db) {
             for (const auto& prop : properties) {
                 if (prop.type == PropertyType::QUANTITY) {
-                    if (const std::string& u = std::get<Quantity>(prop.value).unit; !unitIndexMap.contains(u)) {
-                        const auto idx = static_cast<uint16_t>(unitTable.size());
-                        unitTable.push_back(u);
-                        unitIndexMap[u] = idx;
+                    if (const std::string& unit = std::get<Quantity>(prop.value).unit; !unitIndexMap.contains(unit)) {
+                        const auto i = static_cast<uint16_t>(unitTable.size());
+                        unitTable.push_back(unit);
+                        unitIndexMap[unit] = i;
                     }
                 }
             }
         }
 
-        // Step 2: write unit table
+        // Write unit table
         const auto numUnits = static_cast<uint16_t>(unitTable.size());
         BinaryIO::write(out, numUnits);
         for (const auto& u : unitTable)
             BinaryIO::writeString(out, u);
 
-        // Step 3: write entries
-        for (const auto&[dbName, properties] : db_) {
+        // Write entries
+        for (const auto&[dbName, properties] : m_db) {
             BinaryIO::writeString(out, dbName);
             auto propCount = static_cast<uint32_t>(properties.size());
             BinaryIO::write(out, propCount);
@@ -177,43 +176,54 @@ public:
 
     // Check the db contains a specified entry
     static bool contains(const std::string& entryName) {
-        return std::ranges::any_of(db_, [&](const DBEntry& e){ return e.name == entryName; });
+        return std::ranges::any_of(m_db, [&](const DBEntry& entry){ return entry.name == entryName; });
+    }
+
+    // Lookup entry (throws error if not found)
+    static const DBEntry& findEntry(const std::string& entryName) {
+        auto itEntry = std::find_if(m_db.begin(), m_db.end(),
+            [&](const DBEntry& entry){ return entry.name == entryName; });
+        if (itEntry == m_db.end())
+            throw std::runtime_error(std::format("Unknown entry '{}'", entryName));
+        return *itEntry;
+    }
+
+    // Lookup property (throws error if not found)
+    static const DBProperty& findProperty(const DBEntry& entry, const std::string& propertyName) {
+        auto itProperty = std::find_if(entry.properties.begin(), entry.properties.end(),
+            [&](const DBProperty& property){ return property.name == propertyName; });
+        if (itProperty == entry.properties.end())
+            throw std::runtime_error(std::format("Unknown property '{}' for entry '{}'", propertyName, entry.name));
+        return *itProperty;
+    }
+
+    // Access string property
+    static std::string getStringProperty(const std::string& entryName, const std::string& property) {
+        const auto& entry = findEntry(entryName);
+        const auto& dbProperty  = findProperty(entry, property);
+        return std::get<std::string>(dbProperty.value);
     }
 
     // Access numeric property
-    static double getProperty(const std::string& entryName, const std::string& property) {
-        auto itEntry = std::find_if(db_.begin(), db_.end(),
-            [&](const DBEntry& e){ return e.name == entryName; });
-        if (itEntry == db_.end())
-            throw std::runtime_error(std::format("Unknown entry '{}'", entryName));
-
-        auto itProp = std::find_if(itEntry->properties.begin(), itEntry->properties.end(),
-            [&](const DBProperty& p){ return p.name == property; });
-        if (itProp == itEntry->properties.end())
-            throw std::runtime_error(std::format("Unknown property '{}' for entry '{}'", property, entryName));
+    static double getNumericProperty(const std::string& entryName, const std::string& property) {
+        const auto& entry = findEntry(entryName);
+        const auto& dbProperty  = findProperty(entry, property);
 
         return std::visit([]<typename T0>(T0&& val) -> double {
             using T = std::decay_t<T0>;
-            if constexpr(std::is_same_v<T, int32_t> || std::is_same_v<T, float> || std::is_same_v<T, double>)
+            if constexpr (std::is_same_v<T, int32_t> || std::is_same_v<T, float> || std::is_same_v<T, double>)
                 return static_cast<double>(val);
-            else if constexpr(std::is_same_v<T, Quantity>)
+            else if constexpr (std::is_same_v<T, Quantity>)
                 return val.value;
             else
                 throw std::runtime_error("Property is not numeric");
-        }, itProp->value);
+        }, dbProperty.value);
     }
 
     // Access Quantity property
     static Quantity getQuantity(const std::string& entryName, const std::string& property) {
-        auto itEntry = std::find_if(db_.begin(), db_.end(),
-            [&](const DBEntry& e){ return e.name == entryName; });
-        if (itEntry == db_.end())
-            throw std::runtime_error(std::format("Unknown entry '{}'", entryName));
-
-        auto itProp = std::find_if(itEntry->properties.begin(), itEntry->properties.end(),
-            [&](const DBProperty& p){ return p.name == property; });
-        if (itProp == itEntry->properties.end())
-            throw std::runtime_error(std::format("Unknown property '{}' for entry '{}'", property, entryName));
+        const auto& entry = findEntry(entryName);
+        const auto& dbProperty  = findProperty(entry, property);
 
         return std::visit([]<typename T0>(T0&& val) -> Quantity {
             using T = std::decay_t<T0>;
@@ -221,11 +231,11 @@ public:
                 return val;
             else
                 throw std::runtime_error("Property is not a Quantity");
-        }, itProp->value);
+        }, dbProperty.value);
     }
 
 protected:
-    static inline std::vector<DBEntry> db_;
+    static inline std::vector<DBEntry> m_db;
 };
 
 
