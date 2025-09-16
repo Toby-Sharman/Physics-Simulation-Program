@@ -17,6 +17,7 @@ class Globals {
     struct Constant {
         // Compile-time constants
         static constexpr std::string FILENAME_PREFIX = "Energies";            // Data output file name prefix (in form prefix[run#]
+        static constexpr std::string OUTPUT_FOLDER = "Output";                // Data output file name prefix (in form prefix[run#]
 
         static constexpr double TIME_STEP = 1e-8;                             // Seconds
         static constexpr double MASSLESS_TOLERANCE = 0;                       // Massless tolerance

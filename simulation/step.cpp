@@ -2,15 +2,15 @@
 // Created by Tobias Sharman on 01/09/2025.
 //
 
+#include "step.h"
+
 #include "vector.h"
 
 #include "particle_collection.h"
 
-#include "step.h"
-
 #include <cmath>
 
-void step(const std::shared_ptr<Box>& collectionBox, const std::string& filename, Particle& p, const double dt) {
+void step(const std::shared_ptr<Box>& collectionBox, Particle& p, const double dt) {
     /*
      * dt default to TIME_STEP
      * Works on assumption c = 1
@@ -41,5 +41,5 @@ void step(const std::shared_ptr<Box>& collectionBox, const std::string& filename
         final_position[0] = initial_position[0] + dt;
         p.setPosition(final_position);
     }
-    logEnergyIfInside(p, *collectionBox, filename);
+    logEnergyIfInside(p, *collectionBox);
 }

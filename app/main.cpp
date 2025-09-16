@@ -7,7 +7,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "config.h"
-#include "output_file_name.h"
 
 #include "vector.h"
 #include "matrix.h"
@@ -49,57 +48,78 @@
 int main() {
     MaterialDB::loadFromBinary(MATERIAL_DATABASE_DB_PATH);
     ParticleDB::loadFromBinary(PARTICLE_DATABASE_DB_PATH);
-    const std::string filename = generateSequentialFilename();
 
     // Objects
+    /* Not to scale
+     * + -------------------------------------------------- +
+     * | World                                 |            |
+     * |              + ---------------------- +            |
+     * |              | Cell                   |            |
+     * |              |     + ---------- +     | Collection |
+     * |       0      |     |   Vapour   |     |            |
+     * |   Particle   |     + ---------- +     |   Region   |
+     * |    Source    |                        |            |
+     * |              + ---------------------- +            |
+     * |                                       |            |
+     * + -------------------------------------------------- +
+     *
+     * World 100mm x 50mm x 50mm
+     * Entire cell 25mm x 15mm x 15mm
+     * Vapour cell 3mm x 3mm x 3mm
+     */
+
     const auto world = construct<Box>(
         Name("World"),
         Material("vacuum"),
-        Size(Vector<3>(Data{100.0,100.0,20.0}, Labels{"L", "W", "H"}, Units{"m", "m", "m"}))
+        Size(Vector<3>(Data{100.0,50.0,50.0}, Labels{"L", "W", "H"}, Units{"mm", "mm", "mm"}))
         );
-    auto cell = world->addChild<Box>(
+    const auto cell = world->addChild<Box>(
         Name("Cell"),
         Material("glass"),
-        Position(Vector<3>(Data{0.0,0.0,0.0}, Labels{"x", "y", "z"}, Units{"m", "m", "m"})),
-        Size(Vector<3>(Data{4.0,4.0,4.0}, Labels{"L", "W", "H"}, Units{"m", "m", "m"}))
+        Size(Vector<3>(Data{25.0,15.0,15.0}, Labels{"L", "W", "H"}, Units{"mm", "mm", "mm"}))
         );
-    auto collection = world->addChild<Box>(
+    const auto vapourCell = cell->addChild<Box>(
+        Name("Vapour Cell"),
+        Material("glass"), // TODO
+        Size(Vector<3>(Data{3.0,3.0,3.0}, Labels{"L", "W", "H"}, Units{"mm", "mm", "mm"}))
+        );
+    const auto collection = world->addChild<Box>( // TODO: Change collection from a box to if particle x > 12.5mm
         Name("Collection"),
         Material("vacuum"),
-        Position(Vector<3>(Data{26.0,0.0,0.0}, Labels{"x", "y", "z"}, Units{"m", "m", "m"})),
-        Size(Vector<3>(Data{48.0,50.0,20.0}, Labels{"L", "W", "H"}, Units{"m", "m", "m"}))
+        Position(Vector<3>(Data{12.5+37.5/2,0.0,0.0}, Labels{"x", "y", "z"}, Units{"m", "m", "m"})),
+        Size(Vector<3>(Data{37.5,50.0,50.0}, Labels{"L", "W", "H"}, Units{"m", "m", "m"}))
         );
     // Print hierarchy
     world->printHierarchy();
 
-    const auto field = getFieldAtPoint(Vector<3>(
-        Data{0.0,0.0,20.0},
-        Labels{"x", "y", "z"},
-        Units{"T", "T", "T"}), world);
-    field.print();
-
-    std::cout << "\n\n\n" << std::endl;
+    // const auto field = getFieldAtPoint(Vector<3>(
+    //     Data{0.0,0.0,20.0},
+    //     Labels{"x", "y", "z"},
+    //     Units{"T", "T", "T"}), world);
+    // field.print();
+    //
+    // std::cout << "\n\n\n" << std::endl;
 
     // Particles
     static constexpr double mass = 1.0;
     auto custom = Particle("electron", mass, -1, 0.5,Vector<4>({0.0, 0.0, 0.0, 0.0}), Vector<4>({std::sqrt( mass*mass + 0.1005*0.1005 ),0.1005,0,0}), Vector<3>({0,0,0}));  // Create an object of MyClass
-    for(int i=0; i<5; ++i) {
-        step(collection, filename, custom);
-        std::cout << "t=" << custom.getPosition()[0]
-                  << " x=" << custom.getPosition()[1]
-                  << " y=" << custom.getPosition()[2]
-                  << " z=" << custom.getPosition()[3] << "\n";
+    for(int i=0; i<100; ++i) {
+        step(collection, custom);
+        // std::cout << "t=" << custom.getPosition()[0]
+        //           << " x=" << custom.getPosition()[1]
+        //           << " y=" << custom.getPosition()[2]
+        //           << " z=" << custom.getPosition()[3] << "\n";
     }
 
-    std::cout << "\n\n\n" << std::endl;
+    // std::cout << "\n\n\n" << std::endl;
 
     // Photon
     auto photon = Particle("photon", 0, 0, 1,Vector<4>({0,0,0,0}), Vector<4>({1,1,0,0}), Vector<3>({0,0,0}));  // Create an object of MyClass
     for(int i=0; i<25; ++i) {
-        step(collection, filename,photon);
-        std::cout << "t=" << photon.getPosition()[0]
-                  << " x=" << photon.getPosition()[1]
-                  << " y=" << photon.getPosition()[2]
-                  << " z=" << photon.getPosition()[3] << "\n";
+    step(collection, photon);
+    // std::cout << "t=" << photon.getPosition()[0]
+    //           << " x=" << photon.getPosition()[1]
+    //           << " y=" << photon.getPosition()[2]
+    //           << " z=" << photon.getPosition()[3] << "\n";
     }
 }

@@ -57,9 +57,6 @@ set(PROJECT_INCLUDE_DIR
 )
 target_include_directories(Simulation_program PRIVATE ${PROJECT_INCLUDE_DIR})
 
-# Create Output directory in build directory
-file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/Output")
-
 target_link_libraries(Simulation_program PRIVATE nlohmann_json::nlohmann_json)
 
 # -------------------------

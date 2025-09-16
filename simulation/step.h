@@ -8,6 +8,6 @@
 #include "globals.h"
 #include "particle.h"
 
-void step(const std::shared_ptr<Box>& collectionBox, const std::string& filename, Particle& p, double dt = Globals::Constant::TIME_STEP);
+void step(const std::shared_ptr<Box>& collectionBox, Particle& p, double dt = Globals::Constant::TIME_STEP);
 
 #endif //PHYSICS_SIMULATION_PROGRAM_STEP_H
