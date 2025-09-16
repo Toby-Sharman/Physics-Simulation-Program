@@ -1,8 +1,93 @@
 {
   "photon": {
-    "charge": 0
+    "symbol": "γ",
+    "rest_mass": { "value": 0.0, "unit": "eV" },
+    "charge": 0,
+    "spin": 1.0,
+    "particle_type": "boson"
+  },
+  "gluon": {
+    "symbol": "g",
+    "rest_mass": { "value": 0.0, "unit": "eV" },
+    "charge": 0,
+    "spin": 1.0,
+    "particle_type": "boson"
+  },
+  "W_plus": {
+    "symbol": "W+",
+    "rest_mass": { "value": 80.3692e9, "unit": "eV" },
+    "charge": 1,
+    "spin": 1.0,
+    "particle_type": "boson"
+  },
+  "W_minus": {
+    "symbol": "W-",
+    "rest_mass": { "value": 80.3692e9, "unit": "eV" },
+    "charge": -1,
+    "spin": 1.0,
+    "particle_type": "boson"
+  },
+  "Z_boson": {
+    "symbol": "Z0",
+    "rest_mass": { "value": 91.1880e9, "unit": "eV" },
+    "charge": 0,
+    "spin": 1.0,
+    "particle_type": "boson"
   },
   "electron": {
-    "charge": -1
+    "symbol": "e-",
+    "rest_mass": { "value": 548.579909065e-6, "unit": "u" },
+    "charge": -1,
+    "spin": 0.5,
+    "particle_type": "lepton"
+  },
+  "muon": {
+    "symbol": "μ-",
+    "rest_mass": { "value": 0.1134289259 , "unit": "u" },
+    "charge": -1,
+    "spin": 0.5,
+    "particle_type": "lepton"
+  },
+  "tau": {
+    "symbol": "τ-",
+    "rest_mass": { "value": 1776.93e6, "unit": "eV" },
+    "charge": -1,
+    "spin": 0.5,
+    "particle_type": "lepton"
+  },
+  "electron_neutrino": {
+    "symbol": "ν_e",
+    "rest_mass": { "value": 0.0, "unit": "eV" },
+    "charge": 0,
+    "spin": 0.5,
+    "particle_type": "lepton"
+  },
+  "muon_neutrino": {
+    "symbol": "ν_μ",
+    "rest_mass": { "value": 0.0, "unit": "eV" },
+    "charge": 0,
+    "spin": 0.5,
+    "particle_type": "lepton"
+  },
+  "tau_neutrino": {
+    "symbol": "ν_τ",
+    "rest_mass": { "value": 0.0, "unit": "eV" },
+    "charge": 0,
+    "spin": 0.5,
+    "particle_type": "lepton"
+  },
+  "proton": {
+    "symbol": "p",
+    "rest_mass": { "value": 1.007276466621, "unit": "u" },
+    "charge": 1,
+    "spin": 0.5,
+    "particle_type": "baryon"
+  },
+  "neutron": {
+    "symbol": "n",
+    "rest_mass": { "value": 1.00866491595, "unit": "u" },
+    "charge": 0,
+    "spin": 0.5,
+    "particle_type": "baryon"
   }
 }
