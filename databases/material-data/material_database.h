@@ -9,8 +9,7 @@
 
 #include "base_database.h"
 
-class MaterialDB : public BaseDB<MaterialDB> {
-public:
+struct MaterialDB : BaseDB<MaterialDB> {
     static double getRelativePermeability(const std::string& material) {
         return getNumericProperty(material, "relativePermeability");
     }
