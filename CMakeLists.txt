@@ -66,6 +66,7 @@ add_executable(json_to_bin databases/json_to_bin.cpp)
 set(JSON_TO_BIN_INCLUDE_DIR
         databases
         databases/utilities
+        core/maths/utilities
 )
 target_include_directories(json_to_bin PRIVATE ${JSON_TO_BIN_INCLUDE_DIR})
 target_link_libraries(json_to_bin PRIVATE nlohmann_json::nlohmann_json)

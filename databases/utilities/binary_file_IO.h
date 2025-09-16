@@ -5,9 +5,14 @@
 #ifndef BINARY_FILE_IO_H
 #define BINARY_FILE_IO_H
 
-#include <fstream>
+
+#include "quantity.h"
+
+#include <vector>
+#include <unordered_map>
 #include <string>
-#include <cstdint>
+#include <fstream>
+#include <cstdint> // For uint8_t ignore warning
 #include <type_traits>
 
 // Enum (or include from a separate header)
@@ -15,7 +20,8 @@ enum class PropertyType : uint8_t {
     BOOL = 0,
     INT = 1,
     DOUBLE = 2,
-    STRING = 3
+    STRING = 3,
+    QUANTITY = 4
 };
 
 namespace BinaryIO {
@@ -43,6 +49,25 @@ namespace BinaryIO {
         str.resize(len);
         in.read(str.data(), len);
         return static_cast<bool>(in);
+    }
+
+    // Writes a Quantity using the cached unit index map
+    inline void writeQuantity(std::ofstream& out, const Quantity& q, const std::unordered_map<std::string, uint16_t>& unitIndexMap) {
+        write(out, q.value);
+        auto it = unitIndexMap.find(q.unit);
+        if (it == unitIndexMap.end())
+            throw std::runtime_error("Unknown unit: " + q.unit);
+        write(out, it->second); // uint16_t unit index
+    }
+
+    // Reads a Quantity using the file-stored unit table
+    inline bool readQuantity(std::ifstream& in, Quantity& q, const std::vector<std::string>& unitTable) {
+        if (!read(in, q.value)) return false;
+        uint16_t idx;
+        if (!read(in, idx)) return false;
+        if (idx >= unitTable.size()) return false;
+        q.unit = unitTable[idx];
+        return true;
     }
 
     // For property type section of binary
