@@ -12,7 +12,7 @@
 class MaterialDB : public BaseDB<MaterialDB> {
 public:
     static double getRelativePermeability(const std::string& material) {
-        return getProperty(material, "relativePermeability");
+        return getNumericProperty(material, "relativePermeability");
     }
 };
 
