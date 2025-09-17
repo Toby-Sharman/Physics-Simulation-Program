@@ -51,10 +51,13 @@ target_sources(Simulation_program PRIVATE
         objects/sphere.cpp
         objects/point.cpp
         particles/particle.cpp
+        particles/particle_manager.cpp
+        particles/particle_source.cpp
         physics/fields/field_solver.cpp
         physics/fields/field_boundary_handling.cpp
         simulation/step.cpp
         simulation/data-collection/particle_collection.cpp
+        simulation/particle-movement/particle_movement.cpp
 )
 
 # Include directories
@@ -75,6 +78,7 @@ target_include_directories(Simulation_program PRIVATE
         physics/fields
         simulation
         simulation/data-collection
+        simulation/particle-movement
 )
 
 target_link_libraries(Simulation_program PRIVATE nlohmann_json::nlohmann_json)
