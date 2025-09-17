@@ -12,10 +12,13 @@
 #include "box.h"
 
 #include <string>
+#include <memory>
 
-// Logs the particle's energy to a CSV file if it is inside the given box
-void logEnergyIfInside(const Particle &p, const Box &box,
+// Logs the particle's energy if inside the box and deletes it if condition met
+void logEnergyIfInside(std::unique_ptr<Particle>& p,
+                       const Box& box,
                        const std::string &baseFolder = Globals::Constant::OUTPUT_FOLDER,
                        const std::string &baseFilename = Globals::Constant::FILENAME_PREFIX);
+
 
 #endif //PHYSICS_SIMULATION_PROGRAM_PARTICLE_COLLECTION_H
