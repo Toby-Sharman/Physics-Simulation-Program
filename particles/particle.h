@@ -34,6 +34,8 @@ class Particle {
         const Vector<4>& momentum = Vector<4>(),
         const Vector<3>& polarisation = Vector<3>());
 
+    ~Particle() = default;
+
     // Getters
     [[nodiscard]] std::string getParticleName() const;
     [[nodiscard]] std::string getSymbol() const;
