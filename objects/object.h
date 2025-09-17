@@ -7,6 +7,8 @@
 #ifndef PHYSICS_SIMULATION_PROGRAM_OBJECT_H
 #define PHYSICS_SIMULATION_PROGRAM_OBJECT_H
 
+#include "quantity.h"
+
 #include "vector.h"
 #include "matrix.h"
 
@@ -82,7 +84,7 @@ std::shared_ptr<T> construct(Args&&... args) {
 
     object->setType(ObjectTypeName<T>::name);
     object->setName(ctx.name);
-    object->setPosition(ctx.position[0], ctx.position[1], ctx.position[2]);
+    object->setPosition(ctx.position[0].asDouble(), ctx.position[1].asDouble(), ctx.position[2].asDouble());
     object->setRotationMatrix(ctx.rotation);
     object->setMaterial(ctx.material);
 

@@ -128,12 +128,13 @@ std::ostream& operator<<(std::ostream& os, const Matrix<T,R,C>& m) {
 
 // Specialization: Multiply 4x4 matrix by 3D vector (homogeneous transform
 inline Vector<3> operator*(const Matrix<double,4,4>& m, const Vector<3>& v) {
-    auto result = Vector<3>{};
+    auto result =  Vector<3>{};
     for (int i = 0; i < 3; i++) {
-        result[i] = m[i][0] * v[0] +
-                    m[i][1] * v[1] +
-                    m[i][2] * v[2] +
-                    m[i][3]; // translation
+        result[i] = Quantity(
+            m[i][0] * v[0].asDouble() +
+            m[i][1] * v[1].asDouble() +
+            m[i][2] * v[2].asDouble() +
+            m[i][3]); // translation
     }
     return result;
 }

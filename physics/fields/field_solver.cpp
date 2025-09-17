@@ -9,7 +9,7 @@
 
 #include "field_solver.h"
 
-auto GLOBAL_B = Vector<3>{Data{0.0, 0.0, 1.0}, Labels{"x", "y", "z"}, Units{"T", "T", "T"}};
+auto GLOBAL_B = Vector<3>{{0.0, 0.0, 1.0},"T"};
 auto Global_H = GLOBAL_B / Globals::Constant::MU0;
 
 Vector<3> getFieldAtPoint(const Vector<3>& point, const std::shared_ptr<Object>& root) {

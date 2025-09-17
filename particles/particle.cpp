@@ -22,9 +22,9 @@ Particle::Particle()
   m_rest_mass(0.0),
   m_charge(0.0),
   m_spin(0.0),
-  m_position(Data({0.0, 0.0, 0.0, 0.0}), Labels({"ct", "x", "y", "z"})),
-  m_momentum(Data({0.0, 0.0, 0.0, 0.0}), Labels({"E/c", "p_x", "p_y", "p_z"})),
-  m_polarisation(Data({0.0, 0.0, 0.0}), Labels({"P_x", "P_y", "P_z"}))
+  m_position({0.0, 0.0, 0.0, 0.0}),
+  m_momentum({0.0, 0.0, 0.0, 0.0}),
+  m_polarisation({0.0, 0.0, 0.0, 0.0})
 {}
 
 // Parameterized constructor
@@ -101,5 +101,5 @@ void Particle::print() const {
 // Lorentz factor
 double Particle::gamma() const {
     if (isMassless()) return 1.0; // Not used for photons
-    return m_momentum[0] / m_rest_mass; // assuming units c=1
+    return m_momentum[0].asDouble() / m_rest_mass; // assuming units c=1
 }

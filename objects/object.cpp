@@ -79,16 +79,16 @@ concept HasSizeDescription = requires(const T &object)
 void Object::describeSelf(const int indent) const {
     const std::string pad(indent, ' ');
     const std::string material = m_material.empty() ? "material unknown" : m_material;
-    const auto localPosition = Vector<3>{Data{m_transformation[0][3], m_transformation[1][3], m_transformation[2][3]}};
-    const auto worldPosition = getWorldTransform() * Vector<3>{Data{0.0,0.0,0.0}};
+    const auto localPosition = Vector<3>{m_transformation[0][3], m_transformation[1][3], m_transformation[2][3]};
+    const auto worldPosition = getWorldTransform() * Vector<3>{0.0,0.0,0.0};
 
     std::string line = std::format( "{}{} \"{}\" | Material: {} | Local Pos = ({}, {}, {}) | World Pos = ({}, {}, {})",
         pad,
         m_type,
         m_name,
         material,
-        localPosition[0], localPosition[1], localPosition[2],
-        worldPosition[0], worldPosition[1], worldPosition[2]
+        localPosition[0].asDouble(), localPosition[1].asDouble(), localPosition[2].asDouble(),
+        worldPosition[0].asDouble(), worldPosition[1].asDouble(), worldPosition[2].asDouble()
     );
 
     // Append size if available (concept-based design)

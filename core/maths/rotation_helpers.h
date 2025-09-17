@@ -51,9 +51,9 @@ inline Matrix<double,3,3> rotationMatrixAxisAngle3x3(const Vector<3>& axis, cons
     const double s = std::sin(angle);
     const double t = 1.0f - c;
 
-    const double x = axis[0];
-    const double y = axis[1];
-    const double z = axis[2];
+    const double x = axis[0].asDouble();
+    const double y = axis[1].asDouble();
+    const double z = axis[2].asDouble();
 
     Matrix<double,3,3> m = Matrix<double,3,3>::Identity();
     m[0][0] = t*x*x + c;     m[0][1] = t*x*y - s*z;   m[0][2] = t*x*z + s*y;

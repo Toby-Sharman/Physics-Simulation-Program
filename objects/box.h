@@ -5,6 +5,8 @@
 #ifndef PHYSICS_SIMULATION_PROGRAM_BOX_H
 #define PHYSICS_SIMULATION_PROGRAM_BOX_H
 
+#include "quantity.h"
+
 #include "object.h"
 #include "vector.h"
 
@@ -18,7 +20,7 @@ protected:
 
 
 private:
-    Vector<3> m_size;  // Using your Vector<3> class
+    Vector<3> m_size;
     // double bounding_radius_{0.0f};
 };
 
