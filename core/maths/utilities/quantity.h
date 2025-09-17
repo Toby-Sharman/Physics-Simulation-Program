@@ -9,7 +9,7 @@
 
 // Quantity struct
 struct Quantity {
-    double value = 0.0;
+    double value;
     std::string unit;
     [[nodiscard]] double asDouble() const { return value; }
 };
