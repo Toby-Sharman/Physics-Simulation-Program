@@ -16,78 +16,78 @@
 #include <string>
 #include <utility>
 
-// Default constructor with proper physics labels
+// Empty construction
 Particle::Particle()
-: m_particle_Name("Unknown"),
-  m_rest_mass(0.0),
-  m_charge(0.0),
-  m_spin(0.0),
-  m_position({0.0, 0.0, 0.0, 0.0}),
-  m_momentum({0.0, 0.0, 0.0, 0.0}),
-  m_polarisation({0.0, 0.0, 0.0, 0.0})
+: m_particleName("Unknown"),
+  m_restMass(Quantity(0.0, "kg")),
+  m_charge(Quantity(0.0, "e")),
+  m_spin(Quantity(0.0, "ℏ")),
+  m_position(Quantity(0.0, ""), Quantity(0.0, ""), Quantity(0.0, ""), Quantity(0.0, "")),
+  m_momentum(Quantity(0.0, ""), Quantity(0.0, ""), Quantity(0.0, ""), Quantity(0.0, "")),
+  m_polarisation(Quantity(0.0, ""), Quantity(0.0, ""), Quantity(0.0, ""))
 {}
 
-// Parameterized constructor
+// Constructor for custom particles - have to assign basic attributes
 Particle::Particle(
-    std::string particle_name,
+    std::string particleName,
     std::string symbol,
-    double rest_mass,
-    double charge,
-    double spin,
-    const Vector<4>& position,
-    const Vector<4>& momentum,
-    const Vector<3>& polarisation)
-: m_particle_Name(std::move(particle_name)),
+    Quantity restMass,
+    Quantity charge,
+    Quantity spin,
+    Vector<4> position,
+    Vector<4> momentum,
+    Vector<3> polarisation)
+: m_particleName(std::move(particleName)),
   m_symbol(std::move(symbol)),
-  m_rest_mass(rest_mass),
-  m_charge(charge),
-  m_spin(spin),
-  m_position(position),
-  m_momentum(momentum),
-  m_polarisation(polarisation)
+  m_restMass(std::move(restMass)),
+  m_charge(std::move(charge)),
+  m_spin(std::move(spin)),
+  m_position(std::move(position)),
+  m_momentum(std::move(momentum)),
+  m_polarisation(std::move(polarisation))
 {}
 
-// Auto constructor using database functions
-Particle::Particle(const std::string& particle_name,
-                   const Vector<4>& position,
-                   const Vector<4>& momentum,
-                   const Vector<3>& polarisation)
-: m_particle_Name(particle_name),
-  m_position(position),
-  m_momentum(momentum),
-  m_polarisation(polarisation)
+// Constructor for specific predefined particle types in db
+Particle::Particle(std::string particleName,
+                   Vector<4> position,
+                   Vector<4> momentum,
+                   Vector<3> polarisation)
+: m_particleName(std::move(particleName)),
+  m_position(std::move(position)),
+  m_momentum(std::move(momentum)),
+  m_polarisation(std::move(polarisation))
 {
-    m_symbol = ParticleDB::getSymbol(particle_name);
-    m_rest_mass = ParticleDB::getRestMass(particle_name).asDouble();
-    m_charge = ParticleDB::getCharge(particle_name);
-    m_spin = ParticleDB::getSpin(particle_name);
+    m_symbol = ParticleDB::getSymbol(particleName);
+    m_restMass = ParticleDB::getRestMass(particleName);
+    m_charge = ParticleDB::getCharge(particleName);
+    m_spin = ParticleDB::getSpin(particleName);
 }
 
 // Getters
-std::string Particle::getParticleName() const { return m_particle_Name; }
-std::string Particle::getSymbol() const { return m_symbol; }
-double Particle::getRestMass() const { return m_rest_mass; }
-double Particle::getCharge() const { return m_charge; }
-double Particle::getSpin() const { return m_spin; }
-const Vector<4>& Particle::getPosition() const { return m_position; }
-const Vector<4>& Particle::getMomentum() const { return m_momentum; }
-const Vector<3>& Particle::getPolarisation() const { return m_polarisation; }
+const std::string &Particle::getParticleName() const { return m_particleName; }
+const std::string &Particle::getSymbol() const { return m_symbol; }
+Quantity Particle::getRestMass() const { return m_restMass; }
+Quantity Particle::getCharge() const { return m_charge; }
+Quantity Particle::getSpin() const { return m_spin; }
+Vector<4> Particle::getPosition() const { return m_position; }
+Vector<4> Particle::getMomentum() const { return m_momentum; }
+Vector<3> Particle::getPolarisation() const { return m_polarisation; }
 
 
 // Setters
-void Particle::setParticleName(const std::string& particle_type) { m_particle_Name = particle_type; }
-void Particle::setSymbol(const std::string& symbol) { m_symbol = symbol; }
-void Particle::setRestMass(double rest_mass) { m_rest_mass = rest_mass; }
-void Particle::setCharge(double charge) { m_charge = charge; }
-void Particle::setSpin(double spin) { m_spin = spin; }
-void Particle::setPosition(const Vector<4>& position) { m_position = position; }
-void Particle::setMomentum(const Vector<4>& momentum) { m_momentum = momentum; }
-void Particle::setPolarisation(const Vector<3>& polarisation) { m_polarisation = polarisation; }
+void Particle::setParticleName(std::string particleName) { m_particleName = std::move(particleName); }
+void Particle::setSymbol(std::string symbol) { m_symbol = std::move(symbol); }
+void Particle::setRestMass(Quantity restMass) { m_restMass = std::move(restMass); }
+void Particle::setCharge(Quantity charge) { m_charge = std::move(charge); }
+void Particle::setSpin(Quantity spin) { m_spin = std::move(spin); }
+void Particle::setPosition(Vector<4> position) { m_position = std::move(position); }
+void Particle::setMomentum(Vector<4> momentum) { m_momentum = std::move(momentum); }
+void Particle::setPolarisation(Vector<3> polarisation) { m_polarisation = std::move(polarisation); }
 
 // Print function
 void Particle::print() const {
-    std::cout << "Particle Type: " << m_particle_Name << "\n";
-    std::cout << "Rest Mass: " << m_rest_mass << "\n";
+    std::cout << "Particle Type: " << m_particleName << "\n";
+    std::cout << "Rest Mass: " << m_restMass << "\n";
     std::cout << "Charge: " << m_charge << "\n";
     std::cout << "Spin: " << m_spin << "\n";
     std::cout << "Position: ";
@@ -99,7 +99,7 @@ void Particle::print() const {
 }
 
 // Lorentz factor
-double Particle::gamma() const {
-    if (isMassless()) return 1.0; // Not used for photons
-    return m_momentum[0].asDouble() / m_rest_mass; // assuming units c=1
+Quantity Particle::gamma() const {
+    if (isMassless()) return Quantity(1.0, "kg"); // Not used for photons
+    return Quantity(m_momentum[0].asDouble() / m_restMass.asDouble(), "FIXME"); // Using natural units // FIXME
 }
