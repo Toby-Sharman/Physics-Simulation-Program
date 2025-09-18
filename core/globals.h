@@ -22,14 +22,17 @@ class Globals {
         static constexpr double TIME_STEP = 1e-8;                             // Seconds
         static constexpr double MASSLESS_TOLERANCE = 0;                       // Massless tolerance
 
+        static constexpr double PI = 3.141592653589793238462643383279502884L; // Pi
+        static constexpr double DEG2RAD = PI / 180.0;                         // Degree to radian ratio
+        static constexpr double RAD2DEG = 180.0 / PI;                         // Radian to degree ratio
+
         static constexpr double C = 299792458;                                // Speed of light
         static constexpr double MU0 = 1.25663706127e-6;                       // Vacuum permeability
         static constexpr double e = 1.602176634e-19;                          // Elementary charge
         static constexpr double u = 1.66053906892e-27;                        // Atomic mass unit TODO: Support for Da (Dalton) name scheme
+        static constexpr double h = 6.62607015e-34;                           // Planck constant
+        static constexpr double hbar = h/PI;                                  // Reduced Planck constant
 
-        static constexpr double PI = 3.141592653589793238462643383279502884L; // Pi
-        static constexpr double DEG2RAD = PI / 180.0;                         // Degree to radian ratio
-        static constexpr double RAD2DEG = 180.0 / PI;                         // Radian to degree ratio
     };
 
     // ========= Runtime constants =========
