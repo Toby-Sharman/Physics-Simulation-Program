@@ -1,10 +1,6 @@
-////////////////////////////////////////////////////////////////////////////////////////////////////
-// File:        Particles.h                                                                       //
-// Author:      Tobias Sharman                                                                    //
-// Created:     28/08/2025                                                                        //
-// Last Modified: 29/08/2025
-// Description: Declarations for the Particles module                                             //
-////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// Created by Tobias Sharman on 28/08/2025.
+//
 
 #ifndef PHYSICS_SIMULATION_PROGRAM_PARTICLES_H
 #define PHYSICS_SIMULATION_PROGRAM_PARTICLES_H

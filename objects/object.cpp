@@ -1,6 +1,7 @@
 //
 // Created by Tobias Sharman on 03/09/2025.
 //
+
 // TODO: Add remove object functionality
 // TODO: Add a cache for world and inverse world transforms to reduce computations
 

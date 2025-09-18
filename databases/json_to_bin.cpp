@@ -1,6 +1,5 @@
 //
-// json_to_bin.cpp
-// Converts JSON database to binary format with Quantities and unit table
+// Created by Tobias Sharman on 13/09/2025.
 //
 
 #include "binary_file_IO.h"

@@ -1,10 +1,6 @@
-////////////////////////////////////////////////////////////////////////////////////////////////////
-// File:          Particles.cpp                                                                   //
-// Author:        Tobias Sharman                                                                  //
-// Created:       28/08/2025                                                                      //
-// Last Modified: 29/08/2025                                                                      //
-// Description:   Implementation of the Particles module                                          //
-////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// Created by Tobias Sharman on 28/08/2025.
+//
 
 #include "particle.h"
 

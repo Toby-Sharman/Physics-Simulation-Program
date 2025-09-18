@@ -1,10 +1,6 @@
-////////////////////////////////////////////////////////////////////////////////////////////////////
-// File:        main.cpp                                                                          //
-// Author:      Tobias Sharman                                                                    //
-// Created:     28/08/2025                                                                        //
-// Last Modified: 29/08/2025
-// Description: Main program file                                                                 //
-////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// Created by Tobias Sharman on 28/08/2025.
+//
 
 #include "config.h"
 
@@ -35,7 +31,7 @@
 #include <iostream>
 
 // TODO: Unit handling
-// TODO: Sort out my file headers
+// TODO: Add some description to headers
 // TODO: Boundary conditions for fields - neglect ferromagnetic effects
 // TODO: Unit handling for vector operations and printing functions
 // TODO: Update Matrix class to handle units too
