@@ -173,7 +173,7 @@ inline UnitInfo parseUnits(const std::string& expr) {
     std::string token;
     char op = '*'; // operator for the current token
 
-    auto flushToken = [&](const std::string& token_, const char op_) {
+    auto processToken = [&](const std::string& token_, const char op_) {
         if (token_.empty()) return;
 
         auto [scale, dimension] = parseUnit(token_);
@@ -191,19 +191,19 @@ inline UnitInfo parseUnits(const std::string& expr) {
     while (!scan.eof()) {
         if (const unsigned char c = scan.peekByte(); c == ' ') {
             if (!token.empty()) {
-                flushToken(token, op);
+                processToken(token, op);
                 token.clear();
             }
             scan.advance();
         }
         else if (c == '*' || c == '/') {
-            flushToken(token, op);
+            processToken(token, op);
             token.clear();
             op = (c == '/') ? '/' : '*';
             scan.advance();
         }
         else if (scan.matchSequence({0xC2, 0xB7})) { // middle dot
-            flushToken(token, op);
+            processToken(token, op);
             token.clear();
             op = '*';
             scan.advance(2);
@@ -214,7 +214,7 @@ inline UnitInfo parseUnits(const std::string& expr) {
         }
     }
 
-    flushToken(token, op);
+    processToken(token, op);
     return result;
 }
 
