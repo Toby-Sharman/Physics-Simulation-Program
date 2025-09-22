@@ -5,139 +5,105 @@
 #ifndef PHYSICS_SIMULATION_PROGRAM_UNIT_UTILITIES_H
 #define PHYSICS_SIMULATION_PROGRAM_UNIT_UTILITIES_H
 
-#include <utility>
-#include <vector>
+#include "units.h"
+
 #include <string>
-#include <map>
+#include <string_view>
 #include <unordered_map>
+#include <stdexcept>
 
-struct Dimension {
-    std::map<std::string,int> exponents;
+class Utf8Scanner {
+public:
+    explicit Utf8Scanner(const std::string_view s) : data(s) {}
 
-    // Default constructor
-    Dimension() = default;
+    [[nodiscard]] bool eof() const { return pos >= data.size(); }
+    [[nodiscard]] size_t position() const { return pos; }
 
-    // Initializer list constructor
-    Dimension(const std::initializer_list<std::pair<const std::string,int>> init)
-        : exponents(init) {}
-
-    static Dimension dimensionless() { return {}; }
-
-    bool operator==(const Dimension& other) const { return exponents == other.exponents; }
-    bool operator!=(const Dimension& other) const { return !(*this == other); }
-
-    Dimension operator+(const Dimension& other) const {
-        Dimension res = *this;
-        for (auto& [k,v] : other.exponents) res.exponents[k] += v;
-        return res.removeEmpty();
+    [[nodiscard]] unsigned char peekByte() const {
+        return eof() ? 0 : static_cast<unsigned char>(data[pos]);
     }
 
-    Dimension operator-(const Dimension& other) const {
-        Dimension res = *this;
-        for (auto& [k,v] : other.exponents) res.exponents[k] -= v;
-        return res.removeEmpty();
-    }
+    void advance(const size_t n = 1) { pos += n; }
 
-    Dimension& removeEmpty() {
-        for (auto it = exponents.begin(); it != exponents.end(); ) {
-            it = (it->second == 0) ? exponents.erase(it) : std::next(it);
+    [[nodiscard]] bool matchSequence(const std::initializer_list<unsigned char> sequence) const {
+        if (pos + sequence.size() > data.size()) return false;
+        size_t i = 0;
+        for (const unsigned char expected : sequence) {
+            if (static_cast<unsigned char>(data[pos + i]) != expected) return false;
+            i++;
         }
-        return *this;
+        return true;
     }
+
+private:
+    std::string_view data;
+    size_t pos{0};
 };
 
+inline std::pair<std::string,double> extractPrefix(const std::string_view unit) {
+    const auto& prefixes = PREFIXES();
+    const auto& units = UNIT_TABLE();
 
-struct UnitInfo {
-    double scale{};       // Factor relative to SI (For use in units like eV)
-    Dimension dimension;  // Dimension type based on SI
-};
+    std::string bestBase;
+    double bestScale = 1.0;
+    size_t bestLen = 0;
 
-inline std::string UTF8_CHAR(const std::string& s, size_t& i) {
-    const unsigned char c = s[i];
-    size_t len = 1;
-    if ((c & 0xE0) == 0xC0) len = 2; // Checks for byte length
-    else if ((c & 0xF0) == 0xE0) len = 3;
-    else if ((c & 0xF8) == 0xF0) len = 4;
-    std::string res = s.substr(i, len);
-    i += len;
-    return res;
+    for (const auto&[symbol, scale] : prefixes) { // TODO: Collapse if statements
+        if (unit.substr(0, symbol.size()) == symbol) {
+            auto base = std::string(unit.substr(symbol.size()));
+            if (!base.empty() && units.contains(base)) {
+                if (symbol.size() > bestLen) {
+                    bestBase = base;
+                    bestScale = scale;
+                    bestLen = symbol.size();
+                }
+            }
+        }
+    }
+
+    if (bestLen > 0) {
+        return { bestBase, bestScale };
+    }
+
+    // No prefix match → return unchanged
+    return { std::string(unit), 1.0 };
 }
 
-inline int UNICODE_DIGIT_VALUE(const std::string& s) {
-    static const std::unordered_map<std::string,int> superscripts = {
-        {"⁰", 0},{"¹", 1},{"²", 2},{"³", 3},{"⁴", 4},
-        {"⁵", 5},{"⁶", 6},{"⁷", 7},{"⁸", 8},{"⁹", 9},
-        {"⁻", -1} // negative sign
+inline int decodeSuperscript(const std::string& s) {
+    static const std::unordered_map<std::string_view,int> supers = {
+        {"⁰", 0}, {"¹", 1}, {"²", 2}, {"³", 3}, {"⁴", 4},
+        {"⁵", 5}, {"⁶", 6}, {"⁷", 7}, {"⁸", 8}, {"⁹", 9}
     };
-    const auto it = superscripts.find(s);
-    return (it != superscripts.end()) ? it->second : -2; // -2 = not a superscript
-}
 
-// Return numerical exponent - Limited to integers
-inline int parseExponent(const std::string& token) {
-    // 1. ^n or ^-n
-    if (const size_t pos = token.find('^'); pos != std::string::npos)
-        return std::stoi(token.substr(pos + 1));
-
-    // 2. Unicode superscripts
-    int exp = 0;
+    Utf8Scanner scan(s);
+    int value = 0;
     bool negative = false;
-    size_t i = 0;
-    while (i < token.size() && static_cast<unsigned char>(token[i]) < 128) i++; // skip ASCII base
-    bool found = false;
-    while (i < token.size()) {
-        std::string ch = UTF8_CHAR(token,i);
-        if (const int val = UNICODE_DIGIT_VALUE(ch); val == -1) negative = true; // superscript minus
-        else if (val >= 0) { exp = exp*10 + val; found = true; } // *10 to shift each digit (e.g. to get 12 10*1+2 etc.)
-        else break;
+
+    while (!scan.eof()) {
+        // Superscript minus (⁻ = E2 81 BB)
+        if (scan.matchSequence({0xE2, 0x81, 0xBB})) {
+            negative = true;
+            scan.advance(3);
+            continue;
+        }
+
+        // Collect one UTF-8 char
+        std::string utf8Char;
+        utf8Char.push_back(static_cast<char>(scan.peekByte()));
+        scan.advance();
+        while (!scan.eof() && (scan.peekByte() & 0xC0) == 0x80) {
+            utf8Char.push_back(static_cast<char>(scan.peekByte()));
+            scan.advance();
+        }
+
+        auto it = supers.find(utf8Char);
+        if (it == supers.end()) {
+            throw std::runtime_error("Invalid superscript sequence: " + utf8Char);
+        }
+        value = value * 10 + it->second;
     }
-    if (found) return negative ? -exp : exp;
 
-    // 3. Trailing digits like s2 or s-12
-    i = token.size();
-    while (i > 0 && std::isdigit(token[i-1])) i--;
-    if (i < token.size()) {
-        const size_t start = (i > 0 && token[i-1]=='-') ? i-1 : i;
-        return std::stoi(token.substr(start));
-    }
-
-    return 1; // default
-}
-
-inline std::string stripExponent(const std::string& token) {
-    if (const size_t pos = token.find('^'); pos != std::string::npos) return token.substr(0,pos); // ^ powers
-
-    size_t i = token.size();
-    while (i>0) {
-        if (const unsigned char c = token[i-1]; std::isdigit(c) || c=='-') { i--; continue; }             // Trailing ASCII
-        size_t j=i-1; while(j>0 && ((token[j]&0xC0)==0x80)) j--;                                          // UTF-8 start
-        if (std::string ch = token.substr(j,i-j); UNICODE_DIGIT_VALUE(ch) != -2) i=j;
-        else break;
-    }
-    return token.substr(0,i);
-}
-
-inline std::vector<std::string> splitTerms(const std::string& s) {
-    std::vector<std::string> tokens;
-    size_t start = 0;
-    while (start < s.size()) {
-        while (start < s.size() && std::isspace(s[start])) start++;
-        if (start >= s.size()) break;
-
-        size_t end = start;
-        while (end < s.size() && !std::isspace(s[end]) && s[end] != '*') end++;
-
-        tokens.push_back(s.substr(start, end - start));
-        start = end + 1;
-    }
-    return tokens;
-}
-
-inline void multiplyUnit(UnitInfo& result, const UnitInfo& u, const int exp=1) {
-    result.scale *= std::pow(u.scale,exp);
-    Dimension d = u.dimension;
-    for (int i=1;i<std::abs(exp);++i) d = d + u.dimension;
-    result.dimension = (exp>0) ? result.dimension + d : result.dimension - d;
+    return negative ? -value : value;
 }
 
 #endif //PHYSICS_SIMULATION_PROGRAM_UNIT_UTILITIES_H
