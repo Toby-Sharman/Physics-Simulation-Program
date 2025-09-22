@@ -107,6 +107,7 @@ add_executable(json_to_bin EXCLUDE_FROM_ALL databases/json_to_bin.cpp)
 target_include_directories(json_to_bin PRIVATE
         databases
         databases/utilities
+        core
         core/maths/utilities
 )
 
