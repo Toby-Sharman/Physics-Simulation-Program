@@ -3,6 +3,7 @@
 Simulate particle movement, objects, and some simple physical interactions.
 
 All particle and object attributes are stored as a Quantity struct data type to combine a value and a unit.
+For operations involving quantities the unit of the left hand operand is conserved
 
 Natural unit usage:
 - Speed of light
