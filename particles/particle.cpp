@@ -55,8 +55,8 @@ Particle::Particle(std::string particleName,
 {
     m_symbol = ParticleDB::getSymbol(particleName);
     m_restMass = ParticleDB::getRestMass(particleName);
-    m_charge = ParticleDB::getCharge(particleName);
-    m_spin = ParticleDB::getSpin(particleName);
+    m_charge = Quantity(ParticleDB::getCharge(particleName), "e");
+    m_spin = Quantity(ParticleDB::getSpin(particleName), "ℏ");
 }
 
 // Getters

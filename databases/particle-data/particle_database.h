@@ -16,12 +16,12 @@ struct ParticleDB : BaseDB<ParticleDB> {
         return getQuantity(particle, "rest mass");
     }
 
-    static Quantity getCharge(const std::string& particle) {
-        return getQuantity(particle, "charge");
+    static double getCharge(const std::string& particle) {
+        return getNumericProperty(particle, "charge");
     }
 
-    static Quantity getSpin(const std::string& particle) {
-        return getQuantity(particle, "spin");
+    static double getSpin(const std::string& particle) {
+        return getNumericProperty(particle, "spin");
     }
 
     static std::string getParticleType(const std::string& particle) {

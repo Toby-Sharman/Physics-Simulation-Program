@@ -9,85 +9,85 @@
   "gluon": {
     "symbol": "g",
     "rest mass": { "value": 0.0, "unit": "eV" },
-    "charge": {"value": 0.0, "unit":  "e"},
-    "spin": {"value": 1.0, "unit":  "ℏ"},
+    "charge": 0.0,
+    "spin": 1.0,
     "particle type": "boson"
   },
   "W+": {
     "symbol": "W+",
     "rest mass": { "value": 80.3692e9, "unit": "eV" },
-    "charge": {"value": 1.0, "unit":  "e"},
-    "spin": {"value": 1.0, "unit":  "ℏ"},
+    "charge": 1.0,
+    "spin": 1.0,
     "particle type": "boson"
   },
   "W-": {
     "symbol": "W-",
     "rest mass": { "value": 80.3692e9, "unit": "eV" },
-    "charge": {"value": -1.0, "unit":  "e"},
-    "spin": {"value": 1.0, "unit":  "ℏ"},
+    "charge": -1.0,
+    "spin": 1.0,
     "particle type": "boson"
   },
   "Z": {
     "symbol": "Z0",
     "rest mass": { "value": 91.1880e9, "unit": "eV" },
-    "charge": {"value": 0.0, "unit":  "e"},
-    "spin": {"value": 1.0, "unit":  "ℏ"},
+    "charge": 0.0,
+    "spin": 1.0,
     "particle type": "boson"
   },
   "electron": {
     "symbol": "e-",
     "rest mass": { "value": 548.579909065e-6, "unit": "u" },
-    "charge": {"value": -1.0, "unit":  "e"},
-    "spin": {"value": 0.5, "unit":  "ℏ"},
+    "charge": -1.0,
+    "spin": 0.5,
     "particle type": "lepton"
   },
   "muon": {
     "symbol": "μ-",
     "rest mass": { "value": 0.1134289259 , "unit": "u" },
-    "charge": {"value": -1.0, "unit":  "e"},
-    "spin": {"value": 0.5, "unit":  "ℏ"},
+    "charge": -1.0,
+    "spin": 0.5,
     "particle type": "lepton"
   },
   "tau": {
     "symbol": "τ-",
     "rest mass": { "value": 1776.93e6, "unit": "eV" },
-    "charge": {"value": -1.0, "unit":  "e"},
-    "spin": {"value": 0.5, "unit":  "ℏ"},
+    "charge": -1.0,
+    "spin": 0.5,
     "particle type": "lepton"
   },
   "electron neutrino": {
     "symbol": "ν_e",
     "rest mass": { "value": 0.0, "unit": "eV" },
-    "charge": {"value": 0.0, "unit":  "e"},
-    "spin": {"value": 0.5, "unit":  "ℏ"},
+    "charge": 0.0,
+    "spin": 0.5,
     "particle type": "lepton"
   },
   "muon neutrino": {
     "symbol": "ν_μ",
     "rest mass": { "value": 0.0, "unit": "eV" },
-    "charge": {"value": 0.0, "unit":  "e"},
-    "spin": {"value": 0.5, "unit":  "ℏ"},
+    "charge": 0.0,
+    "spin": 0.5,
     "particle type": "lepton"
   },
   "tau neutrino": {
     "symbol": "ν_τ",
     "rest mass": { "value": 0.0, "unit": "eV" },
-    "charge": {"value": 0.0, "unit":  "e"},
-    "spin": {"value": 0.5, "unit":  "ℏ"},
+    "charge": 0.0,
+    "spin": 0.5,
     "particle type": "lepton"
   },
   "proton": {
     "symbol": "p",
     "rest mass": { "value": 1.007276466621, "unit": "u" },
-    "charge": {"value": 1.0, "unit":  "e"},
-    "spin": {"value": 0.5, "unit":  "ℏ"},
+    "charge": 1.0,
+    "spin": 0.5,
     "particle type": "baryon"
   },
   "neutron": {
     "symbol": "n",
     "rest mass": { "value": 1.00866491595, "unit": "u" },
-    "charge": {"value": 0.0, "unit":  "e"},
-    "spin": {"value": 0.5, "unit":  "ℏ"},
+    "charge": 0.0,
+    "spin": 0.5,
     "particle type": "baryon"
   }
 }
