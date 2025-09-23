@@ -36,7 +36,7 @@ Model for photon absorption/emission:
                     - Rotate spin vector so its z aligns with the B field
             - Lifetime τ
             - Velocity form MB distribution (Maybe extend to low and high energies too with FD, BE, MJ)
-        - Since neglecting time evolution/direct simulation of gas particles all Larmor can be neglected
+        - Since simulating gas particles over time excited will need to consider larmor (arguably unnecessary for large average but prefer inclusion)
         - If an interaction occurs keep the gas particle existent until photon emission then delete
 
     - Interaction probabilities
