@@ -7,13 +7,13 @@
 #include "vector.h"
 #include "matrix.h"
 #include "rotation_helpers.h"
+#include "unit_utilities.h"
 
 #include "globals.h"
 #include "material_database.h"
 #include "particle_database.h"
 
 #include "object_tags.h"
-
 #include "object.h"
 #include "box.h"
 #include "sphere.h" // FIXME
@@ -29,6 +29,7 @@
 
 #include <memory>
 #include <iostream>
+#include <iomanip>
 
 // TODO: Unit handling
 // TODO: Add some description to headers
@@ -44,6 +45,44 @@ int main() {
     MaterialDB::loadFromBinary(MATERIAL_DATABASE_DB_PATH);
     ParticleDB::loadFromBinary(PARTICLE_DATABASE_DB_PATH);
 
+    // try {
+    //
+    //     auto [scale1, dim1] = parseUnit("m^3");
+    //     std::cout << "m^3 → scale=" << scale1
+    //               << " dim=" << dim1.toString() << "\n";
+    //
+    //     auto [scale2, dim2] = parseUnit("cm");
+    //     std::cout << "cm → scale=" << scale2
+    //               << " dim=" << dim2.toString() << "\n";
+    //
+    //     auto [scale3, dim3] = parseUnit("m⁻³");
+    //     std::cout << "m⁻³ → scale=" << scale3
+    //               << " dim=" << dim3.toString() << "\n";
+    //
+    //     auto [scale4, dim4] = parseUnit("kg-1");
+    //     std::cout << "kg-1 → scale=" << scale4
+    //               << " dim=" << dim4.toString() << "\n";
+    //
+    //
+    //     UnitInfo u1 = parseUnits("kg m^2 / s^2");
+    //     std::cout << "kg m^2 / s^2 → scale=" << u1.scale
+    //               << " dim=" << u1.dimension.toString() << "\n";
+    //
+    //     UnitInfo u2 = parseUnits("cm·s^-1");
+    //     std::cout << "cm·s^-1 → scale=" << u2.scale
+    //               << " dim=" << u2.dimension.toString() << "\n";
+    //
+    //     UnitInfo u3 = parseUnits("N m");
+    //     std::cout << "N m → scale=" << u3.scale
+    //               << " dim=" << u3.dimension.toString() << "\n";
+    //
+    // } catch (const std::exception& ex) {
+    //     std::cerr << "Error: " << ex.what() << "\n";
+    //     return 1;
+    // }
+    //
+    // return 0;
+    
     // Objects
     /* Not to scale
      * + -------------------------------------------------- +
@@ -88,9 +127,8 @@ int main() {
     world->printHierarchy();
 
     // const auto field = getFieldAtPoint(Vector<3>(
-    //     Data{0.0,0.0,20.0},
-    //     Labels{"x", "y", "z"},
-    //     Units{"T", "T", "T"}), world);
+    //     {0.0,0.0,20.0},
+    //     "T"), world);
     // field.print();
     //
     // std::cout << "\n\n\n" << std::endl;
