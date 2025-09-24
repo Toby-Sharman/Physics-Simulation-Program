@@ -1,54 +1,82 @@
 //
-// Created by Tobias Sharman on 16/09/2025.
+// Physics Simulation Program
+// File: quantity.h
+// Created by Tobias Sharman on 16/09/2025
+//
+// Copyright (c) 2025, Tobias Sharman
+// Licensed under a Non-Commercial License. See LICENSE file for details.
 //
 
-#ifndef QUANTITY_H
-#define QUANTITY_H
-
-#include "unit_utilities.h"
+#ifndef PHYSICS_SIMULATION_PROGRAM_QUANTITY_H
+#define PHYSICS_SIMULATION_PROGRAM_QUANTITY_H
 
 #include <cmath>
 #include <format>
-#include <string>
 #include <iostream>
+#include <stdexcept>
+#include <string>
+#include <unordered_map>
 
-// Quantity struct
+#include "core/maths/utilities/units.h"
+#include "core/maths/utilities/unit_utilities.h"
+
+// Represents a physical quantity with a value and a unit
 struct Quantity {
-    using Self = Quantity;
+    using Self = Quantity; // Shorthand for readability
 
     double value;
-    std::string unit;
+    std::string unit; // Operations will fail if the unit cannot be constructed from the PREFIXES and UNIT_TABLE keys
 
+    // Returns the raw numeric value
+    //
+    // Note: For testing only; not intended for production use
     [[nodiscard]] double asDouble() const { return value; }
+
+    // Returns the unit string
+    //
+    // Note: For testing only; not intended for production use
     [[nodiscard]] std::string asUnit() const { return unit; }
 
-    // TODO: Addition. subtraction, multiplication, division, ?powers?, ?unary operations (e.g. trig)?, ?etc.?
-    // Logic framework:
-    // parse units ✅
-    // If units are of valid type for operation (correct dimensions) (+, -, others?) ✅
-    //      multiply value by scale -> new function for first three parts ✅
-    //      perform operation (+, -, *, etc.) on value
-    //      -> for non consistent units check for combo units (N, J, etc.) -> new function
-    //      check size >=1000 or <0 and if so shift to prefix ✅
-    //          -> take care for power units (m^3, etc.)
-
-    [[nodiscard]] Quantity convertTo(const std::string& newUnit) const {
+    // Converts the Quantity to a new unit if they have the same dimensions else throws an error
+    //
+    // Parameters:
+    //   newUnit - the target unit to convert into (e.g. m, s, etc.)
+    //
+    // Returns:
+    //   An updated Quantity with new unit and reflected value changes
+    //
+    // Example:
+    //   Quantity length{1000.0, "mm"};
+    //   Quantity meters = length.convertTo("m");  -> meters is 1.0 m
+    [[nodiscard]] Quantity convertTo(const std::string& newUnit) const { // TODO: Take care for units with powers (m^3) and use string view
         const auto [scaleA, dimensionA] = parseUnits(unit);
         const auto [scaleB, dimensionB] = parseUnits(newUnit);
 
         if (dimensionA != dimensionB) {
-            throw std::runtime_error(std::format("Cannot convert {} to {}",unit, newUnit));
+            throw std::invalid_argument(std::format("Cannot convert {} to {} due to mismatched dimensions",unit, newUnit));
         }
 
         return Quantity(value * (scaleA / scaleB), newUnit);
     }
 
-    static Quantity withBestPrefix(Quantity quantity) { // TODO: Take care for units with powers
+    // Adjusts the Quantity to use a suitable SI prefix and scales the value so that it falls in the range [1, 1000)
+    //
+    // Parameters:
+    //   quantity - the Quantity to adjust
+    //
+    // Returns:
+    //   A new Quantity with a scaled value and updated unit
+    //
+    // Example:
+    //   Quantity length{1500.0, "m"};
+    //   Quantity scaled = Quantity::withBestPrefix(length);  -> scaled is 1.5 km
+    static Quantity withBestPrefix(Quantity quantity) { // TODO: Take care for units with powers (m^3)
+        if (quantity.value == 0.0) return quantity;
+        // Would break the second while loop if zero was allowed and removes redundant operations
+
         auto [baseUnit, prefixScale] = extractPrefix(quantity.unit);
         quantity.value *= prefixScale;
         double absVal = std::fabs(quantity.value);
-
-        if (absVal == 0.0) return quantity;
 
         int order = 0;
         while (absVal >= 1000.0) {
@@ -62,44 +90,77 @@ struct Quantity {
 
         if (order == 0) return quantity;
 
-        // Map order → 10^order
-        static const std::map<int, double> ORDER_TO_SCALE = {
-            {-30, 1e-30}, {-27, 1e-27}, {-24, 1e-24}, {-21, 1e-21}, {-18, 1e-18},
-            {-15, 1e-15}, {-12, 1e-12}, {-9, 1e-9},   {-6, 1e-6},   {-3, 1e-3},
-            {3, 1e3},     {6, 1e6},     {9, 1e9},     {12, 1e12},   {15, 1e15},
-            {18, 1e18},   {21, 1e21},   {24, 1e24},   {27, 1e27},   {30, 1e30}
+        // Map doesn't link to PREFIXES map so if that is changed for some reason changes need to be reflected here
+        // PREFIXES should never be changed so this should not be an issue
+        static const std::unordered_map<int, std::string_view> orderToPrefix = {
+            {-30, "q"}, {-27, "r"}, {-24, "y"}, {-21, "z"}, {-18, "a"},
+            {-15, "f"}, {-12, "p"}, {-9, "n"},  {-6, "µ"},  {-3, "m"},
+            {3, "k"},   {6, "M"},   {9, "G"},   {12, "T"},  {15, "P"},
+            {18, "E"},  {21, "Z"},  {24, "Y"},  {27, "R"},  {30, "Q"}
         };
 
-        if (const auto itScale = ORDER_TO_SCALE.find(order); itScale != ORDER_TO_SCALE.end()) {
-            const double targetScale = itScale->second;
-
-            // Search existing PREFIXES() for matching scale
-            for (const auto&[symbol, scale] : PREFIXES()) {
-                if (std::abs(scale - targetScale) < 1e-12) { // FIXME: Check if I need this
-                    const double scaledValue = quantity.value / scale;
-                    const std::string newUnit = std::format("{}{}", symbol, baseUnit);
-                    return Quantity{scaledValue, newUnit};
-                }
-            }
+        // Find prefix in table else throw an error if it is too big or small
+        std::string_view newPrefix;
+        if (const auto it = orderToPrefix.find(order); it != orderToPrefix.end()) {
+            newPrefix = it->second;
+        } else {
+            throw std::out_of_range(std::format("No SI prefix defined for order {}", order));
         }
 
-        // fallback
-        return Quantity(quantity.value, baseUnit);
+        return Quantity{quantity.value, std::format("{}{}", newPrefix, baseUnit)};
     }
 
+    // Adds one Quantity to another of the same dimensions
+    //
+    // Parameters:
+    //   other - the Quantity to add
+    //
+    // Returns:
+    //   A new Quantity representing the sum, expressed in this quantity’s unit
+    //
+    // Example:
+    //   Quantity a{2.0, "m"};
+    //   Quantity b{3.0, "km"};
+    //   Quantity c = a + b;  -> c is 3002.0 m
     Self operator+(const Self& other) const {
         return Quantity(value + other.convertTo(unit).value, unit);
     }
 
+    // Subtracts one Quantity from another of the same dimensions
+    //
+    // Parameters:
+    //   other - the Quantity to subtract
+    //
+    // Returns:
+    //   A new Quantity representing the difference, expressed in this quantity’s unit
+    //
+    // Example:
+    //   Quantity a{2.0, "km"};
+    //   Quantity b{3.0, "m"};
+    //   Quantity c = a - b;  -> c is 1.997 km
     Self operator-(const Self& other) const {
         return Quantity(value - other.convertTo(unit).value, unit);
     }
+
+    // TODO: More operators overloads like * and /
+    // TODO: For functions that will create a new unit have some function to merge the units well
 };
 
-// Non-member operator<< TODO: Format library support
-inline std::ostream& operator<<(std::ostream& os, const Quantity& q) {
-    os << q.value << " " << q.unit;
+// Outputs a Quantity to a stream in the format "<value> <unit>"
+//
+// Parameters:
+//   os        - the output stream
+//   quantity  - the Quantity to print
+//
+// Returns:
+//   A reference to the output stream for chaining
+//
+// Example:
+//   Quantity distance{10.0, "m"};
+//   std::cout << distance;  -> prints "10 m"
+inline std::ostream& operator<<(std::ostream& os, const Quantity& quantity) { // TODO: Format library support
+    os << quantity.value << " " << quantity.unit;
     return os;
 }
 
-#endif //QUANTITY_H
+#endif //PHYSICS_SIMULATION_PROGRAM_QUANTITY_H
