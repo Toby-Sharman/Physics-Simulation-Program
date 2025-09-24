@@ -4,7 +4,7 @@
 // Created by Tobias Sharman on 16/09/2025
 //
 // Copyright (c) 2025, Tobias Sharman
-// Licensed under a Non-Commercial License. See LICENSE file for details.
+// Licensed under a Non-Commercial License. See LICENSE file for details
 //
 
 #ifndef PHYSICS_SIMULATION_PROGRAM_QUANTITY_H
