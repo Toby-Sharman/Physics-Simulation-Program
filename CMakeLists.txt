@@ -11,6 +11,7 @@ project(Simulation_program)
 # -------------------------
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+#set(CMAKE_INTERPROCEDURAL_OPTIMIZATION ON) # Link time optimisation
 
 # -------------------------
 # Default build type
@@ -62,6 +63,7 @@ target_sources(Simulation_program PRIVATE
 
 # Include directories
 target_include_directories(Simulation_program PRIVATE
+        ${CMAKE_SOURCE_DIR}
         app
         config
         core
@@ -105,6 +107,7 @@ set(CONFIG_INCLUDE_GUARD "PHYSICS_SIMULATION_PROGRAM_CONFIG_H")
 add_executable(json_to_bin EXCLUDE_FROM_ALL databases/json_to_bin.cpp)
 
 target_include_directories(json_to_bin PRIVATE
+        ${CMAKE_SOURCE_DIR}
         databases
         databases/utilities
         core
