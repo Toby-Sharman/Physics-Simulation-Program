@@ -117,14 +117,6 @@ struct Vector {
     }
 
     // -------------------------
-    // Copy and move constructors
-    // -------------------------
-    Vector(const Vector& other) = default;
-    Vector(Vector&& other) = default;
-    Vector& operator=(const Vector& other) = default;
-    Vector& operator=(Vector&& other) = default;
-
-    // -------------------------
     // Indexing
     // -------------------------
     Quantity& operator[](size_t i) {
