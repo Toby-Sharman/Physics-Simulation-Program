@@ -73,6 +73,9 @@ struct Quantity {
     // Returns:
     //   An updated Quantity with new unit and reflected value changes
     //
+    // Throws:
+    //   invalid_argument if units have different dimensions
+    //
     // Example:
     //   Quantity length{1000.0, "mm"};
     //   Quantity meters = length.convertTo("m");  -> meters is 1.0 m
@@ -94,6 +97,9 @@ struct Quantity {
     //
     // Returns:
     //   A new Quantity with a scaled value and updated unit
+    //
+    // Throws:
+    //   out_of_range if no defined prefix - if >10^30 or <10^-30
     //
     // Example:
     //   Quantity length{1500.0, "m"};
