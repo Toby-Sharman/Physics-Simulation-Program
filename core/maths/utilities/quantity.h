@@ -21,11 +21,22 @@
 #include "core/maths/utilities/unit_utilities.h"
 
 // Represents a physical quantity with a value and a unit
+// Supports arithmetic operations, unit conversions
 struct Quantity {
-    using Self = Quantity; // Shorthand for readability
-
     double value;
     std::string unit; // Operations will fail if the unit cannot be constructed from the PREFIXES and UNIT_TABLE keys
+
+    // Constructs a Quantity from a value and unit string
+    // Allows construction with () rather than {}
+    //
+    // Parameters:
+    //   value - any double
+    //   unit  - any string - see struct's unit variable declaration for limitations
+    //
+    // Example:
+    //   Quantity g(9.81, "m/s^2");
+    Quantity(const double value, std::string unit)
+        : value(value), unit(std::move(unit)) {}
 
     // Returns the raw numeric value
     //
@@ -36,6 +47,15 @@ struct Quantity {
     //
     // Note: For testing only; not intended for production use
     [[nodiscard]] std::string asUnit() const { return unit; }
+
+    // Prints the Quantity in the form "<value> <unit>"
+    //
+    // Example:
+    //   Quantity q(5.0, "m");
+    //   q.print(); -> 5 m
+    void print() const {
+        std::cout << value << " " << unit;
+    }
 
     // Converts the Quantity to a new unit if they have the same dimensions else throws an error
     //
@@ -56,7 +76,7 @@ struct Quantity {
             throw std::invalid_argument(std::format("Cannot convert {} to {} due to mismatched dimensions",unit, newUnit));
         }
 
-        return Quantity(value * (scaleA / scaleB), newUnit);
+        return {value * (scaleA / scaleB), newUnit};
     }
 
     // Adjusts the Quantity to use a suitable SI prefix and scales the value so that it falls in the range [1, 1000)
@@ -110,6 +130,38 @@ struct Quantity {
         return Quantity{quantity.value, std::format("{}{}", newPrefix, baseUnit)};
     }
 
+    // Multiply a Quantity by a scalar
+    //
+    // Parameters:
+    //   scalar - amount to multiply by
+    //
+    // Returns:
+    //   A new Quantity representing the updated value
+    //
+    // Example:
+    //   Quantity a{2.0, "m"};
+    //   double b = 5.0
+    //   Quantity c = a * b;  -> c is 10.0 m
+    Quantity operator*(const double scalar) const {
+        return {value * scalar, unit};
+    }
+
+    // Divide a Quantity by a scalar
+    //
+    // Parameters:
+    //   scalar - amount to divide by
+    //
+    // Returns:
+    //   A new Quantity representing the updated value
+    //
+    // Example:
+    //   Quantity a{2.0, "m"};
+    //   double b = 5.0
+    //   Quantity c = a / b;  -> c is 0.4 m
+    Quantity operator/(const double scalar) const {
+        return {value / scalar, unit};
+    }
+
     // Adds one Quantity to another of the same dimensions
     //
     // Parameters:
@@ -122,8 +174,8 @@ struct Quantity {
     //   Quantity a{2.0, "m"};
     //   Quantity b{3.0, "km"};
     //   Quantity c = a + b;  -> c is 3002.0 m
-    Self operator+(const Self& other) const {
-        return Quantity(value + other.convertTo(unit).value, unit);
+    Quantity operator+(const Quantity& other) const {
+        return {value + other.convertTo(unit).value, unit};
     }
 
     // Subtracts one Quantity from another of the same dimensions
@@ -138,12 +190,13 @@ struct Quantity {
     //   Quantity a{2.0, "km"};
     //   Quantity b{3.0, "m"};
     //   Quantity c = a - b;  -> c is 1.997 km
-    Self operator-(const Self& other) const {
-        return Quantity(value - other.convertTo(unit).value, unit);
+    Quantity operator-(const Quantity& other) const {
+        return {value - other.convertTo(unit).value, unit};
     }
 
-    // TODO: More operators overloads like * and /
+    // TODO: More operators overloads like * and / for two quantities
     // TODO: For functions that will create a new unit have some function to merge the units well
+    // TODO: Add compound assignment operators
 };
 
 // Outputs a Quantity to a stream in the format "<value> <unit>"
