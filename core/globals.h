@@ -1,56 +1,60 @@
 //
+// Physics Simulation Program
+// File: globals.h
 // Created by Tobias Sharman on 01/09/2025.
+//
+// Copyright (c) 2025, Tobias Sharman
+// Licensed under a Non-Commercial License. See LICENSE file for details.
 //
 
 #ifndef PHYSICS_SIMULATION_PROGRAM_GLOBALS_H
 #define PHYSICS_SIMULATION_PROGRAM_GLOBALS_H
 
-#include <string>
+#include <string_view>
+
+// TODO: Update to use Quantity for relevant constants
+// TODO: Comment on where data values are from
 
 class Globals {
     public:
-    static Globals &Instance() {
-        static Globals instance;
-        return instance;
-    };
+        // Singleton access
+        static Globals &instance() {
+            static Globals instance;
+            return instance;
+        };
 
-    struct Constant {
+        // No copies allowed
+        Globals(const Globals&) = delete;
+        Globals& operator=(const Globals&) = delete;
+
         // Compile-time constants
-        static constexpr std::string FILENAME_PREFIX = "Energies";            // Data output file name prefix (in form prefix[run#]
-        static constexpr std::string OUTPUT_FOLDER = "Output";                // Data output file name prefix (in form prefix[run#]
+        struct Constant {
+            struct Program{
+                static constexpr std::string_view filenamePrefix = "Energies";        // Data output file name prefix
+                static constexpr std::string_view outputFolder = "Output";            // Data output folder name (in Build)
 
-        static constexpr double TIME_STEP = 1e-8;                             // Seconds
-        static constexpr double MASSLESS_TOLERANCE = 0;                       // Massless tolerance
+                static constexpr double timeStep = 1e-8;                              // Seconds
+                static constexpr double masslessTolerance = 0;                        // Massless tolerance
+            };
+            struct Maths {
+                static constexpr double pi = 3.141592653589793238462643383279502884L; // Pi
+                static constexpr double deg2rad = pi / 180.0;                         // Degree to radian ratio
+                static constexpr double rad2deg = 180.0 / pi;                         // Radian to degree ratio
+            };
+            struct Physics {
+                static constexpr double c = 299792458;                                // Speed of light
+                static constexpr double mu0 = 1.25663706127e-6;                       // Vacuum permeability
+                static constexpr double e = 1.602176634e-19;                          // Elementary charge
+                static constexpr double u = 1.66053906892e-27;                        // Atomic mass unit
+                static constexpr double da = u;                                       // Dalton
+                static constexpr double h = 6.62607015e-34;                           // Planck constant
+                static constexpr double hbar = h/Maths::pi;                           // Reduced Planck constant
+            };
+        };
 
-        static constexpr double PI = 3.141592653589793238462643383279502884L; // Pi
-        static constexpr double DEG2RAD = PI / 180.0;                         // Degree to radian ratio
-        static constexpr double RAD2DEG = 180.0 / PI;                         // Radian to degree ratio
-
-        static constexpr double C = 299792458;                                // Speed of light
-        static constexpr double MU0 = 1.25663706127e-6;                       // Vacuum permeability
-        static constexpr double e = 1.602176634e-19;                          // Elementary charge
-        static constexpr double u = 1.66053906892e-27;                        // Atomic mass unit TODO: Support for Da (Dalton) name scheme
-        static constexpr double h = 6.62607015e-34;                           // Planck constant
-        static constexpr double hbar = h/PI;                                  // Reduced Planck constant
-
-    };
-
-    // ========= Runtime constants =========
-    // Stored in memory, set at runtime
-    // Use Globals::instance().CONST_NAME
-    // const std::string NAME = "name";
-
-    // ========= Modifiable variables =========
-    // Use Globals::instance().var_name
-    // int counter = 0;
-
-    // No copies allowed
-    Globals(const Globals&) = delete;
-    Globals& operator=(const Globals&) = delete;
-
-private:
-    ~Globals() = default;
-    Globals() = default;  // Private constructor
+    private:
+        ~Globals() = default;
+        Globals() = default;
 };
 
 #endif //PHYSICS_SIMULATION_PROGRAM_GLOBALS_H
