@@ -47,6 +47,7 @@ add_executable(Simulation_program)
 
 target_sources(Simulation_program PRIVATE
         app/main.cpp
+        core/maths/utilities/unit_utilities.cpp
         objects/box.cpp
         objects/object.cpp
         objects/sphere.cpp
