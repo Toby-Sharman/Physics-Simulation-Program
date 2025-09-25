@@ -32,31 +32,13 @@ struct Quantity {
     // Allows construction with () rather than {}
     //
     // Parameters:
-    //   value - any double
-    //   unit  - any string - see struct's unit variable declaration for limitations
-    //
-    // Example:
-    //   Quantity g(9.81, "m/s^2");
-    Quantity(const double value, std::string unit)
-        : value(value), unit(std::move(unit)) {}
-
-    // Constructs a Quantity from a value and unit string
-    // Allows construction with () rather than {}
-    //
-    // Allow {value, "unit"} brace-init construction - used to make construction of Vector to be nicer
-    //
-    // Parameters:
     //   value - any type convertible to double
-    //   unit  - any type convertible to std::string - see struct's unit variable declaration for limitations
+    //   unit  - any type convertible to std::string - see class's unit variable declaration for limitations
     //
     // Example:
     //   Quantity g(9.81, "m/s^2");
-    template<typename T1, typename T2>
-    requires std::convertible_to<T1, double> && std::convertible_to<T2, std::string> // Only work if arguments types are valid
-    Quantity(T1&& v, T2&& u)
-        : value(static_cast<double>(std::forward<T1>(v))), // Convert to double
-          unit(std::forward<T2>(u)) {}                     // Move or copy string
-
+    template<std::convertible_to<double> T, std::convertible_to<std::string> U>
+    Quantity(T v, U&& u) : value(static_cast<double>(v)), unit(std::forward<U>(u)) {}
 
     // Returns the raw numeric value
     //
