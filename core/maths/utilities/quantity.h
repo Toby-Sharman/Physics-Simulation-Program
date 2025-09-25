@@ -28,6 +28,12 @@ struct Quantity {
     double value;
     std::string unit; // Operations will fail if the unit cannot be constructed from the PREFIXES and UNIT_TABLE keys
 
+    // Constructs a Quantity with value = 0.0 and unit = ""
+    Quantity() : value(0.0) {}
+
+    // Constructs a Quantity with value = value and unit = ""
+    explicit Quantity(const double value) : value(value) {}
+
     // Constructs a Quantity from a value and unit string
     // Allows construction with () rather than {}
     //
