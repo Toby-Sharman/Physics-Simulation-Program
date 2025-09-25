@@ -188,13 +188,13 @@ struct Quantity {
 
     // Multiplication operator for Quantity
     //
-    // Multiply a Quantity by a scalar
+    // Multiply a Quantity by a scalar in the order Quantity * scalar
     //
     // Parameters:
     //   scalar - amount to multiply by
     //
     // Returns:
-    //   A new Quantity representing the updated value
+    //   A new Quantity representing the product of the two
     //
     // Example:
     //   Quantity a{2.0, "m"};
@@ -206,13 +206,13 @@ struct Quantity {
 
     // Division operator for Quantity
     //
-    // Divide a Quantity by a scalar
+    // Divide a Quantity by a scalar in the order Quantity / scalar
     //
     // Parameters:
     //   scalar - amount to divide by
     //
     // Returns:
-    //   A new Quantity representing the updated value
+    //   A new Quantity representing the quotient of the two
     //
     // Example:
     //   Quantity a{2.0, "m"};
@@ -241,9 +241,31 @@ struct Quantity {
 // Example:
 //   Quantity distance{10.0, "m"};
 //   std::cout << distance;  -> prints "10 m"
-inline std::ostream& operator<<(std::ostream& os, const Quantity& quantity) { // TODO: Format library support
+inline std::ostream& operator<<(std::ostream& os, const Quantity& quantity) {
     os << quantity.value << " " << quantity.unit;
     return os;
 }
+
+// Multiplication operator for Quantity
+//
+// Multiply a Quantity by a scalar in the order scalar * Quantity
+//
+// Parameters:
+//   scalar - amount to multiply by
+//
+// Returns:
+//   A new Quantity representing the product of the two
+//
+// Example:
+//   double a = 5.0
+//   Quantity b{2.0, "m"};
+//   Quantity c = a * b;  -> c is 10.0 m
+inline Quantity operator*(const double scalar, const Quantity& quantity) {
+    return {scalar * quantity.value, quantity.unit};
+}
+
+// inline Quantity operator/(const double scalar, const Quantity& quantity) { // FIXME: Invert unit
+//     return {scalar / quantity.value, quantity.unit};
+// }
 
 #endif //PHYSICS_SIMULATION_PROGRAM_QUANTITY_H
