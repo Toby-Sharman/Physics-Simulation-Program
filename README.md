@@ -7,7 +7,7 @@ For operations involving quantities, **the unit of the left hand operand is cons
 
 ---
 
-## Supported Physics
+## Physics
 
 Movement has relativistic considerations.
 
@@ -15,6 +15,10 @@ Movement has relativistic considerations.
 - Speed of light (c)
 - Elementary charge (e)
 - Planck constant (ℏ)
+
+### Physical constants
+All physical constant are from [CODATA recommended values of the fundamental physical
+constants: 2022](https://tsapps.nist.gov/publication/get_pdf.cfm?pub_id=958143)
 
 ---
 

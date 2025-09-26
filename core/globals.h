@@ -12,9 +12,6 @@
 
 #include <string_view>
 
-// TODO: Update to use Quantity for relevant constants
-// TODO: Comment on where data values are from
-
 class Globals {
     public:
         // Singleton access
@@ -41,14 +38,15 @@ class Globals {
                 static constexpr double deg2rad = pi / 180.0;                         // Degree to radian ratio
                 static constexpr double rad2deg = 180.0 / pi;                         // Radian to degree ratio
             };
+            // Physics constants from: CODATA recommended values of the fundamental physical constants: 2022
             struct Physics {
-                static constexpr double c = 299792458;                                // Speed of light
-                static constexpr double mu0 = 1.25663706127e-6;                       // Vacuum permeability
-                static constexpr double e = 1.602176634e-19;                          // Elementary charge
-                static constexpr double u = 1.66053906892e-27;                        // Atomic mass unit
-                static constexpr double da = u;                                       // Dalton
+                static constexpr double c = 299792458;                                // Speed of light in m s^-1
                 static constexpr double h = 6.62607015e-34;                           // Planck constant
                 static constexpr double hbar = h/Maths::pi;                           // Reduced Planck constant
+                static constexpr double e = 1.602176634e-19;                          // Elementary charge
+                static constexpr double mu0 = 1.25663706127e-6;                       // Vacuum permeability
+                static constexpr double u = 1.66053906892e-27;                        // Atomic mass unit in kg
+                static constexpr double Da = u;                                       // Dalton
             };
         };
 
