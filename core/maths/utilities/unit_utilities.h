@@ -164,7 +164,7 @@
 //
 // Example usage:
 //   std::string_view unit = "Mg km/ms^-2"
-//   auto [factor, siUnit] = parseUnit(tokenStart, tokenEnd); // factor = 1 siUnit = {1, 1, -2, 0, 0, 0, 0}
+//   auto [factor, siUnit] = parseUnit(unit); // factor = 1 siUnit = {1, 1, -2, 0, 0, 0, 0}
 [[nodiscard]] UnitInfo parseUnits(std::string_view units);
 
 #endif // PHYSICS_SIMULATION_PROGRAM_UNIT_UTILITIES_H
