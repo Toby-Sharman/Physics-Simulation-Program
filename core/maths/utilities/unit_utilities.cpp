@@ -3,16 +3,16 @@
 // File: unit_utilities.cpp
 // Created by Tobias Sharman on 25/09/2025
 //
+// Implementation of unit_utilities.h
+//
 // Copyright (c) 2025, Tobias Sharman
 // Licensed under a Non-Commercial License. See LICENSE file for details
 //
 
-#include <cassert>
-#include <cctype>
+#include <cctype> // Ignore IDE warning of possibly unused it is used for std::isalpha and std::isspace
 #include <charconv>
 #include <cmath>
 #include <format>
-#include <iostream>
 #include <stdexcept>
 #include <string>
 #include <string_view>
