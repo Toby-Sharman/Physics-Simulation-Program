@@ -5,7 +5,7 @@ BUILD_DIR="Build" # Directory for building
 # Ensure build directory exists and create if not then enter it:
 
 mkdir -p "$BUILD_DIR"
-cd BUILD_DIR || exit 1
+cd "$BUILD_DIR" || exit 1
 
 # CMake:
 
