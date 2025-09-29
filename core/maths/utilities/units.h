@@ -3,6 +3,9 @@
 // File: units.h
 // Created by Tobias Sharman on 16/09/2025
 //
+// Description:
+//   - Describes Unit custom data type and sets up tables for prefixes and units
+//
 // Copyright (c) 2025, Tobias Sharman
 // Licensed under a Non-Commercial License. See LICENSE file for details
 //
