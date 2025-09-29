@@ -5,6 +5,9 @@ Simulate particle movement, objects, and some simple physical interactions.
 All particle and object attributes are stored as a `Quantity` struct data type that combines a value and a unit.
 For operations involving quantities, **the unit of the left hand operand is conserved**.
 
+There is no preservation of unit context, since the program tracks units in terms of their SI dimensions and 
+factor/scale to base SI units (m, kg, s, A, K, mol, cd). 
+
 ---
 
 ## Physics
@@ -34,6 +37,25 @@ Can be auto created based on standard particle attributes defined in `particle_d
 
 ### Supported types 
 - Box
+
+---
+
+## Documentation
+
+At the top of each file is the name of the project, the file, author, creation date, a brief description of what is in
+file, and legal/license information.
+
+Verbose commenting in headers and in source files any relevant comments to describe algorithms that aren't immediately
+clear.
+
+Comments in headers will focus on describing what the code is for, how it is used, and its limitations. Where relevant
+there may also be comments on algorithms/logic if the implemented logic is peculiar, or that the approach is notable
+to how the code is used.
+
+Classes will keep a general description of all of their methods and an example of usage. For methods in classes
+there will be a brief description of what the method does but any important details will be kept in a class wide comment
+to avoid duplication of comments for similar function (for example addition and subtraction overloads having the
+condition that the units have the same dimensions).
 
 ---
 
