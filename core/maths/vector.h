@@ -12,61 +12,64 @@
 
 #include <array>
 #include <cmath>
-#include <concepts>
 #include <initializer_list>
 #include <iostream>
 #include <stdexcept>
 #include <string>
-#include <type_traits>
-#include <utility>
-
 
 #include "core/maths/utilities/quantity.h"
+#include "core/maths/utilities/units.h"
 
-// Anything that is okay to be used as a maths Vector index and can be made into a valid Quantity
-// Helps with compile time errors
-template<typename T>
-concept ConvertibleToQuantity =
-    std::same_as<std::decay_t<T>, Quantity> ||
-    std::is_arithmetic_v<std::decay_t<T>> ||
-    std::convertible_to<T, Quantity>;
-
-// Generic Vector of size N
-// Supports common vector operations
+// Quantity
+//
+// Represents a physical quantity with a numeric value and a dimensional unit
+//   - The unit is represented using the Unit class, which tracks powers of the seven base SI dimensions
+//
+// This class supports arithmetic operations, dimension checking, and printing
+//
+// Notes on initialisation:
+//   - Can be constructed with value and unit arguments
+//         -> Value is taken as a double
+//         -> Unit can be either passed as a Unit type or a string that will be parsed into a Unit type by parseUnits
+//
+// Notes on algorithms:
+//   - Addition and subtraction require identical units (dimensions must match exactly)
+//   - Multiplication and division automatically combine units via Unit operators
+//
+// Notes on output:
+//   - The unit is printed using the base dimension symbols (L, M, T, I, Θ, N, J)
+//         -> Since this is how Unit type's toString() method works
+//
+// Supported overloads / operations and functions / methods:
+//   - Printing:               print()
+//   - Addition:               operator+, operator+=
+//   - Subtraction:            operator-, operator-=
+//   - Multiplication:         operator*, operator*= (Quantity * Quantity, Quantity * scalar, scalar * Quantity)
+//   - Division:               operator/, operator/= (Quantity / Quantity, Quantity / scalar, scalar / Quantity)
+//   - Stream output:          operator<<
+//   - Dimensionless factory:  Quantity::dimensionless()
+//
+// Example usage:
+//   Unit meter{{1,0,0,0,0,0,0}};
+//   Unit second{{0,0,1,0,0,0,0}};
+//
+//   Quantity length{5.0, meter};                            // 5 L^1
+//   Quantity time{2.0, second};                             // 2 T^1
+//
+//   Quantity speed = length / time;                         // 2.5 L^1 T^-1
+//   Quantity doubled = speed * 2.0;                         // 5.0 L^1 T^-1
+//   Quantity acceleration = speed / time;                   // 1.25 L^1 T^-2
+//
+//   Quantity totalLength = length + Quantity{3.0, meter};   // 8 L^1
+//   Quantity smallLength = length - Quantity{3.0, meter};   // 2 L^1
+//
+//   Quantity dimensionless = Quantity::dimensionless(42.0); // 42 dimensionless
+//
+//   std::cout << speed;                                     // Output: "2.5 L^1 T^-1"
+//   speed.print();                                          // Output: "2.5 L^1 T^-1"
 template <size_t N>
 struct Vector {
     std::array<Quantity, N> data{};  // Each element = value + unit
-
-    // Variadic template constructor for Vector<N>
-    //
-    // Allows constructing a Vector with exactly N arguments of mixed types:
-    //   A Quantity (stored directly) or a brace-init style that directly goes to a Quantity
-    //   An arithmetic type (wrapped into a Quantity with an empty unit)
-    //   Otherwise → either triggers a compile-time error or throws a runtime error
-    //     Could only get to runtime error with very weird usage
-    //
-    // Template Parameters:
-    //   Args... - a pack of argument types, deduced per call
-    //
-    // Parameters:
-    //   args... - a pack of argument values, forwarded to the constructor
-    //
-    // Returns:
-    //   Custom Vector type - fixed size array of custom Quantity types
-    //
-    // Constraints:
-    //   requires(sizeof...(Args) == N)
-    //     Ensures the number of arguments matches the dimension of the Vector.
-    //
-    // Example:
-    //   Vector<3> v(
-    //       1,                    // arithmetic -> Quantity{1.0, ""}
-    //       {9.81, "m/s^2"},      // brace-init -> Quantity{9.81, "m/s^2"} FIXME: brace-init is not working
-    //       Quantity{3.14, "rad"} // already a Quantity
-    //   );
-    template<ConvertibleToQuantity... Args>
-    requires(sizeof...(Args) == N)
-    explicit(false) Vector(Args&&... args) : data{convertToQuantity(std::forward<Args>(args))...} {}
 
     // Array constructor for Vector<N>
     //
@@ -87,7 +90,7 @@ struct Vector {
     //   Vector<3> v(vals, "m"); -> v contains 3 Quantity types: 1 m, 2 m, 3 m
     explicit Vector(const std::array<double, N>& values, const std::string& unit = "") : data{} {
         for (size_t i = 0; i < N; i++) {
-            data[i] = Quantity{values[i], unit};
+            this->data[i] = Quantity{values[i], unit};
         }
     }
 
@@ -115,7 +118,7 @@ struct Vector {
             throw std::invalid_argument("initializer_list size must match vector size");
         size_t i = 0;
         for (const double value : values) {
-            data[i++] = Quantity{value, unit};
+            this->data[i++] = Quantity{value, unit};
         }
     }
 
@@ -145,11 +148,11 @@ struct Vector {
     //     auto x = cv[1]; -> reads the second element, cannot modify
     Quantity& operator[](size_t i) {
         if (i >= N) throw std::out_of_range("Vector index out of range");
-        return data[i];
+        return this->data[i];
     }
     const Quantity& operator[](size_t i) const {
         if (i >= N) throw std::out_of_range("Vector index out of range");
-        return data[i];
+        return this->data[i];
     }
 
     // Print method for Vector<N>
@@ -172,7 +175,7 @@ struct Vector {
     void print() const {
         std::cout << "(";
         for (size_t i = 0; i < N; i++) {
-            data[i].print();            // delegate to Quantity's print
+            this->data[i].print();            // delegate to Quantity's print
             if (i < N - 1) std::cout << ", ";
         }
         std::cout << ")\n";
@@ -195,7 +198,7 @@ struct Vector {
     Vector<N> operator+(const Vector<N>& other) const {
         Vector<N> result;
         for (size_t i = 0; i < N; i++) {
-            result[i] = data[i] + other[i];
+            result[i] = this->data[i] + other[i];
         }
         return result;
     }
@@ -217,7 +220,7 @@ struct Vector {
     Vector<N> operator-(const Vector<N>& other) const {
         Vector<N> result;
         for (size_t i = 0; i < N; i++) {
-            result[i] = data[i] - other[i];
+            result[i] = this->data[i] - other[i];
         }
         return result;
     }
@@ -239,7 +242,7 @@ struct Vector {
     Vector<N> operator*(double scalar) const {
         Vector<N> res;
         for (size_t i = 0; i < N; i++) {
-            res[i] = {data[i] * scalar};
+            res[i] = {this->data[i] * scalar};
         }
         return res;
     }
@@ -261,7 +264,7 @@ struct Vector {
     Vector<N> operator/(double scalar) const {
         Vector<N> res;
         for (size_t i = 0; i < N; i++) {
-            res[i] = {data[i] / scalar, data[i].unit};
+            res[i] = {this->data[i] / scalar, this->data[i].unit};
         }
         return res;
     }
@@ -313,16 +316,32 @@ struct Vector {
 
     // -------------------------
     // Dot product
-    // -------------------------
-    [[nodiscard]] double dot(const Vector<N>& other) const {
-        double sum = 0;
-        for (size_t i = 0; i < N; i++) {
-            if (data[i].unit != other[i].unit)
+    // ------------------------- TODO: Good handling of resultUnit
+    Quantity dot(const Vector<N>& other) const {
+        double accumulatedValue = 0.0;
+        Unit resultDimension;
+        std::optional<std::string> resultUnit;
+
+        for (std::size_t i = 0; i < N; ++i) {
+            const auto [scaleA, dimensionA] = parseUnits(this->data[i].unit);
+            const auto [scaleB, dimensionB] = parseUnits(other.data[i].unit);
+
+            const double productValue = scaleA * this->data[i].value * scaleB * other.data[i].value;
+            Unit combinedDimension = dimensionA + dimensionB;
+
+            if (!resultUnit.has_value()) {
+                resultDimension = combinedDimension;
+                resultUnit = this->data[i].unit + "*" + other[i].unit;
+            } else if (resultDimension != combinedDimension) {
                 throw std::invalid_argument("Unit mismatch in dot product");
-            sum += data[i].value * other[i].value;
+            }
+
+            accumulatedValue += productValue;
         }
-        return sum;
+
+        return Quantity{accumulatedValue, *resultUnit};
     }
+
     // -------------------------
     // Length / Norm
     // -------------------------
@@ -341,40 +360,6 @@ struct Vector {
 
     // TODO: Cross product
     // TODO: Minkowski
-    private:
-        // convertToQuantity function for Vector<N>
-        //
-        // Constructs a Quantity from a variety of inputs
-        // Separate to Quantity's own constructor to allow for empty units,
-        // which would make no real sense for standard Quantity usage
-        //
-        // Parameters:
-        //   arg - anything that can be converted into a Quantity or is arithmetic
-        //
-        // Returns:
-        //   A custom Quantity data type as defined in quantity.h
-        //
-        // Throws:
-        //   Error if passed an argument that cannot be made into a maths Vector
-        //
-        // Example:
-        //   Quantity a = convertToQuantity(arg);
-        static Quantity convertToQuantity(auto&& arg) {
-            using T = std::decay_t<decltype(arg)>;
-
-            if constexpr (std::is_arithmetic_v<T>) {
-                // Number -> Quantity with value = arg, unit = ""
-                return Quantity{static_cast<double>(arg), ""};
-            } else if constexpr (std::same_as<T, Quantity>) {
-                // Quantity -> Just forwards arg through directly as is already correct type
-                return std::forward<T>(arg);
-            } else if constexpr (std::convertible_to<T, Quantity>) {
-                // Brace-init list or convertible type -> make a Quantity
-                return Quantity{std::forward<T>(arg)};
-            } else {
-                throw std::invalid_argument("Vector constructor argument cannot be converted to Quantity");
-            }
-        }
 };
 
 // << operator for Vector<N>
