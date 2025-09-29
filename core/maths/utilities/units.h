@@ -55,7 +55,7 @@ inline constexpr std::array<Prefix, 24> prefixes = {{
 //   J = luminous intensity
 // as int8_ts in an array, where the value of each index is the exponent on that dimension.
 //
-// Notes on initialization:
+// Notes on initialisation:
 //   - Unit contains a std::array member so **double braces** are required for aggregate initialization:
 //         -> Unit meter{{1,0,0,0,0,0,0}}; // Outer braces = Unit, inner braces = std::array
 //   - To simplify creation, you can use a helper constructor:
