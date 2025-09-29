@@ -7,203 +7,153 @@
 // Licensed under a Non-Commercial License. See LICENSE file for details
 //
 
+#include <cassert>
+#include <cctype>
+#include <charconv>
+#include <cmath>
+#include <format>
+#include <iostream>
+#include <stdexcept>
+#include <string>
+#include <string_view>
+#include <utility>
+
 #include "core/maths/utilities/unit_utilities.h"
+#include "core/maths/utilities/units.h"
 
-Utf8Scanner::Utf8Scanner(const std::string_view s) : data(s) {}
+std::pair<std::string_view, int> extractSuperscript(const std::string_view unit) noexcept {
+    if (unit.empty()) { return {unit, 0}; } // If empty return input with exponent = 0
 
-bool Utf8Scanner::eof() const { return pos >= data.size(); }
-size_t Utf8Scanner::position() const { return pos; }
+    const char* start = unit.data();
+    const char* end = start + unit.size();
+    const char* p = start;
 
-unsigned char Utf8Scanner::peekByte() const {
-    return eof() ? 0 : static_cast<unsigned char>(data[pos]);
-}
-
-void Utf8Scanner::advance(const size_t n) { pos += n; }
-
-bool Utf8Scanner::matchSequence(const std::initializer_list<unsigned char> sequence) const {
-    if (pos + sequence.size() > data.size()) return false;
-    size_t i = 0;
-    for (const unsigned char expected : sequence) {
-        if (static_cast<unsigned char>(data[pos + i]) != expected) return false;
-        i++;
+    // Find the start of the exponent
+    while (p != end) {
+        const char c = *p;
+        if ((c >= '0' && c <= '9') || c == '-') {
+            break; // Exponent starts here
+        }
+        if (c == '^') {
+            ++p; // Skip caret
+            break; // Exponent starts after caret
+        }
+        ++p;
     }
-    return true;
+
+    // Number parsing
+    if (const char* numStart = p; numStart != end) {
+        int exponent = 0;
+        if (auto [ptr, ec] = std::from_chars(numStart, end, exponent); ec == std::errc()) {
+            const char* baseEnd = (numStart > start && *(numStart - 1) == '^') ? numStart - 1 : numStart;
+            return {std::string_view(start, baseEnd - start), exponent};
+        }
+    }
+
+    return {unit, 1}; // No numeric exponent found
 }
 
-std::pair<std::string,double> extractPrefix(const std::string_view unit) {
-    const auto& prefixes = PREFIXES();
-    const auto& units = UNIT_TABLE();
+UnitInfo extractPrefix(const std::string_view unit) {
+    auto& table = unitTable(); // Load unit table
 
-    std::string bestBase;
-    double bestScale = 1.0;
-    size_t bestLen = 0;
+    // Search for prefix, unit combination
+    for (const auto &[symbol, scale] : prefixes) {
+        if (const auto prefix = symbol; unit.substr(0, prefix.size()) == prefix) {
+            if (const auto it = table.find(unit.substr(prefix.size())); it != table.end()) {
+                return {it->second.factor * scale, it->second.unit};
+            }
+        }
+    }
 
-    for (const auto&[symbol, scale] : prefixes) { // TODO: Collapse if statements
-        if (unit.substr(0, symbol.size()) == symbol) {
-            auto base = std::string(unit.substr(symbol.size()));
-            if (!base.empty() && units.contains(base)) {
-                if (symbol.size() > bestLen) {
-                    bestBase = base;
-                    bestScale = scale;
-                    bestLen = symbol.size();
+    // Search for standalone unit
+    if (const auto it = table.find(unit); it != table.end()) {
+        return it->second;
+    }
+
+    // Throw error for if no valid unit was found
+    throw std::invalid_argument(
+        std::format(
+            "Could not find a valid prefix, base unit combination or stand alone base unit from prefixes and unit tables for {}",
+            unit
+        )
+    );
+}
+
+UnitInfo parseUnit(const char* tokenStart, const char* tokenEnd) {
+    // Trim leading spaces
+    while (tokenStart < tokenEnd && std::isspace(static_cast<unsigned char>(*tokenStart))) {
+        ++tokenStart;
+    }
+
+    // Trim trailing spaces
+    while (tokenEnd > tokenStart && std::isspace(static_cast<unsigned char>(*(tokenEnd - 1)))) {
+        --tokenEnd;
+    }
+
+    if (tokenStart == tokenEnd) {
+        // Only spaces / empty
+        return {1.0, Unit::dimensionless()};
+    }
+
+    std::string cleanedToken;
+    cleanedToken.reserve(tokenEnd - tokenStart);
+
+    // Copy while skipping internal spaces
+    for (const char* p = tokenStart; p < tokenEnd; ++p) {
+        if (!std::isspace(static_cast<unsigned char>(*p))) {
+            cleanedToken.push_back(*p);
+        }
+    }
+
+    auto [baseUnit, exponent] = extractSuperscript(cleanedToken); // baseUnit = string view, exponent = int
+    auto [scale, siUnit] = extractPrefix(baseUnit); // scale = double, siUnit = 7d array of int8_t
+    return {std::pow(scale, exponent), siUnit.raisedTo(exponent)};
+}
+
+UnitInfo parseUnits(const std::string_view units) {
+    UnitInfo result = {1.0, Unit::dimensionless()};
+
+    const char* p = units.data();
+    const char* end = p + units.size();
+
+    bool divideNext = false; // false = multiply, true = divide
+
+    while (p < end) {
+        // Skip leading whitespace
+        while (p < end && std::isspace(static_cast<unsigned char>(*p))) ++p;
+        if (p == end) break;
+
+        // Explicit operators
+        if (*p == '*') { divideNext = false; ++p; continue; } // Not necessary but added protection
+        if (*p == '/') { divideNext = true;  ++p; continue; }
+
+        // Capture token until next '*' or '/' or space
+        const char* tokenStart = p;
+        while (p < end && *p != '*' && *p != '/' && !std::isspace(static_cast<unsigned char>(*p))) ++p;
+        if (std::isspace(static_cast<unsigned char>(*p))) {
+            // Handling for spaces stuff like '^' operators clashing with spaces representing implicit multiplication
+            while (p < end && std::isspace(static_cast<unsigned char>(*p))) ++p;
+            while (p < end && *p != '*' && *p != '/' // Operators
+                && !std::isalpha(static_cast<unsigned char>(*p)) // Letters
+                && !((static_cast<unsigned char>(*p) == 0xCE) && (p + 1 < end && static_cast<unsigned char>(p[1]) == 0xBC))) { // μ for UTF-8 encoding
+                ++p;
                 }
-            }
+            --p; // Since pointer is on something indicative of next token or a multiplicative operator
         }
+
+        const char* tokenEnd = p;
+
+        // Clean token of any spaces and parse it
+        auto [factor, siUnit] = parseUnit(tokenStart, tokenEnd);
+
+        // Adding member functions for operations may reduce any temporary creations in updating result
+        if (divideNext) {
+            result = {result.factor / factor, result.unit / siUnit};
+        } else {
+            result = {result.factor * factor, result.unit * siUnit};
+        }
+
+        divideNext = false; // Reset so whitespace between units implies multiply; if not '/' multiply
     }
-
-    if (bestLen > 0) {
-        return { bestBase, bestScale };
-    }
-
-    // No prefix match → return unchanged
-    return { std::string(unit), 1.0 };
-}
-
-int decodeSuperscript(const std::string& s) {
-    static const std::unordered_map<std::string_view,int> supers = {
-        {"⁰", 0}, {"¹", 1}, {"²", 2}, {"³", 3}, {"⁴", 4},
-        {"⁵", 5}, {"⁶", 6}, {"⁷", 7}, {"⁸", 8}, {"⁹", 9}
-    };
-
-    Utf8Scanner scan(s);
-    int value = 0;
-    bool negative = false;
-
-    while (!scan.eof()) {
-        // Superscript minus (⁻ = E2 81 BB)
-        if (scan.matchSequence({0xE2, 0x81, 0xBB})) {
-            negative = true;
-            scan.advance(3);
-            continue;
-        }
-
-        // Collect one UTF-8 char
-        std::string utf8Char;
-        utf8Char.push_back(static_cast<char>(scan.peekByte()));
-        scan.advance();
-        while (!scan.eof() && (scan.peekByte() & 0xC0) == 0x80) {
-            utf8Char.push_back(static_cast<char>(scan.peekByte()));
-            scan.advance();
-        }
-
-        auto it = supers.find(utf8Char);
-        if (it == supers.end()) {
-            throw std::runtime_error("Invalid superscript sequence: " + utf8Char);
-        }
-        value = value * 10 + it->second;
-    }
-
-    return negative ? -value : value;
-}
-
-// Parse a single unit token (with optional prefix + exponent)
-UnitInfo parseUnit(const std::string& token) {
-    std::string unit;
-    int exponent = 1;
-
-    // Caret (^) form
-    if (const size_t caretPos = token.find('^'); caretPos != std::string::npos) {
-        unit = token.substr(0, caretPos);
-        exponent = std::stoi(token.substr(caretPos + 1));
-    } else {
-        // Scan manually
-        Utf8Scanner scan(token);
-        size_t split = token.size();
-
-        while (!scan.eof()) {
-            const unsigned char c = scan.peekByte();
-            if (std::isdigit(c) || c == '-') {
-                split = scan.position();
-                break;
-            }
-            if ((c & 0xF0) == 0xE0) { // superscript
-                split = scan.position();
-                break;
-            }
-            scan.advance();
-        }
-
-        unit = token.substr(0, split);
-
-        if (split < token.size()) {
-            if (const std::string exponentPart = token.substr(split);
-                !exponentPart.empty() && (std::isdigit(exponentPart[0]) || exponentPart[0] == '-'))
-                exponent = std::stoi(exponentPart);
-            else
-                exponent = decodeSuperscript(exponentPart);
-        }
-    }
-
-    // Prefix handling
-    auto [baseUnit, prefixScale] = extractPrefix(unit);
-
-    if (baseUnit.empty()) {
-        throw std::runtime_error("Parsed an empty base unit from token: '" + token + "'");
-    }
-
-    // Lookup
-    const auto& table = UNIT_TABLE();
-    const auto it = table.find(baseUnit);
-    if (it == table.end()) throw std::runtime_error("Unknown unit: " + baseUnit);
-
-    const auto&[scale_, dimension_] = it->second;
-    const double totalScale = std::pow(prefixScale * scale_, exponent);
-
-    Dimension dimension;
-    for (auto& [k,v] : dimension_.exponents) {
-        dimension.exponents[k] += v * exponent;
-    }
-
-    return UnitInfo{totalScale, dimension};
-}
-
-// Parse a compound unit string (spaces, *, /, · separators)
-UnitInfo parseUnits(const std::string& expr) {
-    UnitInfo result{1.0, Dimension::dimensionless()};
-    std::string token;
-    char op = '*'; // operator for the current token
-
-    auto processToken = [&](const std::string& token_, const char op_) {
-        if (token_.empty()) return;
-
-        auto [scale, dimension] = parseUnit(token_);
-
-        if (op_ == '*') {
-            result.dimension = result.dimension + dimension;
-            result.scale *= scale;
-        } else if (op_ == '/') {
-            result.dimension = result.dimension - dimension;
-            result.scale /= scale;
-        }
-    };
-
-    Utf8Scanner scan(expr);
-    while (!scan.eof()) {
-        if (const unsigned char c = scan.peekByte(); c == ' ') {
-            if (!token.empty()) {
-                processToken(token, op);
-                token.clear();
-            }
-            scan.advance();
-        }
-        else if (c == '*' || c == '/') {
-            processToken(token, op);
-            token.clear();
-            op = (c == '/') ? '/' : '*';
-            scan.advance();
-        }
-        else if (scan.matchSequence({0xC2, 0xB7})) { // middle dot
-            processToken(token, op);
-            token.clear();
-            op = '*';
-            scan.advance(2);
-        }
-        else {
-            token.push_back(static_cast<char>(c));
-            scan.advance();
-        }
-    }
-
-    processToken(token, op);
     return result;
 }
