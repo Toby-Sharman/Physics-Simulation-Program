@@ -21,10 +21,10 @@
 //
 // Represents the different prefixes for SI units, where prefixes represent a shorthand for orders of magnitude
 //   - symbol is the symbol of that prefix
-//   - factor is the amount that prefix represents
+//   - scale is the amount that prefix represents
 struct Prefix {
     std::string_view symbol;
-    double factor;
+    double scale;
 };
 
 // Table of prefixes for all standard prefixes
@@ -50,7 +50,7 @@ inline constexpr std::array<Prefix, 24> prefixes = {{
 //   Θ = thermodynamic temperature
 //   N = amount of substance
 //   J = luminous intensity
-//
+// as int8_ts in an array, where the value of each index is the exponent on that dimension.
 //
 // Notes on initialization:
 //   - Unit contains a std::array member so **double braces** are required for aggregate initialization:
@@ -99,11 +99,11 @@ inline constexpr std::array<Prefix, 24> prefixes = {{
 //
 //   bool same = (speed == meter / second); // true
 //
-//   std::cout << "Speed: " << speed.toString() << "\n";          // Output: "L T^-1"
+//   std::cout << "Speed: " << speed.toString() << "\n"; // Output: "L T^-1"
 struct Unit {
     std::array<int8_t, 7> exponents; // L, M, T, I, Θ, N, J
 
-    static constexpr Unit makeUnit(
+    [[nodiscard]] static constexpr Unit makeUnit(
         const int8_t l,
         const int8_t m,
         const int8_t t,
@@ -118,7 +118,7 @@ struct Unit {
     // Multiplication
     //
     // Multiplies two Units by adding their corresponding exponents
-    constexpr Unit operator*(const Unit& other) const noexcept {
+    [[nodiscard]] constexpr Unit operator*(const Unit& other) const noexcept {
         return Unit{{
             static_cast<int8_t>(this->exponents[0] + other.exponents[0]),
             static_cast<int8_t>(this->exponents[1] + other.exponents[1]),
@@ -147,7 +147,7 @@ struct Unit {
     // Division
     //
     // Divides two Units by subtracting the exponents of the right-hand side from the left-hand side
-    constexpr Unit operator/(const Unit& other) const noexcept {
+    [[nodiscard]] constexpr Unit operator/(const Unit& other) const noexcept {
         return Unit{{
             static_cast<int8_t>(this->exponents[0] - other.exponents[0]),
             static_cast<int8_t>(this->exponents[1] - other.exponents[1]),
@@ -204,23 +204,23 @@ struct Unit {
     }
 
     // Equality
-    //d
+    //
     // Compares all exponents for exact equality
-    constexpr bool operator==(const Unit& other) const noexcept {
+    [[nodiscard]] constexpr bool operator==(const Unit& other) const noexcept {
         return this->exponents == other.exponents;
     }
 
     // Inequality
     //
     // Compares all exponents for inequality
-    constexpr bool operator!=(const Unit& other) const noexcept {
+    [[nodiscard]] constexpr bool operator!=(const Unit& other) const noexcept {
         return this->exponents != other.exponents;
     }
 
     // Static method for dimensionless Unit
     //
     // Returns a Unit with all exponents zero
-    static constexpr Unit dimensionless() noexcept {
+    [[nodiscard]] static constexpr Unit dimensionless() noexcept {
         return Unit{{0,0,0,0,0,0,0}};
     }
 
@@ -264,7 +264,7 @@ struct UnitInfo {
 //
 // SI dimensionless units like radians and degrees are neglected
 //   - Unsure of implication on lumen and lux FIXME
-inline const std::unordered_map<std::string_view, UnitInfo>& unitTable() {
+[[nodiscard]] inline const std::unordered_map<std::string_view, UnitInfo>& unitTable() {
     using PhysConst = Globals::Constant::Physics;
     static const std::unordered_map<std::string_view, UnitInfo> table = {
         // Base SI units (except kg -> g)
@@ -297,14 +297,13 @@ inline const std::unordered_map<std::string_view, UnitInfo>& unitTable() {
         {"Sv",  {1.0,  Unit::makeUnit(2,  0,  -2, 0,  0, 0, 0)}}, // sievert
         {"kat", {1.0,  Unit::makeUnit(0,  0,  -1, 0,  0, 1, 0)}}, // katal
 
-        // Non SI units or quantities
-        {"c",    {PhysConst::c,    Unit::makeUnit(1, 0, -1, 0,  0, 0, 0)}}, // speed of light in vacuum
+        // Non-SI units
         {"eV",   {PhysConst::e,    Unit::makeUnit(2, 1, -2, 0,  0, 0, 0)}}, // electronVolt
         {"u",    {PhysConst::u,    Unit::makeUnit(0, 1, 0,  0,  0, 0, 0)}}, // atomic mass unit
         {"Da",   {PhysConst::Da,   Unit::makeUnit(0, 1, 0,  0,  0, 0, 0)}}, // dalton
-        {"h",    {PhysConst::h,    Unit::makeUnit(2, 1, -2, 0,  0, 0, 0)}}, // planck constant
-        {"hbar", {PhysConst::hbar, Unit::makeUnit(2, 1, -2, 0,  0, 0, 0)}}, // reduced planck constant
-        {"mu0",  {PhysConst::mu0,  Unit::makeUnit(1, 1, -2, -2, 0, 0, 0)}}  // vacuum permeability
+
+        {"min", {60.0,   Unit::makeUnit(0, 0, 1, 0, 0, 0, 0)}}, // minute
+        {"h",   {3600.0, Unit::makeUnit(0, 0, 1, 0, 0, 0, 0)}}, // hour
     };
     return table;
 }
