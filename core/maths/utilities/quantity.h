@@ -13,6 +13,7 @@
 #ifndef PHYSICS_SIMULATION_PROGRAM_QUANTITY_H
 #define PHYSICS_SIMULATION_PROGRAM_QUANTITY_H
 
+#include <cmath>
 #include <iostream>
 #include <stdexcept>
 #include <string>
@@ -48,6 +49,7 @@
 //   - Subtraction:            operator-, operator-=
 //   - Multiplication:         operator*, operator*= (Quantity * Quantity, Quantity * scalar, scalar * Quantity)
 //   - Division:               operator/, operator/= (Quantity / Quantity, Quantity / scalar, scalar / Quantity)
+//   - Exponentiation:         raisedTo(n)
 //   - Stream output:          operator<<
 //   - Dimensionless factory:  Quantity::dimensionless()
 //
@@ -65,11 +67,13 @@
 //   Quantity totalLength = length + Quantity{3.0, meter};   // 8 L^1
 //   Quantity smallLength = length - Quantity{3.0, meter};   // 2 L^1
 //
+//   Quantity squaredLength = length.raisedTo(2);            // 25 L^2
+//
 //   Quantity dimensionless = Quantity::dimensionless(42.0); // 42 dimensionless
 //
 //   std::cout << speed;                                     // Output: "2.5 L^1 T^-1"
 //   speed.print();                                          // Output: "2.5 L^1 T^-1"
-struct Quantity {
+struct [[nodiscard]] Quantity {
     double value;
     Unit unit; // Dimensions represented by Unit struct
 
@@ -198,6 +202,13 @@ struct Quantity {
         this->value /= other.value;
         this->unit /= other.unit;
         return *this;
+    }
+
+    // Exponentiation method
+    //
+    // Raises a Quantity to any real power
+    [[nodiscard]] Quantity raisedTo(const double power) const {
+        return {std::pow(value, power), unit.raisedTo(power)};
     }
 
     // Dimensionless Quantity factory
