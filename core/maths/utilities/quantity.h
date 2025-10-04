@@ -225,10 +225,10 @@ inline std::ostream& operator<<(std::ostream& outputStream, const Quantity& quan
 [[nodiscard]] inline const std::unordered_map<std::string_view, UnitInfo>& quantityTable() {
     using PhysConst = Globals::Constant::Physics;
     static const std::unordered_map<std::string_view, UnitInfo> table = {
-        {"c",    {PhysConst::c,    Unit::makeUnit(1, 0, -1, 0,  0, 0, 0)}}, // speed of light in vacuum
-        {"h",    {PhysConst::h,    Unit::makeUnit(2, 1, -2, 0,  0, 0, 0)}}, // planck constant
-        {"hbar", {PhysConst::hbar, Unit::makeUnit(2, 1, -2, 0,  0, 0, 0)}}, // reduced planck constant
-        {"mu0",  {PhysConst::mu0,  Unit::makeUnit(1, 1, -2, -2, 0, 0, 0)}}  // vacuum permeability
+        {"c",    {PhysConst::c,    Unit(1, 0, -1, 0,  0, 0, 0)}}, // speed of light in vacuum
+        {"h",    {PhysConst::h,    Unit(2, 1, -2, 0,  0, 0, 0)}}, // planck constant
+        {"hbar", {PhysConst::hbar, Unit(2, 1, -2, 0,  0, 0, 0)}}, // reduced planck constant
+        {"mu0",  {PhysConst::mu0,  Unit(1, 1, -2, -2, 0, 0, 0)}}  // vacuum permeability
     };
     return table;
 }
