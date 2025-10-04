@@ -44,6 +44,7 @@
 //         -> Since this is how Unit type's toString() method works
 //
 // Supported overloads / operations and functions / methods:
+//   - Constructor:            Quantity()
 //   - Printing:               print()
 //   - Addition:               operator+, operator+=
 //   - Subtraction:            operator-, operator-=
