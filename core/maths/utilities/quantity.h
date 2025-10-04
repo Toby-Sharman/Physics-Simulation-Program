@@ -55,11 +55,11 @@
 //   - Stream output:          operator<<
 //
 // Example usage:
-//   Unit meter{{1,0,0,0,0,0,0}};
-//   Unit second{{0,0,1,0,0,0,0}};
+//   Unit meter(1, 0, 0, 0, 0, 0, 0);
+//   Unit second(0, 0, 1, 0, 0, 0, 0);
 //
-//   Quantity length{5.0, meter};                            // 5 L^1
-//   Quantity time{2.0, second};                             // 2 T^1
+//   Quantity length(5.0, meter);                            // 5 L^1
+//   Quantity time(2.0, second);                             // 2 T^1
 //
 //   Quantity speed = length / time;                         // 2.5 L^1 T^-1
 //   Quantity doubled = speed * 2.0;                         // 5.0 L^1 T^-1

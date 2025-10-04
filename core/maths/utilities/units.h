@@ -89,8 +89,8 @@ inline constexpr std::array<Prefix, 24> prefixes = {{
 //   - String conversion:      toString()
 //
 // Example usage:
-//   Unit meter = Unit(1,0,0,0,0,0,0);
-//   Unit second = Unit(0,0,1,0,0,0,0);
+//   Unit meter = Unit(1, 0, 0, 0, 0, 0, 0);
+//   Unit second = Unit(0, 0, 1, 0, 0, 0, 0);
 //
 //   Unit speed = meter / second;           // {1,0,-1,0,0,0,0}
 //   Unit area  = meter * meter;            // {2,0,0,0,0,0,0}
