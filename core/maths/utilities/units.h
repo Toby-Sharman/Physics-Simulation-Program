@@ -80,12 +80,12 @@ inline constexpr std::array<Prefix, 24> prefixes = {{
 //
 // Supported overloads / operations and functions / methods:
 //   - Constructor:            Unit()
+//   - Dimensionless factory:  Unit::dimensionless()
 //   - Multiplication:         operator*, operator*=
 //   - Division:               operator/, operator/=
 //   - Equality/Inequality:    operator==, operator!=
 //   - Exponentiation:         raisedTo(n)
 //   - Inverse:                inverse()
-//   - Dimensionless factory:  Unit::dimensionless()
 //   - String conversion:      toString()
 //
 // Example usage:
@@ -107,6 +107,14 @@ struct [[nodiscard]] Unit {
 
     // Default Constructor
     constexpr Unit() noexcept : exponents{0,0,0,0,0,0,0} {}
+
+    // Dimensionless Unit factory
+    //
+    // Returns a Unit with all exponents zero
+    // Used to make it clearer when there is dimensionless Unit initialisation
+    [[nodiscard]] static constexpr Unit dimensionless() noexcept {
+        return Unit{0,0,0,0,0,0,0};
+    }
 
     // Constructor method from array
     explicit constexpr Unit(const std::array<int8_t, 7> exps) noexcept : exponents(exps) {}
@@ -222,13 +230,6 @@ struct [[nodiscard]] Unit {
             static_cast<int8_t>(-this->exponents[5]),
             static_cast<int8_t>(-this->exponents[6])
         };
-    }
-
-    // Dimensionless Unit factory
-    //
-    // Returns a Unit with all exponents zero
-    [[nodiscard]] static constexpr Unit dimensionless() noexcept {
-        return Unit{0,0,0,0,0,0,0};
     }
 
     // Convert to string method

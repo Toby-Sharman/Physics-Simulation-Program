@@ -45,14 +45,14 @@
 //
 // Supported overloads / operations and functions / methods:
 //   - Constructor:            Quantity()
-//   - Printing:               print()
+//   - Dimensionless factory:  Quantity::dimensionless()
 //   - Addition:               operator+, operator+=
 //   - Subtraction:            operator-, operator-=
 //   - Multiplication:         operator*, operator*= (Quantity * Quantity, Quantity * scalar, scalar * Quantity)
 //   - Division:               operator/, operator/= (Quantity / Quantity, Quantity / scalar, scalar / Quantity)
 //   - Exponentiation:         raisedTo(n)
+//   - Printing:               print()
 //   - Stream output:          operator<<
-//   - Dimensionless factory:  Quantity::dimensionless()
 //
 // Example usage:
 //   Unit meter{{1,0,0,0,0,0,0}};
@@ -81,6 +81,14 @@ struct [[nodiscard]] Quantity {
     // Default constructor
     Quantity() : value(0.0), unit(Unit::dimensionless()) {}
 
+    // Dimensionless Quantity factory
+    //
+    // Returns a Quantity with a value of 1.0 and a Unit with all exponents zero
+    // Used to make it clearer when there is dimensionless (and if non-specified valueless) Quantity initialisation
+    [[nodiscard]] static Quantity dimensionless(double value = 0.0) noexcept {
+        return {value, Unit::dimensionless()};
+    }
+
     // Constructor from value only (dimensionless unit)
     explicit Quantity(const double value) : value(value), unit(Unit::dimensionless()) {}
 
@@ -99,11 +107,6 @@ struct [[nodiscard]] Quantity {
     //
     // Note: For testing only; not intended for production use
     [[nodiscard]] Unit asUnit() const { return this->unit; }
-
-    // Print method
-    void print() const {
-        std::cout << this->value << " " << unit.toString();
-    }
 
     // Addition operator
     //
@@ -212,11 +215,9 @@ struct [[nodiscard]] Quantity {
         return {std::pow(value, power), unit.raisedTo(power)};
     }
 
-    // Dimensionless Quantity factory
-    //
-    // Returns a Quantity with a value of 1.0 and a Unit with all exponents zero
-    [[nodiscard]] static Quantity dimensionless(double value = 1.0) noexcept {
-        return {value, Unit::dimensionless()};
+    // Print method
+    void print() const {
+        std::cout << this->value << " " << unit.toString();
     }
 
     private:
