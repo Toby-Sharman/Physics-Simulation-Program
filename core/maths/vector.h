@@ -3,6 +3,9 @@
 // File: vector.h
 // Created by Tobias Sharman on 01/09/2025
 //
+// Description:
+//   - Describes Vector custom data type
+//
 // Copyright (c) 2025, Tobias Sharman
 // Licensed under a Non-Commercial License. See LICENSE file for details
 //
@@ -11,108 +14,111 @@
 #define PHYSICS_SIMULATION_PROGRAM_VECTOR_H
 
 #include <array>
-#include <cmath>
 #include <initializer_list>
 #include <iostream>
 #include <stdexcept>
 #include <string>
 
 #include "core/maths/utilities/quantity.h"
-#include "core/maths/utilities/units.h"
 
-// Quantity
+// Vector<N>
 //
-// Represents a physical quantity with a numeric value and a dimensional unit
-//   - The unit is represented using the Unit class, which tracks powers of the seven base SI dimensions
+// Represents a mathematical vector in the form of an array of quantities as described by Quantity
 //
-// This class supports arithmetic operations, dimension checking, and printing
+// This class supports common operator overloads (in particular arithmetic and stream operators) and dot product, cross
+// product, length, squared length, unit vector, and printing methods
 //
 // Notes on initialisation:
-//   - Can be constructed with value and unit arguments
-//         -> Value is taken as a double
-//         -> Unit can be either passed as a Unit type or a string that will be parsed into a Unit type by parseUnits
+//   - Can be constructed as a series of Quantity types
+//   - Can be constructed as an array or initializer list of values with an optional shared unit
+//   - Construction requires the same amount of values as the size of the Vector
+//   - Neglected construction from a Unit type for the Unit to be passed to a Quantity constructor as this would be a
+//     place of high likelihood of mistaken user input
 //
 // Notes on algorithms:
-//   - Addition and subtraction require identical units (dimensions must match exactly)
+//   - Vector operations require the same dimensional vectors
+//   - Addition and subtraction require identical units for same Vector index (dimensions must match exactly)
 //   - Multiplication and division automatically combine units via Unit operators
+//   - Cannot dot product an empty Vector
+//   - Dot product on a 1d Vector will just to a Quantity multiplication operation
+//   - Cannot generate a unit vector for a 0 length vector
 //
 // Notes on output:
 //   - The unit is printed using the base dimension symbols (L, M, T, I, Θ, N, J)
 //         -> Since this is how Unit type's toString() method works
 //
 // Supported overloads / operations and functions / methods:
-//   - Printing:               print()
+//   - Constructor:            Vector()
+//   - Subscript:              operator[]
 //   - Addition:               operator+, operator+=
 //   - Subtraction:            operator-, operator-=
-//   - Multiplication:         operator*, operator*= (Quantity * Quantity, Quantity * scalar, scalar * Quantity)
-//   - Division:               operator/, operator/= (Quantity / Quantity, Quantity / scalar, scalar / Quantity)
+//   - Multiplication:         operator*, operator*=
+//   - Division:               operator/, operator/=
+//   - Dot product:            dot()
+//   - Cross product:          cross()
+//   - Length squared:         lengthSquared()
+//   - Length:                 length()
+//   - Unit vector:            unitVector()
+//   - Printing:               print()
 //   - Stream output:          operator<<
-//   - Dimensionless factory:  Quantity::dimensionless()
+
+// Example usage: (The units have been described qualitatively when in reality they would be an array of dimensions)
+//   std::array<double, 3> vals = {1.0, 2.0, 3.0};
+//   Vector<3> v1(vals, "m");                      // v1 contains 3 Quantity types: {1.0 ,2.0 ,3.0}, dimensions of "m"
+//   Vector<3> v2 = Vector({1.0, 2.0, 3.0});       // v2 contains 3 Quantity types: {1.0 ,2.0 ,3.0}, dimensions of ""
+//   Vector<3> v3 = Vector({2.0, 6.0, 8.0}, "kg"); // v3 contains 3 Quantity types: {1.0 ,2.0 ,3.0}, dimensions of "kg"
+//   const Vector<3> v4(Quantity{1.0, ""}, Quantity{2.0, ""}, Quantity{3.0, ""}); // Read-only Vector
 //
-// Example usage:
-//   Unit meter{{1,0,0,0,0,0,0}};
-//   Unit second{{0,0,1,0,0,0,0}};
+//   v1[0] = Quantity{4.0, ""};                    // v1 index 0 is a Quantity with value of 4.0 and dimensions of ""
 //
-//   Quantity length{5.0, meter};                            // 5 L^1
-//   Quantity time{2.0, second};                             // 2 T^1
+//   Vector<3> v5 = v2 + v4;                       // v4 = {2.0, 4.0, 6.0} no dimensions
+//   Vector<3> v6 = v2 - v4;                       // v6 = {0.0, 0.0, 0.0} no dimensions
 //
-//   Quantity speed = length / time;                         // 2.5 L^1 T^-1
-//   Quantity doubled = speed * 2.0;                         // 5.0 L^1 T^-1
-//   Quantity acceleration = speed / time;                   // 1.25 L^1 T^-2
+//   double a = 3.0;
+//   Vector<3> v7 = v3 * a;                        // v7 = {6.0, 18.0, 24.0} all dimensions of "kg"
 //
-//   Quantity totalLength = length + Quantity{3.0, meter};   // 8 L^1
-//   Quantity smallLength = length - Quantity{3.0, meter};   // 2 L^1
+//   double b = 2.0;
+//   Vector<3> v8 = v3 / a;                        // v8 = {1.0, 3.0, 4.0} all dimensions of "kg"
 //
-//   Quantity dimensionless = Quantity::dimensionless(42.0); // 42 dimensionless
+//   Quantity q1 = v2.dot(v3);                     // q1 = 14 "kg"
+//   Quantity q2 = dot(v2, v3);                    // q2 = 14 "kg"
 //
-//   std::cout << speed;                                     // Output: "2.5 L^1 T^-1"
-//   speed.print();                                          // Output: "2.5 L^1 T^-1"
+//   Vector<3> v9 = v2.cross(v3);                  // v9 = {-2, -2, 2} all dimensions of "kg"
+//   Vector<3> v10 = cross(v2, v3);                // v10 = {-2, -2, 2} all dimensions of "kg"
+//
+//   Quantity q3 = v3.lengthSquared();             // q3 = 14 "kg^2"
+//   Quantity q4 = v3.length();                    // q4 = sqrt(14) "kg"
+//
+//   Vector<3> v11 = v3.unitVector;                // v11 = v3/q4
+//
+//   v1.print;                                     // prints "(1.0, 2.0 L, 3.0 L)"
+//   std::cout << v1;                              // returns a stream "(1.0, 2.0 L, 3.0 L)"
 template <size_t N>
 struct Vector {
-    std::array<Quantity, N> data{};  // Each element = value + unit
+    std::array<Quantity, N> data;  // Each element = value + unit
 
-    // Array constructor for Vector<N>
-    //
-    // Construct from array of doubles + optional shared unit
-    //
-    // Maps array values to the value of a Quantity
-    // Sets all units to the unit described by the optional unit
-    //
-    // Parameters:
-    //   values - std::array of doubles, one per Vector element
-    //   unit   - optional unit string to assign to all elements (default: "")
-    //
-    // Returns:
-    //   Custom Vector type - fixed size array of custom Quantity types
-    //
-    // Example:
-    //   std::array<double, 3> vals = {1.0, 2.0, 3.0};
-    //   Vector<3> v(vals, "m"); -> v contains 3 Quantity types: 1 m, 2 m, 3 m
-    explicit Vector(const std::array<double, N>& values, const std::string& unit = "") : data{} {
+    Vector() = default;
+
+    // Constructor from Quantities
+    Vector(const std::initializer_list<Quantity> quantities) {
+        if (quantities.size() != N) {
+            throw std::invalid_argument("Number of Quantity arguments must match vector dimension");
+        }
+
+        std::size_t i = 0;
+        for (const auto& quantity : quantities) {
+            data[i++] = quantity;
+        }
+    }
+
+    // Constructor from array of values and optional shared unit
+    constexpr explicit Vector(const std::array<double, N>& values, const std::string& unit = "") : data{} {
         for (size_t i = 0; i < N; i++) {
             this->data[i] = Quantity{values[i], unit};
         }
     }
 
-    // Initializer list constructor for Vector<N>
-    //
-    // Construct from initializer_list of doubles + optional shared unit
-    // Maps initializer_list values to the value of a Quantity
-    // Sets all units to the unit described by the optional unit
-    //
-    // Parameters:
-    //   values - initializer_list of doubles; size must match N
-    //   unit   - optional unit string to assign to all elements (default: "")
-    //
-    // Returns:
-    //   Custom Vector type - fixed size array of custom Quantity types
-    //
-    // Throws:
-    //   invalid_argument if passed an initializer_list of different size to desired vector
-    //
-    // Example:
-    //   Vector<3> v = Vector<3>({1.0, 2.0, 3.0}); -> v contains 3 Quantity types: 1, 2, 3 (unit = "")
-    //   Vector<3> vWithUnit = Vector<3>({1.0, 2.0, 3.0}, "kg"); -> v contains 3 Quantity types: 1 kg, 2 kg, 3 kg
+    // Constructor from initializer list of values and optional shared unit
     Vector(const std::initializer_list<double>& values, const std::string& unit = "") : data{} {
         if (values.size() != N)
             throw std::invalid_argument("initializer_list size must match vector size");
@@ -122,288 +128,169 @@ struct Vector {
         }
     }
 
-    // Subscript operator for Vector<N>
+    // Subscript operator
     //
-    // Provides element access by index, with two overloads:
-    //   Non-const version: returns a reference to allow modification of the element
-    //   Const version: returns a const reference to allow read-only access
-    //
-    // Parameters:
-    //   i - Index of the element to access
-    //
-    // Returns:
-    //   Reference (or const reference) to the Quantity stored at position i
-    //
-    // Throws:
-    //   out_of_range if i >= N, ensuring safe bounds-checked access
-    //
-    // Examples:
-    //   Non-const usage (modify elements):
-    //     Vector<3> v{1, 2, 3};
-    //     v[0] = Quantity{4.0, ""}; -> sets the first element
-    //     v[2] += Quantity{1.5, ""}; -> modifies the third element
-    //
-    //   Const usage (read-only access):
-    //     const Vector<3> cv{Quantity{1.0, ""}, Quantity{2.0, ""}, Quantity{3.0, ""}};
-    //     auto x = cv[1]; -> reads the second element, cannot modify
+    // Mutable
     Quantity& operator[](size_t i) {
         if (i >= N) throw std::out_of_range("Vector index out of range");
         return this->data[i];
     }
+
+    // Subscript operator
+    //
+    // Read-only
     const Quantity& operator[](size_t i) const {
         if (i >= N) throw std::out_of_range("Vector index out of range");
         return this->data[i];
     }
 
-    // Print method for Vector<N>
-    //
-    // Outputs the contents of the vector to std::cout in a human-readable format.
-    // Each element is displayed as its value followed by its unit (if any), separated by commas,
-    // and enclosed in parentheses.
-    //
-    // This method does not modify the vector and is marked as const.
-    //
-    // Parameters:
-    //   None
-    //
-    // Returns:
-    //   void
-    //
-    // Examples:
-    //   Vector<3> v{Quantity{1.0, "m"}, Quantity{2.5, "s"}, Quantity{3.0, ""}};
-    //   v.print(); -> Output: (1 m, 2.5 s, 3)
+    // Addition operator
+    [[nodiscard]] Vector operator+(const Vector& other) const {
+        Vector result;
+        for (size_t i = 0; i < N; ++i) result[i] = data[i] + other[i];
+        return result;
+    }
+
+    // Addition assignment operator
+    Vector& operator+=(const Vector& other) {
+        for (size_t i = 0; i < N; ++i) data[i] = data[i] + other[i];
+        return *this;
+    }
+
+    // Subtraction operator
+    [[nodiscard]] Vector operator-(const Vector& other) const {
+        Vector result;
+        for (size_t i = 0; i < N; ++i) result[i] = data[i] - other[i];
+        return result;
+    }
+
+    // Subtraction assignment operator
+    Vector& operator-=(const Vector& other) {
+        for (size_t i = 0; i < N; ++i) data[i] = data[i] - other[i];
+        return *this;
+    }
+
+    // Multiplication operator
+    [[nodiscard]] constexpr Vector operator*(double scalar) const noexcept {
+        Vector result;
+        for (size_t i = 0; i < N; ++i) result[i] = data[i] * scalar;
+        return result;
+    }
+
+    // Multiplication assignment operator
+    constexpr Vector& operator*=(double scalar) noexcept {
+        for (size_t i = 0; i < N; ++i) data[i] = data[i] * scalar;
+        return *this;
+    }
+
+    // Division operator
+    [[nodiscard]] Vector operator/(double scalar) const noexcept {
+        Vector result;
+        for (size_t i = 0; i < N; ++i) result[i] = data[i] / scalar;
+        return result;
+    }
+
+    // Division assignment operator
+    Vector& operator/=(double scalar) noexcept {
+        for (size_t i = 0; i < N; ++i) data[i] = data[i] / scalar;
+        return *this;
+    }
+
+    // Dot product method
+    [[nodiscard]] Quantity dot(const Vector& other) const {
+        if (N == 0) throw std::invalid_argument("Cannot take dot product of empty vector");
+
+        Quantity result = data[0] * other[0];
+
+        if (N == 1) return result;
+
+        for (size_t i = 1; i < N; ++i)
+            result += data[i] * other[i];
+
+        return result;
+    }
+
+    // Cross product method
+    [[nodiscard]] Vector<3> cross(const Vector<3>& other) const {
+        static_assert(N == 3, "Cross product is only defined for 3D vectors");
+
+        return Vector<3>{
+            data[1] * other.data[2] - data[2] * other.data[1],
+            data[2] * other.data[0] - data[0] * other.data[2],
+            data[0] * other.data[1] - data[1] * other.data[0]
+        };
+    }
+
+    // TODO: Minkowski?
+
+    // Length squared method
+    [[nodiscard]] Quantity lengthSquared() const { return dot(*this); }
+
+    // Length method
+    [[nodiscard]] Quantity length() const { return lengthSquared().raisedTo(0.5); }
+
+    // Unit vector method
+    [[nodiscard]] Vector unitVector() const {
+        const double len = length().value;
+        if (len == 0) {
+            throw std::invalid_argument("Cannot create a unit vector for a 0 length vector");
+        }
+        return *this / len;
+    }
+
+    // Print method
     void print() const {
         std::cout << "(";
         for (size_t i = 0; i < N; i++) {
-            this->data[i].print();            // delegate to Quantity's print
-            if (i < N - 1) std::cout << ", ";
+            if (i > 0) std::cout << ", ";
+            std::cout << data[i];
         }
         std::cout << ")\n";
     }
-
-    // Addition operator for Vector<N>
-    //
-    // Adds one Vector to another of the same size using the Quantity types overloads
-    //
-    // Parameters:
-    //   other - the Vector to add
-    //
-    // Returns:
-    //   A new Vector representing the sum of the two
-    //
-    // Example:
-    //   Vector<3> a({1.0, 2.0, 3.0});
-    //   Vector<3> b({5.0, 7.0, 9.0});
-    //   Vector<3> c = a + b;  -> c is {6.0, 9.0, 12.0} (neglecting units for example)
-    Vector<N> operator+(const Vector<N>& other) const {
-        Vector<N> result;
-        for (size_t i = 0; i < N; i++) {
-            result[i] = this->data[i] + other[i];
-        }
-        return result;
-    }
-
-    // Subtraction operator for Vector<N>
-    //
-    // Subtracts one Vector from another of the same size using the Quantity types overloads
-    //
-    // Parameters:
-    //   other - the Vector to subtract
-    //
-    // Returns:
-    //   A new Vector representing the difference of the two
-    //
-    // Example:
-    //   Vector<3> a({1.0, 0.0, 3.0});
-    //   Vector<3> b({5.0, 7.0, 9.0});
-    //   Vector<3> c = a - b;  -> c is {-4.0, 2.0, -6.0} (neglecting units for example)
-    Vector<N> operator-(const Vector<N>& other) const {
-        Vector<N> result;
-        for (size_t i = 0; i < N; i++) {
-            result[i] = this->data[i] - other[i];
-        }
-        return result;
-    }
-
-    // Multiplication operator for Vector<N>
-    //
-    // Multiplies one Vector by a scalar in the order Quantity * scalar
-    //
-    // Parameters:
-    //   scalar - amount to multiply by
-    //
-    // Returns:
-    //   A new Vector representing the product of the two
-    //
-    // Example:
-    //   Vector<3> a({1.0, 2.0, 3.0});
-    //   double b = 3.0
-    //   Vector<3> c = a * b;  -> c is {3.0, 6.0, 9.0} (neglecting units for example)
-    Vector<N> operator*(double scalar) const {
-        Vector<N> res;
-        for (size_t i = 0; i < N; i++) {
-            res[i] = {this->data[i] * scalar};
-        }
-        return res;
-    }
-
-    // Division operator for Vector<N>
-    //
-    // Divides one Vector by a scalar in the order Quantity / scalar
-    //
-    // Parameters:
-    //   scalar - amount to divide by
-    //
-    // Returns:
-    //   A new Vector representing the quotient of the two
-    //
-    // Example:
-    //   Vector<3> a({1.0, 2.0, 3.0});
-    //   double b = 2.0
-    //   Vector<3> c = a / b;  -> c is {0.5, 1.0, 1.5} (neglecting units for example)
-    Vector<N> operator/(double scalar) const {
-        Vector<N> res;
-        for (size_t i = 0; i < N; i++) {
-            res[i] = {this->data[i] / scalar, this->data[i].unit};
-        }
-        return res;
-    }
-
-    // Compound assignment operators for Vector<N>
-    //
-    // Performs an in-place arithmetic operation (addition, subtraction, multiplication, or division) on this Vector
-    // For addition and subtraction supports Vectors
-    // For multiplication and division supports scalars
-    //
-    // Supported operators: +=, -=, *=, /=
-    //
-    // Parameters:
-    //   value - the scalar or Vector to combine with this Vector
-    //
-    // Returns:
-    //   A reference to this Vector after the operation
-    //
-    // Examples:
-    //   Vector<3> a({1.0, 2.0, 3.0});
-    //   Vector<3> b({4.0, 1.0, 12.0});
-    //   double c = 2.0;
-    //
-    //   a += b;  // {5.0, 3.0, 15.0}
-    //   a -= b;  // {-3.0, 1.0, -9.0}
-    //
-    //   a *= c;  // {2.0, 4.0, 6.0}
-    //   a /= c;  // {0.5, 1.0, 1.5}
-    Vector<N>& operator+=(const Vector<N>& other) {
-        // Addition
-        *this = *this + other;
-        return *this;
-    }
-    Vector<N>& operator-=(const Vector<N>& other) {
-        // Subtraction
-        *this = *this - other;
-        return *this;
-    }
-    Vector<N>& operator*=(double scalar) {
-        // Multiplication by scalar
-        *this = *this * scalar;
-        return *this;
-    }
-    Vector<N>& operator/=(double scalar) {
-        // Division by scalar
-        *this = *this / scalar;
-        return *this;
-    }
-
-    // -------------------------
-    // Dot product
-    // ------------------------- TODO: Good handling of resultUnit
-    Quantity dot(const Vector<N>& other) const {
-        double accumulatedValue = 0.0;
-        Unit resultDimension;
-        std::optional<std::string> resultUnit;
-
-        for (std::size_t i = 0; i < N; ++i) {
-            const auto [scaleA, dimensionA] = parseUnits(this->data[i].unit);
-            const auto [scaleB, dimensionB] = parseUnits(other.data[i].unit);
-
-            const double productValue = scaleA * this->data[i].value * scaleB * other.data[i].value;
-            Unit combinedDimension = dimensionA + dimensionB;
-
-            if (!resultUnit.has_value()) {
-                resultDimension = combinedDimension;
-                resultUnit = this->data[i].unit + "*" + other[i].unit;
-            } else if (resultDimension != combinedDimension) {
-                throw std::invalid_argument("Unit mismatch in dot product");
-            }
-
-            accumulatedValue += productValue;
-        }
-
-        return Quantity{accumulatedValue, *resultUnit};
-    }
-
-    // -------------------------
-    // Length / Norm
-    // -------------------------
-    [[nodiscard]] double lengthSquared() const { return dot(*this); }
-    [[nodiscard]] double length() const { return std::sqrt(lengthSquared()); }
-    [[nodiscard]] Vector<N> normalized() const {
-        const double len = length();
-        if (len == 0) return Vector<N>(0);
-        return *this * (1.0 / len);
-    }
-
-    // TODO: Readd metric length squared? (Non-euclidean etc.)
-
-    // TODO: Readd metric dot? (Non-euclidean etc.)
-
-
-    // TODO: Cross product
-    // TODO: Minkowski
 };
 
-// << operator for Vector<N>
-//
-// Outputs a Vector to a stream in the format "(<value> <unit>, ...)"
-//
-// Parameters:
-//   os      - the output stream
-//   vector  - the Vector<N> to print
-//
-// Returns:
-//   A reference to the output stream for chaining
-//
-// Example:
-//   Vector<3> a({1.0, 2.0, 3.0}, "m");
-//   std::cout << a;  -> prints "(1.0 m, 2.0 m, 3.0 m)"
-template <std::size_t N>
-std::ostream& operator<<(std::ostream& os, const Vector<N>& v) {
-    os << "(";
-    for (std::size_t i = 0; i < N; ++i) {
-        os << v[i];
-        if (i != N - 1) os << ", ";
+// Stream operator
+template <size_t N>std::ostream& operator<<(std::ostream& outputStream, const Vector<N>& vector) {
+    outputStream << "(";
+    for (size_t i = 0; i < N; ++i) {
+        if (i > 0) outputStream << ", ";
+        outputStream << vector[i];
     }
-    os << ")";
-    return os;
+    outputStream << ")";
+    return outputStream;
 }
 
-// Multiplication operator for Vector<N>
-//
-// Multiply a Vector<N> by a scalar in the order Vector<N> * scalar
-//
-// Parameters:
-//   scalar - amount to multiply by
-//
-// Returns:
-//   A new Vector<N> representing the product of the two
-//
-// Example:
-//   double a = 3.0
-//   Vector<3> b({1.0, 2.0, 3.0});
-//   Vector<3> c = a * b;  -> c is {3.0, 6.0, 9.0} (neglecting units for example)
+// Multiplication operator
 template <size_t N>
-Vector<N> operator*(double scalar, const Vector<N>& v) {
-    return v * scalar;
+[[nodiscard]] constexpr Vector<N> operator*(double scalar, const Vector<N>& vector) noexcept {
+    return vector * scalar;
+}
+
+// Dot product method
+template <std::size_t N>
+[[nodiscard]] Quantity dot(const Vector<N>& vector1, const Vector<N>& vector2) {
+    if (N == 0) throw std::invalid_argument("Cannot take dot product of empty vector");
+
+    Quantity result = vector1[0] * vector2[0];
+
+    if (N == 1) return result;
+
+    for (size_t i = 1; i < N; ++i)
+        result += vector1[i] * vector2[i];
+
+    return result;
+}
+
+// Cross product method
+template <size_t N>
+[[nodiscard]] Vector<N> cross(const Vector<N>& vector1, const Vector<N>& vector2) {
+    static_assert(N == 3, "Cross product is only defined for 3D vectors");
+
+    return Vector<3>{
+        vector1.data[1] * vector2.data[2] - vector1.data[2] * vector2.data[1],
+        vector1.data[2] * vector2.data[0] - vector1.data[0] * vector2.data[2],
+        vector1.data[0] * vector2.data[1] - vector1.data[1] * vector2.data[0]
+    };
 }
 
 #endif //PHYSICS_SIMULATION_PROGRAM_VECTOR_H
