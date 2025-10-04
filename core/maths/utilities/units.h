@@ -72,11 +72,11 @@ inline constexpr std::array<Prefix, 24> prefixes = {{
 //         -> If wanting to get rid of warning static_cast<int16_t> or static_cast<short> will work
 //
 // Notes on output:
-//   - Outputted in base dimensions (L, M, T, I, Θ, N, J)
-//         -> toString is for testing not for nice outputs
 //   - The toString() method outputs each non-zero exponent in the form SYMBOL^EXPONENT (omitting ^1 for brevity),
 //     separated by spaces
-//   - If all exponents are zero, it returns "dimensionless"
+//         -> Outputted in base dimensions (L, M, T, I, Θ, N, J)
+//         -> If all exponents are zero, it returns "dimensionless"
+//         -> toString is for testing not for nice outputs
 //
 // Supported overloads / operations and functions / methods:
 //   - Constructor:            Unit()
