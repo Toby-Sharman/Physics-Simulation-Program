@@ -79,7 +79,7 @@ struct [[nodiscard]] Quantity {
     Unit unit; // Dimensions represented by Unit struct
 
     // Default constructor
-    Quantity() : value(0.0), unit(Unit::dimensionless()) {}
+    constexpr Quantity() : value(0.0), unit(Unit::dimensionless()) {}
 
     // Dimensionless Quantity factory
     //
@@ -90,23 +90,27 @@ struct [[nodiscard]] Quantity {
     }
 
     // Constructor from value only (dimensionless unit)
-    explicit Quantity(const double value) : value(value), unit(Unit::dimensionless()) {}
+    constexpr explicit Quantity(const double value) : value(value), unit(Unit::dimensionless()) {}
 
     // Constructor from value and unit
-    Quantity(const double value, const Unit& unit) : value(value), unit(unit) {}
+    constexpr Quantity(const double value, const Unit& unit) : value(value), unit(unit) {}
 
     // Construct from value and unit string
-    Quantity(const double value, const std::string_view unit) : Quantity(fromValueAndUnitString(value, unit)) {}
+    constexpr Quantity(const double value, const std::string_view unitStr)
+        : Quantity([&]() constexpr -> Quantity {
+            auto [factor, siUnit] = parseUnits(unitStr);
+            return { value * factor, siUnit };
+        }()) {}
 
     // Returns the raw numeric value
     //
     // Note: For testing only; not intended for production use
-    [[nodiscard]] double asDouble() const { return this->value; }
+    [[nodiscard]] constexpr double asDouble() const { return this->value; }
 
     // Returns the unit as a Unit
     //
     // Note: For testing only; not intended for production use
-    [[nodiscard]] Unit asUnit() const { return this->unit; }
+    [[nodiscard]] constexpr Unit asUnit() const { return this->unit; }
 
     // Addition operator
     //
@@ -149,14 +153,14 @@ struct [[nodiscard]] Quantity {
     // Multiplication operator
     //
     // Quantity * scalar
-    [[nodiscard]] Quantity operator*(const double scalar) const noexcept {
+    [[nodiscard]] constexpr Quantity operator*(const double scalar) const noexcept {
         return {this->value * scalar, this->unit};
     }
 
     // Multiplication assignment operator
     //
     // Quantity *= scalar
-    Quantity& operator*=(const double scalar) noexcept {
+    constexpr Quantity& operator*=(const double scalar) noexcept {
         this->value *= scalar;
         return *this;
     }
@@ -164,14 +168,14 @@ struct [[nodiscard]] Quantity {
     // Multiplication operator
     //
     // Quantity * Quantity
-    [[nodiscard]] Quantity operator*(const Quantity& other) const noexcept {
+    [[nodiscard]] constexpr Quantity operator*(const Quantity& other) const noexcept {
         return {this->value * other.value, this->unit * other.unit};
     }
 
     // Multiplication assignment operator
     //
     // Quantity *= Quantity
-    Quantity& operator*=(const Quantity& other) noexcept {
+    constexpr Quantity& operator*=(const Quantity& other) noexcept {
         this->value *= other.value;
         this->unit *= other.unit;
         return *this;
@@ -219,27 +223,6 @@ struct [[nodiscard]] Quantity {
     void print() const {
         std::cout << this->value << " " << unit.toString();
     }
-
-    private:
-        // fromValueAndUnitString
-        //
-        // Helper for construction of a Quantity when using a string representation of units rather than a direct Unit
-        // type
-        //
-        // Notes on inputs:
-        //   - value can be any double
-        //   - units must abide by the rules described by parseUnits for functional and correct parsing
-        //
-        // Parameters:
-        //   - value - a double
-        //   - units - an immutable string of characters
-        //
-        // Returns:
-        //   - A Quantity type with a value and base SI dimensional representation
-        [[nodiscard]] static Quantity fromValueAndUnitString(const double value, const std::string_view units) {
-            auto [factor, siUnit] = parseUnits(units);
-            return {value * factor, siUnit};
-        }
 };
 
 // Stream operator
@@ -251,14 +234,14 @@ inline std::ostream& operator<<(std::ostream& outputStream, const Quantity& quan
 // Multiplication operator
 //
 // Scalar * Quantity
-[[nodiscard]] inline Quantity operator*(const double scalar, const Quantity& quantity) noexcept {
+[[nodiscard]] constexpr inline Quantity operator*(const double scalar, const Quantity& quantity) noexcept {
     return {scalar * quantity.value, quantity.unit};
 }
 
 // Division operator
 //
 // Scalar / Quantity
-[[nodiscard]] inline Quantity operator/(const double scalar, const Quantity& quantity) noexcept {
+[[nodiscard]] constexpr inline Quantity operator/(const double scalar, const Quantity& quantity) noexcept {
     return {scalar / quantity.value, quantity.unit.inverse()};
 }
 

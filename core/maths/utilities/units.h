@@ -207,7 +207,7 @@ struct [[nodiscard]] Unit {
     //
     // Raises a Unit to any real power and throws an error if the resultant exponent is non-integer
     [[nodiscard]] Unit raisedTo(const double power) const {
-        Unit result;
+        Unit result = {0, 0, 0, 0, 0, 0, 0};
         for (size_t i = 0; i < 7; ++i) { const double newExponent = static_cast<double>(exponents[i]) * power;
             if (std::round(newExponent) != newExponent) throw std::domain_error("New exponent is non-integer");
 
@@ -236,7 +236,7 @@ struct [[nodiscard]] Unit {
     //
     // Non-zero exponents are appended in the form SYMBOL^EXPONENT (exponent 1 is omitted), separated by spaces
     // Returns "Dimensionless" if all exponents are zero
-    [[nodiscard]] std::string toString() const {
+    [[nodiscard]] constexpr std::string toString() const {
         static const std::array<std::string,7> symbols = {"L","M","T","I","Θ","N","J"};
         std::string s;
         s.reserve(32); // Rough estimate to reduce reallocations
