@@ -82,9 +82,9 @@ inline constexpr std::array<Prefix, 24> prefixes = {{
 //   - Constructor:            Unit()
 //   - Multiplication:         operator*, operator*=
 //   - Division:               operator/, operator/=
+//   - Equality/Inequality:    operator==, operator!=
 //   - Exponentiation:         raisedTo(n)
 //   - Inverse:                inverse()
-//   - Equality/Inequality:    operator==, operator!=
 //   - Dimensionless factory:  Unit::dimensionless()
 //   - String conversion:      toString()
 //
@@ -181,6 +181,20 @@ struct [[nodiscard]] Unit {
         return *this;
     }
 
+    // Equality operator
+    //
+    // Compares all exponents for exact equality
+    [[nodiscard]] constexpr bool operator==(const Unit& other) const noexcept {
+        return this->exponents == other.exponents;
+    }
+
+    // Inequality operator
+    //
+    // Compares all exponents for inequality
+    [[nodiscard]] constexpr bool operator!=(const Unit& other) const noexcept {
+        return this->exponents != other.exponents;
+    }
+
     // Exponentiation method
     //
     // Raises a Unit to any real power and throws an error if the resultant exponent is non-integer
@@ -208,20 +222,6 @@ struct [[nodiscard]] Unit {
             static_cast<int8_t>(-this->exponents[5]),
             static_cast<int8_t>(-this->exponents[6])
         };
-    }
-
-    // Equality operator
-    //
-    // Compares all exponents for exact equality
-    [[nodiscard]] constexpr bool operator==(const Unit& other) const noexcept {
-        return this->exponents == other.exponents;
-    }
-
-    // Inequality operator
-    //
-    // Compares all exponents for inequality
-    [[nodiscard]] constexpr bool operator!=(const Unit& other) const noexcept {
-        return this->exponents != other.exponents;
     }
 
     // Dimensionless Unit factory
