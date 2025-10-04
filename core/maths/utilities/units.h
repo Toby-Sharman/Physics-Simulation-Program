@@ -82,7 +82,7 @@ inline constexpr std::array<Prefix, 24> prefixes = {{
 //   - Constructor:            Unit()
 //   - Multiplication:         operator*, operator*=
 //   - Division:               operator/, operator/=
-//   - Exponentiation:         raisedTo(int n)
+//   - Exponentiation:         raisedTo(n)
 //   - Inverse:                inverse()
 //   - Equality/Inequality:    operator==, operator!=
 //   - Dimensionless factory:  Unit::dimensionless()
