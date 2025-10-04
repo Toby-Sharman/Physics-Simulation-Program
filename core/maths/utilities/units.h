@@ -62,7 +62,8 @@ inline constexpr std::array<Prefix, 24> prefixes = {{
 //   - Each exponent is stored as an int8_t in a fixed-size array of length 7
 //         -> Usage of int8_t limits the allowed values of exponents but will give some performance increase
 //         -> No sensible quantity should be exceeding [-128, 127]
-//   - Some functions may seem overly verbose, but this is intentional to stop any performance hit from debug modes
+//   - Some functions may seem overly verbose, but this is intentional to stop any, however minor, performance hit from
+//     debug modes
 //         -> Compiler would normally unpack small for loops that may be used for the operator overloads
 //         -> For assignment operators there is repeat to avoid temporaries
 //   - Equality and inequality are branchless since short-circuiting should not be faster for Quantity use cases
@@ -103,6 +104,9 @@ inline constexpr std::array<Prefix, 24> prefixes = {{
 //   std::cout << "Speed: " << speed.toString() << "\n"; // Output: "L T^-1"
 struct [[nodiscard]] Unit {
     std::array<int8_t, 7> exponents; // L, M, T, I, Θ, N, J
+
+    // Default Constructor
+    constexpr Unit() noexcept : exponents{0,0,0,0,0,0,0} {}
 
     // Constructor method from array
     explicit constexpr Unit(const std::array<int8_t, 7> exps) noexcept : exponents(exps) {}
@@ -179,17 +183,16 @@ struct [[nodiscard]] Unit {
 
     // Exponentiation method
     //
-    // Raises a Unit to an integer power by multiplying each exponent by n
-    [[nodiscard]] constexpr Unit raisedTo(const int n) const noexcept {
-        return Unit{
-            static_cast<int8_t>(this->exponents[0] * n),
-            static_cast<int8_t>(this->exponents[1] * n),
-            static_cast<int8_t>(this->exponents[2] * n),
-            static_cast<int8_t>(this->exponents[3] * n),
-            static_cast<int8_t>(this->exponents[4] * n),
-            static_cast<int8_t>(this->exponents[5] * n),
-            static_cast<int8_t>(this->exponents[6] * n)
-        };
+    // Raises a Unit to any real power and throws an error if the resultant exponent is non-integer
+    [[nodiscard]] Unit raisedTo(const double power) const {
+        Unit result;
+        for (size_t i = 0; i < 7; ++i) { const double newExponent = static_cast<double>(exponents[i]) * power;
+            if (std::round(newExponent) != newExponent) throw std::domain_error("New exponent is non-integer");
+
+            result.exponents[i] = static_cast<int8_t>(std::round(newExponent));
+        }
+
+        return result;
     }
 
     // Inverse method
@@ -246,6 +249,7 @@ struct [[nodiscard]] Unit {
         }
 
         if (s.empty()) return "Dimensionless";
+
         s.pop_back(); // remove trailing space
         return s;
     }
