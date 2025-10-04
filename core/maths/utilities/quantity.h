@@ -100,14 +100,18 @@ struct Quantity {
         std::cout << this->value << " " << unit.toString();
     }
 
-    // Addition (requires same Unit)
+    // Addition operator
+    //
+    // Requires same Unit
     [[nodiscard]] Quantity operator+(const Quantity& other) const {
         if (this->unit != other.unit)
             throw std::invalid_argument("Cannot add quantities with different units");
         return {this->value + other.value, this->unit};
     }
 
-    // Addition assignment (requires same Unit)
+    // Addition assignment operator
+    //
+    // Requires same Unit
     Quantity& operator+=(const Quantity& other) {
         if (this->unit != other.unit)
             throw std::invalid_argument("Cannot add quantities with different units");
@@ -115,14 +119,18 @@ struct Quantity {
         return *this;
     }
 
-    // Subtraction (requires same Unit)
+    // Subtraction operator
+    //
+    // Requires same Unit
     [[nodiscard]] Quantity operator-(const Quantity& other) const {
         if (this->unit != other.unit)
             throw std::invalid_argument("Cannot subtract quantities with different units");
         return {this->value - other.value, this->unit};
     }
 
-    // Subtraction assignment (requires same Unit)
+    // Subtraction assignment operator
+    //
+    // Requires same Unit
     Quantity& operator-=(const Quantity& other) {
         if (this->unit != other.unit)
             throw std::invalid_argument("Cannot subtract quantities with different units");
@@ -130,53 +138,69 @@ struct Quantity {
         return *this;
     }
 
-    // Multiplication by scalar
+    // Multiplication operator
+    //
+    // Quantity * scalar
     [[nodiscard]] Quantity operator*(const double scalar) const noexcept {
         return {this->value * scalar, this->unit};
     }
 
-    // Multiplication by scalar assignment
+    // Multiplication assignment operator
+    //
+    // Quantity *= scalar
     Quantity& operator*=(const double scalar) noexcept {
         this->value *= scalar;
         return *this;
     }
 
-    // Multiplication by another Quantity
+    // Multiplication operator
+    //
+    // Quantity * Quantity
     [[nodiscard]] Quantity operator*(const Quantity& other) const noexcept {
         return {this->value * other.value, this->unit * other.unit};
     }
 
-    // Multiplication by another Quantity assignment
+    // Multiplication assignment operator
+    //
+    // Quantity *= Quantity
     Quantity& operator*=(const Quantity& other) noexcept {
         this->value *= other.value;
         this->unit *= other.unit;
         return *this;
     }
 
-    // Division by scalar
+    // Division operator
+    //
+    // Quantity / scalar
     [[nodiscard]] Quantity operator/(const double scalar) const noexcept {
         return {this->value / scalar, this->unit};
     }
 
-    // Division by scalar assignment
+    // Division assignment operator
+    //
+    // Quantity /= scalar
     Quantity& operator/=(const double scalar) noexcept {
         this->value /= scalar;
         return *this;
     }
 
-    // Division by another Quantity
+    // Division operator
+    //
+    // Quantity / Quantity
     [[nodiscard]] Quantity operator/(const Quantity& other) const noexcept {
         return {this->value / other.value, this->unit / other.unit};
     }
 
-    // Division by another Quantity assignment
+    // Division assignment operator
+    //
+    // Quantity /= Quantity
     Quantity& operator/=(const Quantity& other) noexcept {
         this->value /= other.value;
         this->unit /= other.unit;
         return *this;
     }
 
-    // Method for dimensionless Quantity
+    // Dimensionless Quantity factory
     //
     // Returns a Quantity with a value of 1.0 and a Unit with all exponents zero
     [[nodiscard]] static Quantity dimensionless(double value = 1.0) noexcept {
@@ -205,17 +229,21 @@ struct Quantity {
         }
 };
 
-// Stream
+// Stream operator
 inline std::ostream& operator<<(std::ostream& outputStream, const Quantity& quantity) {
     outputStream << quantity.value << " " << quantity.unit.toString();
     return outputStream;
 }
 
+// Multiplication operator
+//
 // Scalar * Quantity
 [[nodiscard]] inline Quantity operator*(const double scalar, const Quantity& quantity) noexcept {
     return {scalar * quantity.value, quantity.unit};
 }
 
+// Division operator
+//
 // Scalar / Quantity
 [[nodiscard]] inline Quantity operator/(const double scalar, const Quantity& quantity) noexcept {
     return {scalar / quantity.value, quantity.unit.inverse()};
