@@ -95,7 +95,7 @@ struct Quantity {
     // Note: For testing only; not intended for production use
     [[nodiscard]] Unit asUnit() const { return this->unit; }
 
-    // Print method for Quantity
+    // Print method
     void print() const {
         std::cout << this->value << " " << unit.toString();
     }
