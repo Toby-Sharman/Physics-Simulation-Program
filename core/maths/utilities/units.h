@@ -56,10 +56,7 @@ inline constexpr std::array<Prefix, 24> prefixes = {{
 // as int8_ts in an array, where the value of each index is the exponent on that dimension.
 //
 // Notes on initialisation:
-//   - Unit contains a std::array member so **double braces** are required for aggregate initialization:
-//         -> Unit meter{{1,0,0,0,0,0,0}}; // Outer braces = Unit, inner braces = std::array
-//   - To simplify creation, you can use a helper constructor:
-//         -> Unit meter = makeUnit(1,0,0,0,0,0,0);
+//   - Construct via curly or standard braces
 //
 // Notes on algorithms:
 //   - Each exponent is stored as an int8_t in a fixed-size array of length 7
@@ -81,6 +78,7 @@ inline constexpr std::array<Prefix, 24> prefixes = {{
 //   - If all exponents are zero, it returns "dimensionless"
 //
 // Supported overloads / operations and functions / methods:
+//   - Constructor:            Unit()
 //   - Multiplication:         operator*, operator*=
 //   - Division:               operator/, operator/=
 //   - Exponentiation:         raisedTo(int n)
@@ -90,8 +88,8 @@ inline constexpr std::array<Prefix, 24> prefixes = {{
 //   - String conversion:      toString()
 //
 // Example usage:
-//   Unit meter = makeUnit(1,0,0,0,0,0,0);
-//   Unit second = makeUnit(0,0,1,0,0,0,0);
+//   Unit meter = Unit(1,0,0,0,0,0,0);
+//   Unit second = Unit(0,0,1,0,0,0,0);
 //
 //   Unit speed = meter / second;           // {1,0,-1,0,0,0,0}
 //   Unit area  = meter * meter;            // {2,0,0,0,0,0,0}
@@ -103,10 +101,14 @@ inline constexpr std::array<Prefix, 24> prefixes = {{
 //   bool same = (speed == meter / second); // true
 //
 //   std::cout << "Speed: " << speed.toString() << "\n"; // Output: "L T^-1"
-struct Unit {
+struct [[nodiscard]] Unit {
     std::array<int8_t, 7> exponents; // L, M, T, I, Θ, N, J
 
-    [[nodiscard]] static constexpr Unit makeUnit(
+    // Constructor method from array
+    explicit constexpr Unit(const std::array<int8_t, 7> exps) noexcept : exponents(exps) {}
+
+    // Constructor method from values
+    constexpr Unit(
         const int8_t l,
         const int8_t m,
         const int8_t t,
@@ -114,15 +116,14 @@ struct Unit {
         const int8_t theta,
         const int8_t n,
         const int8_t j
-    ) noexcept {
-        return Unit{{l,m,t,i,theta,n,j}};
-    }
+    ) noexcept
+        : exponents{l, m, t, i, theta, n, j} {}
 
-    // Multiplication
+    // Multiplication operator
     //
     // Multiplies two Units by adding their corresponding exponents
     [[nodiscard]] constexpr Unit operator*(const Unit& other) const noexcept {
-        return Unit{{
+        return Unit{
             static_cast<int8_t>(this->exponents[0] + other.exponents[0]),
             static_cast<int8_t>(this->exponents[1] + other.exponents[1]),
             static_cast<int8_t>(this->exponents[2] + other.exponents[2]),
@@ -130,10 +131,10 @@ struct Unit {
             static_cast<int8_t>(this->exponents[4] + other.exponents[4]),
             static_cast<int8_t>(this->exponents[5] + other.exponents[5]),
             static_cast<int8_t>(this->exponents[6] + other.exponents[6])
-        }};
+        };
     }
 
-    // Multiplication assignment
+    // Multiplication assignment operator
     //
     // Adds the exponents of another Unit to this Unit in-place
     constexpr Unit& operator*=(const Unit& other) noexcept {
@@ -147,11 +148,11 @@ struct Unit {
         return *this;
     }
 
-    // Division
+    // Division operator
     //
     // Divides two Units by subtracting the exponents of the right-hand side from the left-hand side
     [[nodiscard]] constexpr Unit operator/(const Unit& other) const noexcept {
-        return Unit{{
+        return Unit{
             static_cast<int8_t>(this->exponents[0] - other.exponents[0]),
             static_cast<int8_t>(this->exponents[1] - other.exponents[1]),
             static_cast<int8_t>(this->exponents[2] - other.exponents[2]),
@@ -159,10 +160,10 @@ struct Unit {
             static_cast<int8_t>(this->exponents[4] - other.exponents[4]),
             static_cast<int8_t>(this->exponents[5] - other.exponents[5]),
             static_cast<int8_t>(this->exponents[6] - other.exponents[6])
-        }};
+        };
     }
 
-    // Division assignment
+    // Division assignment operator
     //
     // Subtracts the exponents of another Unit from this Unit in-place
     constexpr Unit& operator/=(const Unit& other) noexcept {
@@ -176,11 +177,11 @@ struct Unit {
         return *this;
     }
 
-    // Exponentiation
+    // Exponentiation method
     //
     // Raises a Unit to an integer power by multiplying each exponent by n
     [[nodiscard]] constexpr Unit raisedTo(const int n) const noexcept {
-        return Unit{{
+        return Unit{
             static_cast<int8_t>(this->exponents[0] * n),
             static_cast<int8_t>(this->exponents[1] * n),
             static_cast<int8_t>(this->exponents[2] * n),
@@ -188,14 +189,14 @@ struct Unit {
             static_cast<int8_t>(this->exponents[4] * n),
             static_cast<int8_t>(this->exponents[5] * n),
             static_cast<int8_t>(this->exponents[6] * n)
-        }};
+        };
     }
 
-    // Inverse
+    // Inverse method
     //
     // Negates all exponents, equivalent to raising the Unit to the power -1
     [[nodiscard]] constexpr Unit inverse() const noexcept {
-        return Unit{{
+        return Unit{
             static_cast<int8_t>(-this->exponents[0]),
             static_cast<int8_t>(-this->exponents[1]),
             static_cast<int8_t>(-this->exponents[2]),
@@ -203,31 +204,31 @@ struct Unit {
             static_cast<int8_t>(-this->exponents[4]),
             static_cast<int8_t>(-this->exponents[5]),
             static_cast<int8_t>(-this->exponents[6])
-        }};
+        };
     }
 
-    // Equality
+    // Equality operator
     //
     // Compares all exponents for exact equality
     [[nodiscard]] constexpr bool operator==(const Unit& other) const noexcept {
         return this->exponents == other.exponents;
     }
 
-    // Inequality
+    // Inequality operator
     //
     // Compares all exponents for inequality
     [[nodiscard]] constexpr bool operator!=(const Unit& other) const noexcept {
         return this->exponents != other.exponents;
     }
 
-    // Static method for dimensionless Unit
+    // Dimensionless Unit factory
     //
     // Returns a Unit with all exponents zero
     [[nodiscard]] static constexpr Unit dimensionless() noexcept {
-        return Unit{{0,0,0,0,0,0,0}};
+        return Unit{0,0,0,0,0,0,0};
     }
 
-    // Returns a string representation of the unit
+    // Convert to string method
     //
     // Non-zero exponents are appended in the form SYMBOL^EXPONENT (exponent 1 is omitted), separated by spaces
     // Returns "Dimensionless" if all exponents are zero
@@ -271,42 +272,42 @@ struct UnitInfo {
     using PhysConst = Globals::Constant::Physics;
     static const std::unordered_map<std::string_view, UnitInfo> table = {
         // Base SI units (except kg -> g)
-        {"m",   {1.0,  Unit::makeUnit(1,  0,  0,  0,  0, 0, 0)}}, // metre
-        {"g",   {1e-3, Unit::makeUnit(0,  1,  0,  0,  0, 0, 0)}}, // gram
-        {"s",   {1.0,  Unit::makeUnit(0,  0,  1,  0,  0, 0, 0)}}, // second
-        {"A",   {1.0,  Unit::makeUnit(0,  0,  0,  1,  0, 0, 0)}}, // ampere
-        {"K",   {1.0,  Unit::makeUnit(0,  0,  0,  0,  1, 0, 0)}}, // kelvin
-        {"mol", {1.0,  Unit::makeUnit(0,  0,  0,  0,  0, 1, 0)}}, // mole
-        {"cd",  {1.0,  Unit::makeUnit(0,  0,  0,  0,  0, 0, 1)}}, // candela
+        {"m",   {1.0,  Unit(1,  0,  0,  0,  0, 0, 0)}}, // metre
+        {"g",   {1e-3, Unit(0,  1,  0,  0,  0, 0, 0)}}, // gram
+        {"s",   {1.0,  Unit(0,  0,  1,  0,  0, 0, 0)}}, // second
+        {"A",   {1.0,  Unit(0,  0,  0,  1,  0, 0, 0)}}, // ampere
+        {"K",   {1.0,  Unit(0,  0,  0,  0,  1, 0, 0)}}, // kelvin
+        {"mol", {1.0,  Unit(0,  0,  0,  0,  0, 1, 0)}}, // mole
+        {"cd",  {1.0,  Unit(0,  0,  0,  0,  0, 0, 1)}}, // candela
 
         // Derived SI units
-        {"Hz",  {1.0,  Unit::makeUnit(0,  0,  -1, 0,  0, 0, 0)}}, // hertz
-        {"N",   {1.0,  Unit::makeUnit(1,  1,  -2, 0,  0, 0, 0)}}, // newton
-        {"Pa",  {1.0,  Unit::makeUnit(-1, 1,  -2, 0,  0, 0, 0)}}, // pascal
-        {"J",   {1.0,  Unit::makeUnit(2,  1,  -2, 0,  0, 0, 0)}}, // joule
-        {"W",   {1.0,  Unit::makeUnit(2,  1,  -3, 0,  0, 0, 0)}}, // watt
-        {"C",   {1.0,  Unit::makeUnit(0,  0,  1,  1,  0, 0, 0)}}, // coulomb
-        {"V",   {1.0,  Unit::makeUnit(2,  1,  -3, -1, 0, 0, 0)}}, // volt
-        {"F",   {1.0,  Unit::makeUnit(-2, -1, 4,  2,  0, 0, 0)}}, // farad
-        {"Ω",   {1.0,  Unit::makeUnit(2,  1,  -3, -2, 0, 0, 0)}}, // ohm
-        {"S",   {1.0,  Unit::makeUnit(-2, -1, 3,  2,  0, 0, 0)}}, // siemens
-        {"Wb",  {1.0,  Unit::makeUnit(2,  1,  -2, -1, 0, 0, 0)}}, // weber
-        {"T",   {1.0,  Unit::makeUnit(0,  1,  -2, -1, 0, 0, 0)}}, // tesla
-        {"H",   {1.0,  Unit::makeUnit(2,  1,  -2, -2, 0, 0, 0)}}, // henry
-        {"lm",  {1.0,  Unit::makeUnit(0,  0,  0,  0,  0, 0, 1)}}, // lumen
-        {"lx",  {1.0,  Unit::makeUnit(-2, 0,  0,  0,  0, 0, 1)}}, // lux
-        {"Bq",  {1.0,  Unit::makeUnit(0,  0,  -1, 0,  0, 0, 0)}}, // becquerel
-        {"Gy",  {1.0,  Unit::makeUnit(2,  0,  -2, 0,  0, 0, 0)}}, // gray
-        {"Sv",  {1.0,  Unit::makeUnit(2,  0,  -2, 0,  0, 0, 0)}}, // sievert
-        {"kat", {1.0,  Unit::makeUnit(0,  0,  -1, 0,  0, 1, 0)}}, // katal
+        {"Hz",  {1.0,  Unit(0,  0,  -1, 0,  0, 0, 0)}}, // hertz
+        {"N",   {1.0,  Unit(1,  1,  -2, 0,  0, 0, 0)}}, // newton
+        {"Pa",  {1.0,  Unit(-1, 1,  -2, 0,  0, 0, 0)}}, // pascal
+        {"J",   {1.0,  Unit(2,  1,  -2, 0,  0, 0, 0)}}, // joule
+        {"W",   {1.0,  Unit(2,  1,  -3, 0,  0, 0, 0)}}, // watt
+        {"C",   {1.0,  Unit(0,  0,  1,  1,  0, 0, 0)}}, // coulomb
+        {"V",   {1.0,  Unit(2,  1,  -3, -1, 0, 0, 0)}}, // volt
+        {"F",   {1.0,  Unit(-2, -1, 4,  2,  0, 0, 0)}}, // farad
+        {"Ω",   {1.0,  Unit(2,  1,  -3, -2, 0, 0, 0)}}, // ohm
+        {"S",   {1.0,  Unit(-2, -1, 3,  2,  0, 0, 0)}}, // siemens
+        {"Wb",  {1.0,  Unit(2,  1,  -2, -1, 0, 0, 0)}}, // weber
+        {"T",   {1.0,  Unit(0,  1,  -2, -1, 0, 0, 0)}}, // tesla
+        {"H",   {1.0,  Unit(2,  1,  -2, -2, 0, 0, 0)}}, // henry
+        {"lm",  {1.0,  Unit(0,  0,  0,  0,  0, 0, 1)}}, // lumen
+        {"lx",  {1.0,  Unit(-2, 0,  0,  0,  0, 0, 1)}}, // lux
+        {"Bq",  {1.0,  Unit(0,  0,  -1, 0,  0, 0, 0)}}, // becquerel
+        {"Gy",  {1.0,  Unit(2,  0,  -2, 0,  0, 0, 0)}}, // gray
+        {"Sv",  {1.0,  Unit(2,  0,  -2, 0,  0, 0, 0)}}, // sievert
+        {"kat", {1.0,  Unit(0,  0,  -1, 0,  0, 1, 0)}}, // katal
 
         // Non-SI units
-        {"eV",   {PhysConst::e,    Unit::makeUnit(2, 1, -2, 0,  0, 0, 0)}}, // electronVolt
-        {"u",    {PhysConst::u,    Unit::makeUnit(0, 1, 0,  0,  0, 0, 0)}}, // atomic mass unit
-        {"Da",   {PhysConst::Da,   Unit::makeUnit(0, 1, 0,  0,  0, 0, 0)}}, // dalton
+        {"eV",   {PhysConst::e,    Unit(2, 1, -2, 0,  0, 0, 0)}}, // electronVolt
+        {"u",    {PhysConst::u,    Unit(0, 1, 0,  0,  0, 0, 0)}}, // atomic mass unit
+        {"Da",   {PhysConst::Da,   Unit(0, 1, 0,  0,  0, 0, 0)}}, // dalton
 
-        {"min", {60.0,   Unit::makeUnit(0, 0, 1, 0, 0, 0, 0)}}, // minute
-        {"h",   {3600.0, Unit::makeUnit(0, 0, 1, 0, 0, 0, 0)}}, // hour
+        {"min", {60.0,   Unit(0, 0, 1, 0, 0, 0, 0)}}, // minute
+        {"h",   {3600.0, Unit(0, 0, 1, 0, 0, 0, 0)}}, // hour
     };
     return table;
 }
