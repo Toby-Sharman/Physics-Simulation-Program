@@ -79,7 +79,7 @@ struct [[nodiscard]] Quantity {
     Unit unit; // Dimensions represented by Unit struct
 
     // Default constructor
-    constexpr Quantity() : value(0.0), unit(Unit::dimensionless()) {}
+    constexpr Quantity() noexcept : value(0.0), unit(Unit::dimensionless()) {}
 
     // Dimensionless Quantity factory
     //
@@ -90,10 +90,10 @@ struct [[nodiscard]] Quantity {
     }
 
     // Constructor from value only (dimensionless unit)
-    constexpr explicit Quantity(const double value) : value(value), unit(Unit::dimensionless()) {}
+    constexpr explicit Quantity(const double value) noexcept : value(value), unit(Unit::dimensionless()) {}
 
     // Constructor from value and unit
-    constexpr Quantity(const double value, const Unit& unit) : value(value), unit(unit) {}
+    constexpr Quantity(const double value, const Unit& unit) noexcept : value(value), unit(unit) {}
 
     // Construct from value and unit string
     constexpr Quantity(const double value, const std::string_view unitStr)
