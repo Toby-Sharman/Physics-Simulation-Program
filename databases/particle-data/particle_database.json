@@ -2,8 +2,8 @@
   "photon": {
     "symbol": "γ",
     "rest mass": { "value": 0.0, "unit": "eV" },
-    "charge": {"value": 0.0, "unit":  "e"},
-    "spin": {"value": 1.0, "unit":  "ℏ"},
+    "charge": 0.0,
+    "spin": 1.0,
     "particle type": "boson"
   },
   "gluon": {
