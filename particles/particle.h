@@ -73,7 +73,7 @@ class Particle {
     [[nodiscard]] Quantity gamma() const;
 
     // Check for if the particle is massless or practically massless
-    [[nodiscard]] bool isMassless() const { return std::abs(m_restMass.asDouble()) <= Globals::Constant::MASSLESS_TOLERANCE; }
+    [[nodiscard]] bool isMassless() const { return std::abs(m_restMass.asDouble()) <= Globals::Constant::Program::masslessTolerance; }
 
     private:
     std::string m_particleName;

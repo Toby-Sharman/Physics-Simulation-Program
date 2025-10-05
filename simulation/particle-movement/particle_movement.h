@@ -5,10 +5,11 @@
 #ifndef PHYSICS_SIMULATION_PROGRAM_PARTICLE_MOVEMENT_H
 #define PHYSICS_SIMULATION_PROGRAM_PARTICLE_MOVEMENT_H
 
+#include "globals.h"
 #include "particle.h"
 #include "globals.h"
 
 // Moves a single particle forward by dt
-void moveParticle(Particle& p, double dt = Globals::Constant::TIME_STEP);
+void moveParticle(Particle& p, double dt = Globals::Constant::Program::timeStep);
 
 #endif //PHYSICS_SIMULATION_PROGRAM_PARTICLE_MOVEMENT_H

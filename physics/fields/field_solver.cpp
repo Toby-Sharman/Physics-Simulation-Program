@@ -9,8 +9,10 @@
 
 #include "field_solver.h"
 
+#include "globals.h"
+
 auto GLOBAL_B = Vector<3>{{0.0, 0.0, 1.0},"T"};
-auto Global_H = GLOBAL_B / Globals::Constant::MU0;
+auto Global_H = GLOBAL_B / Globals::Constant::Physics::mu0;
 
 Vector<3> getFieldAtPoint(const Vector<3>& point, const std::shared_ptr<Object>& root) {
     if (!root) return GLOBAL_B;

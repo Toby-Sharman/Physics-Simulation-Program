@@ -17,9 +17,9 @@
 
 // Pitch/Yaw/Roll rotation (3x3, degrees)
 inline Matrix<double,3,3> rotationMatrix3x3(const double pitch, const double yaw, const double roll) {
-    const double p = pitch * Globals::Constant::DEG2RAD; // Convert pitch
-    const double y = yaw   * Globals::Constant::DEG2RAD; // Convert yaw
-    const double r = roll  * Globals::Constant::DEG2RAD; // Convert roll
+    const double p = pitch * Globals::Constant::Maths::deg2rad; // Convert pitch
+    const double y = yaw   * Globals::Constant::Maths::deg2rad; // Convert yaw
+    const double r = roll  * Globals::Constant::Maths::deg2rad; // Convert roll
 
     const double cp = std::cos(p); const double sp = std::sin(p);
     const double cy = std::cos(y); const double sy = std::sin(y);
@@ -46,7 +46,7 @@ inline auto rotationMatrix4x4(const double pitch, const double yaw, double roll)
 
 // Axis-angle rotation (3x3, axis must be normalized, angle in degrees)
 inline Matrix<double,3,3> rotationMatrixAxisAngle3x3(const Vector<3>& axis, const double angle_deg) {
-    const double angle = angle_deg * Globals::Constant::DEG2RAD; // Convert angle
+    const double angle = angle_deg * Globals::Constant::Maths::deg2rad; // Convert angle
     const double c = std::cos(angle);
     const double s = std::sin(angle);
     const double t = 1.0f - c;

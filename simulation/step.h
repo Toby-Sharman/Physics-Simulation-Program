@@ -11,9 +11,9 @@
 
 #include <memory>
 
-void step(const std::shared_ptr<Box>& collectionBox, std::unique_ptr<Particle>& p, double dt = Globals::Constant::TIME_STEP);
+void step(const std::shared_ptr<Box>& collectionBox, std::unique_ptr<Particle>& p, double dt = Globals::Constant::Program::timeStep);
 
 // Step all particles in a vector
-void stepAll(const std::shared_ptr<Box>& collectionBox, std::vector<std::unique_ptr<Particle>>& particles, double dt = Globals::Constant::TIME_STEP);
+void stepAll(const std::shared_ptr<Box>& collectionBox, std::vector<std::unique_ptr<Particle>>& particles, double dt = Globals::Constant::Program::timeStep);
 
 #endif //PHYSICS_SIMULATION_PROGRAM_STEP_H

@@ -17,8 +17,8 @@
 // Logs the particle's energy if inside the box and deletes it if condition met
 void logEnergyIfInside(std::unique_ptr<Particle>& p,
                        const Box& box,
-                       const std::string &baseFolder = Globals::Constant::OUTPUT_FOLDER,
-                       const std::string &baseFilename = Globals::Constant::FILENAME_PREFIX);
+                       const std::string_view &baseFolder = Globals::Constant::Program::outputFolder,
+                       const std::string_view &baseFilename = Globals::Constant::Program::filenamePrefix);
 
 
 #endif //PHYSICS_SIMULATION_PROGRAM_PARTICLE_COLLECTION_H

@@ -14,7 +14,7 @@ void moveParticle(Particle& p, double dt) {
                                         momentum[3].asDouble()*momentum[3].asDouble());
         if (p_norm != 0.0) {
             for (int i = 1; i < 4; ++i)
-                final_position[i] = Quantity(initial_position[i].asDouble() + (momentum[i].asDouble() / p_norm) * dt * Globals::Constant::C);
+                final_position[i] = Quantity(initial_position[i].asDouble() + (momentum[i].asDouble() / p_norm) * dt * Globals::Constant::Physics::c);
         }
         final_position[0] = Quantity(initial_position[0].asDouble() + dt);
         p.setPosition(final_position);
@@ -23,7 +23,7 @@ void moveParticle(Particle& p, double dt) {
         Vector<4> final_position{};
         for (int i = 1; i < 4; ++i)
             final_position[i] = Quantity(initial_position[i].asDouble() +
-                                         (p.getMomentum()[i].asDouble() / p.getMomentum()[0].asDouble()) * dt * Globals::Constant::C);
+                                         (p.getMomentum()[i].asDouble() / p.getMomentum()[0].asDouble()) * dt * Globals::Constant::Physics::c);
         final_position[0] = Quantity(initial_position[0].asDouble() + dt);
         p.setPosition(final_position);
     }

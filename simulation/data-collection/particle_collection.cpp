@@ -5,13 +5,14 @@
 #include "particle_collection.h"
 
 #include <filesystem>
+#include <format>
 #include <fstream>
 #include <iostream>
 #include <map>
 
 void logEnergyIfInside(std::unique_ptr<Particle>& p, const Box& box,
-                       const std::string &baseFolder,
-                       const std::string &baseFilename)
+                       const std::string_view &baseFolder,
+                       const std::string_view &baseFilename)
 {
     if (!p) return; // already deleted
 
@@ -31,7 +32,7 @@ void logEnergyIfInside(std::unique_ptr<Particle>& p, const Box& box,
             int counter = 1;
             std::filesystem::path filename;
             do {
-                filename = folder / (baseFilename + std::to_string(counter) + ".csv");
+                filename = folder / std::format("{}{}{}", baseFilename, counter, ".csv");
                 counter++;
             } while (std::filesystem::exists(filename));
 
