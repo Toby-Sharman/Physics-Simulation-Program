@@ -19,14 +19,16 @@
 #include <utility>
 
 #include "core/maths/utilities/unit_utilities.h"
+
+#include "core/maths/utilities/quantity.h"
 #include "core/maths/utilities/units.h"
 
 std::pair<std::string_view, int> extractSuperscript(const std::string_view unit) noexcept {
     if (unit.empty()) { return {unit, 0}; } // If empty return input with exponent = 0
 
-    const char* start = unit.data();
-    const char* end = start + unit.size();
-    const char* p = start;
+    const auto start = unit.data();
+    const auto end = start + unit.size();
+    auto p = start;
 
     // Find the start of the exponent
     while (p != end) {
@@ -42,10 +44,10 @@ std::pair<std::string_view, int> extractSuperscript(const std::string_view unit)
     }
 
     // Number parsing
-    if (const char* numStart = p; numStart != end) {
+    if (const auto numStart = p; numStart != end) {
         int exponent = 0;
         if (auto [ptr, ec] = std::from_chars(numStart, end, exponent); ec == std::errc()) {
-            const char* baseEnd = (numStart > start && *(numStart - 1) == '^') ? numStart - 1 : numStart;
+            const auto baseEnd = (numStart > start && *(numStart - 1) == '^') ? numStart - 1 : numStart;
             return {std::string_view(start, baseEnd - start), exponent};
         }
     }
@@ -54,26 +56,33 @@ std::pair<std::string_view, int> extractSuperscript(const std::string_view unit)
 }
 
 UnitInfo extractPrefix(const std::string_view unit) {
-    auto& table = unitTable(); // Load unit table
+    auto& unitsTable = unitTable(); // Load unit table
 
     // Search for prefix, unit combination
     for (const auto &[symbol, scale] : prefixes) {
         if (const auto prefix = symbol; unit.substr(0, prefix.size()) == prefix) {
-            if (const auto it = table.find(unit.substr(prefix.size())); it != table.end()) {
+            if (const auto it = unitsTable.find(unit.substr(prefix.size())); it != unitsTable.end()) {
                 return {it->second.factor * scale, it->second.unit};
             }
         }
     }
 
     // Search for standalone unit
-    if (const auto it = table.find(unit); it != table.end()) {
+    if (const auto it = unitsTable.find(unit); it != unitsTable.end()) {
+        return it->second;
+    }
+
+    auto& quantitiesTable = quantityTable(); // Load unit table
+
+    // Search for a standalone quantity; to handle cases like ev/c^2
+    if (const auto it = quantitiesTable.find(unit); it != quantitiesTable.end()) {
         return it->second;
     }
 
     // Throw error for if no valid unit was found
     throw std::invalid_argument(
         std::format(
-            "Could not find a valid prefix, base unit combination or stand alone base unit from prefixes and unit tables for {}",
+            "Could not find a valid prefix, base unit combination or stand alone base unit from prefixes, unit, and quantity tables for {}",
             unit
         )
     );
@@ -99,7 +108,7 @@ UnitInfo parseUnit(const char* tokenStart, const char* tokenEnd) {
     cleanedToken.reserve(tokenEnd - tokenStart);
 
     // Copy while skipping internal spaces
-    for (const char* p = tokenStart; p < tokenEnd; ++p) {
+    for (auto p = tokenStart; p < tokenEnd; ++p) {
         if (!std::isspace(static_cast<unsigned char>(*p))) {
             cleanedToken.push_back(*p);
         }
@@ -120,28 +129,36 @@ UnitInfo parseUnits(const std::string_view units) {
 
     while (p < end) {
         // Skip leading whitespace
-        while (p < end && std::isspace(static_cast<unsigned char>(*p))) ++p;
-        if (p == end) break;
+        while (p < end && std::isspace(static_cast<unsigned char>(*p))) {
+            ++p;
+        }
+        if (p == end) {
+            break;
+        }
 
         // Explicit operators
         if (*p == '*') { divideNext = false; ++p; continue; } // Not necessary but added protection
         if (*p == '/') { divideNext = true;  ++p; continue; }
 
         // Capture token until next '*' or '/' or space
-        const char* tokenStart = p;
-        while (p < end && *p != '*' && *p != '/' && !std::isspace(static_cast<unsigned char>(*p))) ++p;
+        const auto tokenStart = p;
+        while (p < end && *p != '*' && *p != '/' && !std::isspace(static_cast<unsigned char>(*p))) {
+            ++p;
+        }
         if (std::isspace(static_cast<unsigned char>(*p))) {
             // Handling for spaces stuff like '^' operators clashing with spaces representing implicit multiplication
-            while (p < end && std::isspace(static_cast<unsigned char>(*p))) ++p;
+            while (p < end && std::isspace(static_cast<unsigned char>(*p))) {
+                ++p;
+            }
             while (p < end && *p != '*' && *p != '/' // Operators
-                && !std::isalpha(static_cast<unsigned char>(*p)) // Letters
-                && !((static_cast<unsigned char>(*p) == 0xCE) && (p + 1 < end && static_cast<unsigned char>(p[1]) == 0xBC))) { // μ for UTF-8 encoding
+                   && !std::isalpha(static_cast<unsigned char>(*p)) // Letters
+                   && !((static_cast<unsigned char>(*p) == 0xCE) && (p + 1 < end && static_cast<unsigned char>(p[1]) == 0xBC))) { // μ for UTF-8 encoding
                 ++p;
                 }
             --p; // Since pointer is on something indicative of next token or a multiplicative operator
         }
 
-        const char* tokenEnd = p;
+        const auto tokenEnd = p;
 
         // Clean token of any spaces and parse it
         auto [factor, siUnit] = parseUnit(tokenStart, tokenEnd);
