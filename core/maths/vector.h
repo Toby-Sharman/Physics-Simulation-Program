@@ -94,7 +94,7 @@
 //   v1.print;                                     // prints "(1.0, 2.0 L, 3.0 L)"
 //   std::cout << v1;                              // returns a stream "(1.0, 2.0 L, 3.0 L)"
 template <size_t N>
-struct Vector {
+struct [[nodiscard]] Vector {
     std::array<Quantity, N> data;  // Each element = value + unit
 
     Vector() = default;
