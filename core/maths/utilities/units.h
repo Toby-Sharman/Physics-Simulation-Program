@@ -209,7 +209,9 @@ struct [[nodiscard]] Unit {
     [[nodiscard]] Unit raisedTo(const double power) const {
         Unit result = {0, 0, 0, 0, 0, 0, 0};
         for (size_t i = 0; i < 7; ++i) { const double newExponent = static_cast<double>(exponents[i]) * power;
-            if (std::round(newExponent) != newExponent) throw std::domain_error("New exponent is non-integer");
+            if (std::round(newExponent) != newExponent) {
+                throw std::domain_error("New exponent is non-integer");
+            }
 
             result.exponents[i] = static_cast<int8_t>(std::round(newExponent));
         }
@@ -244,12 +246,16 @@ struct [[nodiscard]] Unit {
         for (size_t i = 0; i < symbols.size(); ++i) {
             if (const int exponent = this->exponents[i]; exponent != 0) { // Ignore warning there is no issue with usage here
                 s.append(symbols[i]);
-                if (exponent != 1) s.append("^" + std::to_string(exponent));
+                if (exponent != 1) {
+                    s.append("^" + std::to_string(exponent));
+                }
                 s.push_back(' ');
             }
         }
 
-        if (s.empty()) return "Dimensionless";
+        if (s.empty()) {
+            return "Dimensionless";
+        }
 
         s.pop_back(); // remove trailing space
         return s;

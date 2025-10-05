@@ -120,8 +120,9 @@ struct [[nodiscard]] Vector {
 
     // Constructor from initializer list of values and optional shared unit
     Vector(const std::initializer_list<double>& values, const std::string& unit = "") : data{} {
-        if (values.size() != N)
+        if (values.size() != N) {
             throw std::invalid_argument("initializer_list size must match vector size");
+        }
         size_t i = 0;
         for (const double value : values) {
             this->data[i++] = Quantity{value, unit};
@@ -132,7 +133,9 @@ struct [[nodiscard]] Vector {
     //
     // Mutable
     Quantity& operator[](size_t i) {
-        if (i >= N) throw std::out_of_range("Vector index out of range");
+        if (i >= N) {
+            throw std::out_of_range("Vector index out of range");
+        }
         return this->data[i];
     }
 
@@ -140,72 +143,95 @@ struct [[nodiscard]] Vector {
     //
     // Read-only
     const Quantity& operator[](size_t i) const {
-        if (i >= N) throw std::out_of_range("Vector index out of range");
+        if (i >= N) {
+            throw std::out_of_range("Vector index out of range");
+        }
         return this->data[i];
     }
 
     // Addition operator
     [[nodiscard]] Vector operator+(const Vector& other) const {
         Vector result;
-        for (size_t i = 0; i < N; ++i) result[i] = data[i] + other[i];
+        for (size_t i = 0; i < N; ++i) {
+            result[i] = data[i] + other[i];
+        }
         return result;
     }
 
     // Addition assignment operator
     Vector& operator+=(const Vector& other) {
-        for (size_t i = 0; i < N; ++i) data[i] = data[i] + other[i];
+        for (size_t i = 0; i < N; ++i) {
+            data[i] = data[i] + other[i];
+        }
         return *this;
     }
 
     // Subtraction operator
     [[nodiscard]] Vector operator-(const Vector& other) const {
         Vector result;
-        for (size_t i = 0; i < N; ++i) result[i] = data[i] - other[i];
+        for (size_t i = 0; i < N; ++i) {
+            result[i] = data[i] - other[i];
+        }
         return result;
     }
 
     // Subtraction assignment operator
     Vector& operator-=(const Vector& other) {
-        for (size_t i = 0; i < N; ++i) data[i] = data[i] - other[i];
+        for (size_t i = 0; i < N; ++i) {
+            data[i] = data[i] - other[i];
+        }
         return *this;
     }
 
     // Multiplication operator
     [[nodiscard]] constexpr Vector operator*(double scalar) const noexcept {
         Vector result;
-        for (size_t i = 0; i < N; ++i) result[i] = data[i] * scalar;
+        for (size_t i = 0; i < N; ++i) {
+            result[i] = data[i] * scalar;
+        }
         return result;
     }
 
     // Multiplication assignment operator
     constexpr Vector& operator*=(double scalar) noexcept {
-        for (size_t i = 0; i < N; ++i) data[i] = data[i] * scalar;
+        for (size_t i = 0; i < N; ++i) {
+            data[i] = data[i] * scalar;
+        }
         return *this;
     }
 
     // Division operator
     [[nodiscard]] Vector operator/(double scalar) const noexcept {
         Vector result;
-        for (size_t i = 0; i < N; ++i) result[i] = data[i] / scalar;
+        for (size_t i = 0; i < N; ++i) {
+            result[i] = data[i] / scalar;
+        }
         return result;
     }
 
     // Division assignment operator
     Vector& operator/=(double scalar) noexcept {
-        for (size_t i = 0; i < N; ++i) data[i] = data[i] / scalar;
+        for (size_t i = 0; i < N; ++i) {
+            data[i] = data[i] / scalar;
+        }
         return *this;
     }
 
     // Dot product method
     [[nodiscard]] Quantity dot(const Vector& other) const {
-        if (N == 0) throw std::invalid_argument("Cannot take dot product of empty vector");
+        if (N == 0) {
+            throw std::invalid_argument("Cannot take dot product of empty vector");
+        }
 
         Quantity result = data[0] * other[0];
 
-        if (N == 1) return result;
+        if (N == 1) {
+            return result;
+        }
 
-        for (size_t i = 1; i < N; ++i)
+        for (size_t i = 1; i < N; ++i) {
             result += data[i] * other[i];
+        }
 
         return result;
     }
@@ -242,7 +268,9 @@ struct [[nodiscard]] Vector {
     void print() const {
         std::cout << "(";
         for (size_t i = 0; i < N; i++) {
-            if (i > 0) std::cout << ", ";
+            if (i > 0) {
+                std::cout << ", ";
+            }
             std::cout << data[i];
         }
         std::cout << ")\n";
@@ -253,7 +281,9 @@ struct [[nodiscard]] Vector {
 template <size_t N>std::ostream& operator<<(std::ostream& outputStream, const Vector<N>& vector) {
     outputStream << "(";
     for (size_t i = 0; i < N; ++i) {
-        if (i > 0) outputStream << ", ";
+        if (i > 0) {
+            outputStream << ", ";
+        }
         outputStream << vector[i];
     }
     outputStream << ")";
@@ -269,14 +299,19 @@ template <size_t N>
 // Dot product method
 template <std::size_t N>
 [[nodiscard]] Quantity dot(const Vector<N>& vector1, const Vector<N>& vector2) {
-    if (N == 0) throw std::invalid_argument("Cannot take dot product of empty vector");
+    if (N == 0) {
+        throw std::invalid_argument("Cannot take dot product of empty vector");
+    }
 
     Quantity result = vector1[0] * vector2[0];
 
-    if (N == 1) return result;
+    if (N == 1) {
+        return result;
+    }
 
-    for (size_t i = 1; i < N; ++i)
+    for (size_t i = 1; i < N; ++i) {
         result += vector1[i] * vector2[i];
+    }
 
     return result;
 }

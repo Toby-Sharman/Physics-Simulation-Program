@@ -116,8 +116,9 @@ struct [[nodiscard]] Quantity {
     //
     // Requires same Unit
     [[nodiscard]] Quantity operator+(const Quantity& other) const {
-        if (this->unit != other.unit)
+        if (this->unit != other.unit) {
             throw std::invalid_argument("Cannot add quantities with different units");
+        }
         return {this->value + other.value, this->unit};
     }
 
@@ -125,8 +126,9 @@ struct [[nodiscard]] Quantity {
     //
     // Requires same Unit
     Quantity& operator+=(const Quantity& other) {
-        if (this->unit != other.unit)
+        if (this->unit != other.unit) {
             throw std::invalid_argument("Cannot add quantities with different units");
+        }
         this->value += other.value;
         return *this;
     }
@@ -135,8 +137,9 @@ struct [[nodiscard]] Quantity {
     //
     // Requires same Unit
     [[nodiscard]] Quantity operator-(const Quantity& other) const {
-        if (this->unit != other.unit)
+        if (this->unit != other.unit) {
             throw std::invalid_argument("Cannot subtract quantities with different units");
+        }
         return {this->value - other.value, this->unit};
     }
 
@@ -144,8 +147,9 @@ struct [[nodiscard]] Quantity {
     //
     // Requires same Unit
     Quantity& operator-=(const Quantity& other) {
-        if (this->unit != other.unit)
+        if (this->unit != other.unit) {
             throw std::invalid_argument("Cannot subtract quantities with different units");
+        }
         this->value -= other.value;
         return *this;
     }
