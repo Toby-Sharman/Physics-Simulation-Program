@@ -18,6 +18,8 @@
 #include <iostream>
 #include <stdexcept>
 #include <string>
+#include <type_traits>
+#include <utility>
 
 #include "core/maths/utilities/quantity.h"
 
@@ -99,7 +101,7 @@ struct [[nodiscard]] Vector {
 
     Vector() = default;
 
-    // Constructor from Quantities
+    // Constructor from initializer list of Quantities
     Vector(const std::initializer_list<Quantity> quantities) {
         if (quantities.size() != N) {
             throw std::invalid_argument("Number of Quantity arguments must match vector dimension");
@@ -110,6 +112,14 @@ struct [[nodiscard]] Vector {
             data[i++] = quantity;
         }
     }
+
+    // Variadic constructor for N elements that can be converted to a Quantity
+    template <typename... Args>
+    requires (std::is_convertible_v<Args, Quantity> && ...)
+    explicit constexpr Vector(Args&&... args) : data{std::forward<Args>(args)...} {
+        static_assert(sizeof...(Args) == N, "Number of arguments must match Vector size");
+    }
+
 
     // Constructor from array of values and optional shared unit
     constexpr explicit Vector(const std::array<double, N>& values, const std::string& unit = "") : data{} {
