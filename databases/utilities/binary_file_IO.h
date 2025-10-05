@@ -14,24 +14,12 @@
 #ifndef PHYSICS_SIMULATION_PROGRAM_BINARY_FILE_IO_H
 #define PHYSICS_SIMULATION_PROGRAM_BINARY_FILE_IO_H
 
-#include <cstdint> // For uint8_t ignore warning
+#include <cstdint> // for uint32_t ignore warning
 #include <fstream>
 #include <string>
 #include <type_traits>
 
 #include "core/maths/utilities/quantity.h"
-
-// PropertyType
-//
-// Enumeration of supported property types for binary files
-// The enum value corresponds to a unique type identifier in binary
-enum class PropertyType : uint8_t {
-    BOOL = 0,
-    INT = 1,
-    DOUBLE = 2,
-    STRING = 3,
-    QUANTITY = 4
-};
 
 // BinaryIO
 //
