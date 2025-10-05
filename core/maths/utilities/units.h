@@ -84,6 +84,7 @@ inline constexpr std::array<Prefix, 24> prefixes = {{
 //   - Multiplication:         operator*, operator*=
 //   - Division:               operator/, operator/=
 //   - Equality/Inequality:    operator==, operator!=
+//   - Less-than:              operator<
 //   - Exponentiation:         raisedTo(n)
 //   - Inverse:                inverse()
 //   - String conversion:      toString()
@@ -201,6 +202,13 @@ struct [[nodiscard]] Unit {
     // Compares all exponents for inequality
     [[nodiscard]] constexpr bool operator!=(const Unit& other) const noexcept {
         return this->exponents != other.exponents;
+    }
+
+    // Less-than operator
+    //
+    // Compares all exponents lexicographically according to std::array's operator <
+    [[nodiscard]] constexpr bool operator<(const Unit& other) const noexcept {
+        return exponents < other.exponents;
     }
 
     // Exponentiation method
