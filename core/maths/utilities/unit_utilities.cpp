@@ -9,7 +9,7 @@
 // Licensed under a Non-Commercial License. See LICENSE file for details
 //
 
-#include <cctype> // Ignore IDE warning of possibly unused it is used for std::isalpha and std::isspace
+#include <cctype> // For std::isalpha and std::isspace ignore warning
 #include <charconv>
 #include <cmath>
 #include <format>
@@ -122,8 +122,8 @@ UnitInfo parseUnit(const char* tokenStart, const char* tokenEnd) {
 UnitInfo parseUnits(const std::string_view units) {
     UnitInfo result = {1.0, Unit::dimensionless()};
 
-    const char* p = units.data();
-    const char* end = p + units.size();
+    auto p = units.data();
+    const auto end = p + units.size();
 
     bool divideNext = false; // false = multiply, true = divide
 
