@@ -1,21 +1,30 @@
 //
-// Created by Tobias Sharman on 13/09/2025.
+// Physics Simulation Program
+// File: binary_file_IO.h
+// Created by Tobias Sharman on 13/09/2025
+//
+// Description:
+//   - Describes Binary file IO operations
+//         -> Reading and writing
+//
+// Copyright (c) 2025, Tobias Sharman
+// Licensed under a Non-Commercial License. See LICENSE file for details
 //
 
-#ifndef BINARY_FILE_IO_H
-#define BINARY_FILE_IO_H
+#ifndef PHYSICS_SIMULATION_PROGRAM_BINARY_FILE_IO_H
+#define PHYSICS_SIMULATION_PROGRAM_BINARY_FILE_IO_H
 
-
-#include "quantity.h"
-
-#include <vector>
-#include <unordered_map>
-#include <string>
-#include <fstream>
 #include <cstdint> // For uint8_t ignore warning
+#include <fstream>
+#include <string>
 #include <type_traits>
 
-// Enum (or include from a separate header)
+#include "core/maths/utilities/quantity.h"
+
+// PropertyType
+//
+// Enumeration of supported property types for binary files
+// The enum value corresponds to a unique type identifier in binary
 enum class PropertyType : uint8_t {
     BOOL = 0,
     INT = 1,
@@ -24,68 +33,80 @@ enum class PropertyType : uint8_t {
     QUANTITY = 4
 };
 
+// BinaryIO
+//
+// A namespace containing different binary operations for reading and writing binary files
 namespace BinaryIO {
 
+    // Write primitive type to binary stream
     template<typename T>
     void write(std::ofstream& out, const T& value) {
         out.write(reinterpret_cast<const char*>(&value), sizeof(T));
     }
 
+    // Read primitive type from binary stream
     template<typename T>
     bool read(std::ifstream& in, T& value) {
         in.read(reinterpret_cast<char*>(&value), sizeof(T));
         return static_cast<bool>(in);
     }
 
-    inline void writeString(std::ofstream& out, const std::string& str) {
-        const auto len = static_cast<uint32_t>(str.size());
-        write(out, len);
-        out.write(str.data(), len);
+    // Write a string with length prefix
+    inline void writeString(std::ofstream& out, const std::string& string) {
+        const auto length = static_cast<uint32_t>(string.size());
+        write(out, length);
+        out.write(string.data(), length);
     }
 
-    inline bool readString(std::ifstream& in, std::string& str) {
-        uint32_t len;
-        if (!read(in, len)) return false;
-        str.resize(len);
-        in.read(str.data(), len);
+    // Read a string with length prefix
+    inline bool readString(std::ifstream& in, std::string& string) {
+        uint32_t length;
+        if (!read(in, length)) {
+            return false;
+        }
+        string.resize(length);
+        in.read(string.data(), length);
         return static_cast<bool>(in);
     }
 
-    // Writes a Quantity using the cached unit index map
-    inline void writeQuantity(std::ofstream& out, const Quantity& q, const std::unordered_map<std::string, uint16_t>& unitIndexMap) {
-        write(out, q.value);
-        auto it = unitIndexMap.find(q.unit);
-        if (it == unitIndexMap.end())
-            throw std::runtime_error("Unknown unit: " + q.unit);
-        write(out, it->second); // uint16_t unit index
+    // Write a Quantity (value + 7 unit exponents)
+    inline void writeQuantity(std::ofstream& out, const Quantity& quantity) {
+        write(out, quantity.value);
+        out.write(reinterpret_cast<const char*>(quantity.unit.exponents.data()), 7);
     }
 
-    // Reads a Quantity using the file-stored unit table
-    inline bool readQuantity(std::ifstream& in, Quantity& q, const std::vector<std::string>& unitTable) {
-        if (!read(in, q.value)) return false;
-        uint16_t idx;
-        if (!read(in, idx)) return false;
-        if (idx >= unitTable.size()) return false;
-        q.unit = unitTable[idx];
-        return true;
+    // Read a Quantity (value + 7 unit exponents)
+    inline bool readQuantity(std::ifstream& in, Quantity& quantity) {
+        if (!read(in, quantity.value)) {
+            return false;
+        }
+        in.read(reinterpret_cast<char*>(quantity.unit.exponents.data()), 7);
+        return static_cast<bool>(in);
     }
 
-    // For property type section of binary
+    // Write enum as underlying integer type
+    //
+    // Used to identify type in the following bytes in the binary
     template<typename Enum, typename = std::enable_if_t<std::is_enum_v<Enum>>>
     void writeEnum(std::ofstream& out, Enum value) {
-        using UT = std::underlying_type_t<Enum>;
-        write<UT>(out, static_cast<UT>(value));
+        using UnitType = std::underlying_type_t<Enum>;
+        write<UnitType>(out, static_cast<UnitType>(value));
     }
 
+    // Read enum as underlying integer type
+    //
+    // Used to identify type in the following bytes in the binary
     template<typename Enum, typename = std::enable_if_t<std::is_enum_v<Enum>>>
     bool readEnum(std::ifstream& in, Enum& value) {
-        using UT = std::underlying_type_t<Enum>;
-        UT tmp;
-        if (!read<UT>(in, tmp)) return false;
+        using UnitType = std::underlying_type_t<Enum>;
+        UnitType tmp;
+        if (!read<UnitType>(in, tmp)) {
+            return false;
+        }
         value = static_cast<Enum>(tmp);
         return true;
     }
 
 }
 
-#endif //BINARY_FILE_IO_H
+#endif //PHYSICS_SIMULATION_PROGRAM_BINARY_FILE_IO_H
