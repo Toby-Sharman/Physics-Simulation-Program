@@ -41,7 +41,7 @@ class Globals {
                 static constexpr std::string_view outputFolder = "Output";            // Data output folder name (in Build)
 
                 static constexpr double timeStep = 1e-8;                              // Seconds
-                // static constexpr double masslessTolerance = 0;                        // Massless tolerance
+                static constexpr double masslessTolerance = 0;                        // Massless tolerance
             };
             // Common maths constants to ensure same value is used program wide
             struct Maths {
