@@ -1,35 +1,35 @@
 {
   "photon": {
     "symbol": "γ",
-    "rest mass": { "value": 0.0, "unit": "eV" },
+    "rest mass": { "value": 0.0, "unit": "eV/c^2" },
     "charge": 0.0,
     "spin": 1.0,
     "particle type": "boson"
   },
   "gluon": {
     "symbol": "g",
-    "rest mass": { "value": 0.0, "unit": "eV" },
+    "rest mass": { "value": 0.0, "unit": "eV/c^2" },
     "charge": 0.0,
     "spin": 1.0,
     "particle type": "boson"
   },
   "W+": {
     "symbol": "W+",
-    "rest mass": { "value": 80.3692e9, "unit": "eV" },
+    "rest mass": { "value": 80.3692e9, "unit": "eV/c^2" },
     "charge": 1.0,
     "spin": 1.0,
     "particle type": "boson"
   },
   "W-": {
     "symbol": "W-",
-    "rest mass": { "value": 80.3692e9, "unit": "eV" },
+    "rest mass": { "value": 80.3692e9, "unit": "eV/c^2" },
     "charge": -1.0,
     "spin": 1.0,
     "particle type": "boson"
   },
   "Z": {
     "symbol": "Z0",
-    "rest mass": { "value": 91.1880e9, "unit": "eV" },
+    "rest mass": { "value": 91.1880e9, "unit": "eV/c^2" },
     "charge": 0.0,
     "spin": 1.0,
     "particle type": "boson"
@@ -50,28 +50,28 @@
   },
   "tau": {
     "symbol": "τ-",
-    "rest mass": { "value": 1776.93e6, "unit": "eV" },
+    "rest mass": { "value": 1776.93e6, "unit": "eV/c^2" },
     "charge": -1.0,
     "spin": 0.5,
     "particle type": "lepton"
   },
   "electron neutrino": {
     "symbol": "ν_e",
-    "rest mass": { "value": 0.0, "unit": "eV" },
+    "rest mass": { "value": 0.0, "unit": "eV/c^2" },
     "charge": 0.0,
     "spin": 0.5,
     "particle type": "lepton"
   },
   "muon neutrino": {
     "symbol": "ν_μ",
-    "rest mass": { "value": 0.0, "unit": "eV" },
+    "rest mass": { "value": 0.0, "unit": "eV/c^2" },
     "charge": 0.0,
     "spin": 0.5,
     "particle type": "lepton"
   },
   "tau neutrino": {
     "symbol": "ν_τ",
-    "rest mass": { "value": 0.0, "unit": "eV" },
+    "rest mass": { "value": 0.0, "unit": "eV/c^2" },
     "charge": 0.0,
     "spin": 0.5,
     "particle type": "lepton"
