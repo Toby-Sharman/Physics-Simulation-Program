@@ -20,8 +20,8 @@ struct PositionTag { Vector<3> value; };
 inline PositionTag Position(const Vector<3>& v) { return PositionTag{v}; }
 template <typename T> concept PositionArg = std::same_as<std::decay_t<T>, PositionTag>;
 
-struct RotationTag { Matrix<double,3,3> value; };
-inline RotationTag Rotation(const Matrix<double,3,3>& m) { return RotationTag{m}; }
+struct RotationTag { Matrix<3,3> value; };
+inline RotationTag Rotation(const Matrix<3,3>& m) { return RotationTag{m}; }
 template <typename T> concept RotationArg = std::same_as<std::decay_t<T>, RotationTag>;
 
 struct SizeTag { Vector<3> value; };

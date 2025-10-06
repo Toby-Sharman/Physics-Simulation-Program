@@ -10,8 +10,8 @@
 struct ObjectConstructionContext {
     std::string name = "Unnamed";
     std::string material;
-    Vector<3> position{{0,0,0}};
-    Matrix<double,3,3> rotation = Matrix<double,3,3>::Identity();
+    Vector<3> position = Vector<3>({0, 0, 0}, "m");
+    Matrix<3,3> rotation = Matrix<3,3>::identity();
     std::optional<Vector<3>> size;
 };
 

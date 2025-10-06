@@ -22,55 +22,55 @@
 
 class Object : public std::enable_shared_from_this<Object> {
     public:
-    Object() = default;
-    virtual ~Object() = default;
+        Object() = default;
+        virtual ~Object() = default;
 
-    // Getters
-    const std::string& getName() const;
-    const std::string& getType() const;
-    Vector<3> getTranslation() const;
-    Matrix<double, 3, 3> getRotationMatrix() const;
-    const std::string& getMaterial() const;
-    const std::vector<std::shared_ptr<Object>>& children() const;
+        // Getters
+        const std::string& getName() const;
+        const std::string& getType() const;
+        Vector<3> getPosition() const;
+        Matrix<3, 3> getRotationMatrix() const;
+        const std::string& getMaterial() const;
+        const std::vector<std::shared_ptr<Object>>& children() const;
 
-    Matrix<double,4,4> getLocalTransform() const;
-    Matrix<double,4,4> getWorldTransform() const;
+        TransformationMatrix getLocalTransform() const;
+        TransformationMatrix getWorldTransform() const;
 
-    // Setters
-    void setType(const std::string& type);
-    void setName(const std::string& name);
-    void setPosition(double x, double y, double z);
-    void setRotationMatrix(const Matrix<double,3,3>& R);
-    void setMaterial(std::string material);
+        // Setters
+        void setType(const std::string &type);
+        void setName(const std::string &name);
+        void setPosition(const Vector<3> &position);
+        void setRotationMatrix(const Matrix<3,3> &rotation);
+        void setMaterial(std::string material);
 
-    // Hierarchy
-    Vector<3> localToWorld(const Vector<3>& localPoint) const;
-    Vector<3> worldToLocal(const Vector<3>& worldPoint) const;
+        // Hierarchy
+        Vector<3> localToWorld(const Vector<3>& localPoint) const;
+        Vector<3> worldToLocal(const Vector<3>& worldPoint) const;
 
-    std::shared_ptr<Object> findObjectContainingPoint(const Vector<3>& worldPoint);
-    template<typename T, typename... Args>
-    std::shared_ptr<T> addChild(Args&&... args) {
-        auto child = construct<T>(std::forward<Args>(args)...); // Constructor is below
-        child->m_parent = shared_from_this();
-        m_children.push_back(child);
-        return child;
-    }
+        std::shared_ptr<Object> findObjectContainingPoint(const Vector<3>& worldPoint);
+        template<typename T, typename... Args>
+        std::shared_ptr<T> addChild(Args&&... args) {
+            auto child = construct<T>(std::forward<Args>(args)...); // Constructor is below
+            child->m_parent = shared_from_this();
+            m_children.push_back(child);
+            return child;
+        }
 
-    void describeSelf(int indent) const;
-    void printHierarchy(int indent = 0) const;
+        void describeSelf(int indent) const;
+        void printHierarchy(int indent = 0) const;
 
-    // Must be implemented by derived objects
-    virtual bool containsPoint(const Vector<3>& world_point) const = 0;
-    virtual std::string getSizeDescription() const { return ""; }
-    // Set size from params not included as it can take a variety of inputs depending on object type
+        // Must be implemented by derived objects
+        virtual bool containsPoint(const Vector<3>& world_point) const = 0;
+        virtual std::string getSizeDescription() const { return ""; }
+        // Set size from params not included as it can take a variety of inputs depending on object type
 
     protected:
-    std::string m_name;
-    std::string m_type;
-    std::string m_material;
-    Matrix<double,4,4> m_transformation;
-    std::weak_ptr<Object> m_parent;
-    std::vector<std::shared_ptr<Object>> m_children;
+        std::string m_name;
+        std::string m_type;
+        std::string m_material;
+        TransformationMatrix m_transformation;
+        std::weak_ptr<Object> m_parent;
+        std::vector<std::shared_ptr<Object>> m_children;
 };
 
 // Templated helper: create child in place with constructor arguments
@@ -84,7 +84,7 @@ std::shared_ptr<T> construct(Args&&... args) {
 
     object->setType(ObjectTypeName<T>::name);
     object->setName(ctx.name);
-    object->setPosition(ctx.position[0].asDouble(), ctx.position[1].asDouble(), ctx.position[2].asDouble());
+    object->setPosition(ctx.position);
     object->setRotationMatrix(ctx.rotation);
     object->setMaterial(ctx.material);
 
