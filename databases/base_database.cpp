@@ -32,7 +32,7 @@ void BaseDatabase::loadFromBinary(const std::string& filepath) {
         throw std::runtime_error(std::format("Cannot open database file '{}'", filepath));
     }
 
-    uint16_t numberOfUnits; // uint8_t (255) would do, but 1 byte extra per file overhead to futureproof is fine
+    uint16_t numberOfUnits; // uint8_t (255) would do, but 1 byte extra per file to futureproof is fine
     if (!BinaryIO::read(in, numberOfUnits)) {
         throw std::runtime_error("Failed to read number of units");
     }
