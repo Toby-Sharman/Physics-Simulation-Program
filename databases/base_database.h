@@ -28,8 +28,8 @@ enum class PropertyType : uint8_t {
     BOOL = 0,
     INT = 1,
     DOUBLE = 2,
-    STRING = 3,
-    QUANTITY = 4
+    QUANTITY = 3,
+    STRING = 4
 };
 
 // DatabaseProperty
@@ -67,12 +67,12 @@ struct DatabaseEntry {
 //       [ Property 0 Name length ]        // length = 2 bytes
 //       [ Property 0 Name ]               // string format
 //       [ Property 0 Type enum ]          // enum (BOOL, INT, DOUBLE, STRING, QUANTITY) = 1 byte
-//       [ Property 0 Value ]              // size depends on type: , INT = 4, DOUBLE = 4, STRING = 2 (for length) + length, QUANTITY =
+//       [ Property 0 Value ]              // size depends on type:
 //       [ Property 1 Name length ]        //   BOOl = 1 byte
 //       [ Property 1 Name ]               //   INT = 8 bytes
 //       [ Property 1 Type enum ]          //   DOUBLE = 8 bytes
-//       [ Property 1 Value ]              //   STRING = 2 (length) + length bytes
-//       ...                               //   QUANTITY = 8 (double) + 2 (unit index) = 10 bytes
+//       [ Property 1 Value ]              //   QUANTITY = 8 (double) + 2 (unit index) = 10 bytes
+//       ...                               //   STRING = 2 (length) + length bytes
 //
 //   [ Entry 1 Name length ]
 //   [ Entry 1 Name ]

@@ -105,16 +105,6 @@ void BaseDatabase::loadFromBinary(const std::string& filepath) {
                     property.value = floating;
                     break;
                 }
-                case PropertyType::STRING: {
-                    std::string string;
-                    if (!BinaryIO::readString(in, string)) {
-                        throw std::runtime_error(
-                            std::format("Unexpected EOF reading string '{}.{}'", entry.name, property.name)
-                            );
-                    }
-                    property.value = string;
-                    break;
-                }
                 case PropertyType::QUANTITY: {
                     Quantity quantity;
                     if (!BinaryIO::read(in, quantity.value)) {
@@ -130,6 +120,16 @@ void BaseDatabase::loadFromBinary(const std::string& filepath) {
                     }
                     quantity.unit = unitTable[idx];
                     property.value = quantity;
+                    break;
+                }
+                case PropertyType::STRING: {
+                    std::string string;
+                    if (!BinaryIO::readString(in, string)) {
+                        throw std::runtime_error(
+                            std::format("Unexpected EOF reading string '{}.{}'", entry.name, property.name)
+                            );
+                    }
+                    property.value = string;
                     break;
                 }
                 default:
@@ -192,15 +192,15 @@ void BaseDatabase::saveToBinary(const std::string& filepath) {
                 case PropertyType::DOUBLE:
                     BinaryIO::write(out, std::get<double>(propertyValue));
                     break;
-                case PropertyType::STRING:
-                    BinaryIO::writeString(out, std::get<std::string>(propertyValue));
-                    break;
                 case PropertyType::QUANTITY: {
                     const auto& quantity = std::get<Quantity>(propertyValue);
                     BinaryIO::write(out, quantity.value);
                     BinaryIO::write(out, unitIndexMap[quantity.unit]);
                     break;
                 }
+                case PropertyType::STRING:
+                    BinaryIO::writeString(out, std::get<std::string>(propertyValue));
+                    break;
                 default:
                     throw std::runtime_error("Unknown property type during write");
             }
