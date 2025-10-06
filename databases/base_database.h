@@ -24,7 +24,7 @@
 //
 // Enumeration of supported property types for binary files
 // The enum value corresponds to a unique type identifier in binary
-enum class PropertyType : uint8_t {
+enum class PropertyType : std::uint8_t {
     BOOL = 0,
     INT = 1,
     DOUBLE = 2,
@@ -39,7 +39,7 @@ enum class PropertyType : uint8_t {
 struct DatabaseProperty {
     std::string name;
     PropertyType type;
-    std::variant<int64_t, double, bool, std::string, Quantity> value;
+    std::variant<std::int64_t, double, bool, std::string, Quantity> value;
 };
 
 // DatabaseEntry

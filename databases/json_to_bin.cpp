@@ -102,7 +102,7 @@ int main(int argc, char** argv) {
     }
 
     // Collect unique Units (by base dimensions)
-    std::map<Unit, uint16_t> unitIndexMap; // uint8_t (255) would do, but 1 byte extra per file to futureproof is fine
+    std::map<Unit, std::uint16_t> unitIndexMap; // uint8_t (255) would do, but 1 byte extra per file to futureproof is fine
     std::vector<Unit> unitTable;
 
     // First pass: gather units and normalize values to SI
@@ -130,7 +130,7 @@ int main(int argc, char** argv) {
 
                 // Check and insert into map
                 if (!unitIndexMap.contains(unit)) {
-                    auto idx = static_cast<uint16_t>(unitTable.size());
+                    auto idx = static_cast<std::uint16_t>(unitTable.size());
                     unitTable.push_back(unit);
                     unitIndexMap[unit] = idx;
                 }
@@ -143,7 +143,7 @@ int main(int argc, char** argv) {
     }
 
     // Write unit table
-    auto numUnits = static_cast<uint16_t>(unitTable.size());
+    auto numUnits = static_cast<std::uint16_t>(unitTable.size());
     BinaryIO::write(out, numUnits);
     for (const auto& u : unitTable) {
         BinaryIO::write(out, u);
@@ -158,7 +158,7 @@ int main(int argc, char** argv) {
 
         BinaryIO::writeString(out, entryName);
 
-        auto propertyCount = static_cast<uint32_t>(properties.size()); // Kept large for future save state feature
+        auto propertyCount = static_cast<std::uint32_t>(properties.size()); // Kept large for future save state feature
         BinaryIO::write(out, propertyCount);
 
         for (auto& [propertyName, value] : properties.items()) {
@@ -167,7 +167,7 @@ int main(int argc, char** argv) {
             switch (getPropertyType(value)) {
                 case PropertyType::BOOL : {
                     BinaryIO::writeEnum(out, PropertyType::BOOL);
-                    BinaryIO::write(out, static_cast<uint8_t>(value.get<bool>()));
+                    BinaryIO::write(out, static_cast<std::uint8_t>(value.get<bool>()));
                     break;
                 }
                 case PropertyType::INT : {
@@ -192,7 +192,7 @@ int main(int argc, char** argv) {
                         std::cerr << "Error: unknown unit '" << unitString << "'\n";
                         return 1;
                     }
-                    uint16_t idx = it->second;
+                    std::uint16_t idx = it->second;
                     BinaryIO::write(out, idx);
                     break;
                 }

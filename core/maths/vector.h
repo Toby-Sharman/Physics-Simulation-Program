@@ -98,7 +98,7 @@
 //
 //   v1.print;                                     // prints "(1.0, 2.0 L, 3.0 L)"
 //   std::cout << v1;                              // returns a stream "(1.0, 2.0 L, 3.0 L)"
-template <size_t N>
+template <std::size_t N>
 struct [[nodiscard]] Vector {
     std::array<Quantity, N> data;  // Each element = value + unit
 
@@ -126,7 +126,7 @@ struct [[nodiscard]] Vector {
 
     // Constructor from array of values and optional shared unit
     constexpr explicit Vector(const std::array<double, N>& values, const std::string& unit = "") : data{} {
-        for (size_t i = 0; i < N; i++) {
+        for (std::size_t i = 0; i < N; i++) {
             this->data[i] = Quantity{values[i], unit};
         }
     }
@@ -136,7 +136,7 @@ struct [[nodiscard]] Vector {
         if (values.size() != N) {
             throw std::invalid_argument("initializer_list size must match vector size");
         }
-        size_t i = 0;
+        std::size_t i = 0;
         for (const double value : values) {
             this->data[i++] = Quantity{value, unit};
         }
@@ -145,7 +145,7 @@ struct [[nodiscard]] Vector {
     // Subscript operator
     //
     // Mutable
-    Quantity& operator[](size_t i) {
+    Quantity& operator[](std::size_t i) {
         if (i >= N) {
             throw std::out_of_range("Vector index out of range");
         }
@@ -155,7 +155,7 @@ struct [[nodiscard]] Vector {
     // Subscript operator
     //
     // Read-only
-    const Quantity& operator[](size_t i) const {
+    const Quantity& operator[](std::size_t i) const {
         if (i >= N) {
             throw std::out_of_range("Vector index out of range");
         }
@@ -165,7 +165,7 @@ struct [[nodiscard]] Vector {
     // Addition operator
     [[nodiscard]] Vector operator+(const Vector& other) const {
         Vector result;
-        for (size_t i = 0; i < N; ++i) {
+        for (std::size_t i = 0; i < N; ++i) {
             result[i] = data[i] + other[i];
         }
         return result;
@@ -173,7 +173,7 @@ struct [[nodiscard]] Vector {
 
     // Addition assignment operator
     Vector& operator+=(const Vector& other) {
-        for (size_t i = 0; i < N; ++i) {
+        for (std::size_t i = 0; i < N; ++i) {
             data[i] = data[i] + other[i];
         }
         return *this;
@@ -182,7 +182,7 @@ struct [[nodiscard]] Vector {
     // Subtraction operator
     [[nodiscard]] Vector operator-(const Vector& other) const {
         Vector result;
-        for (size_t i = 0; i < N; ++i) {
+        for (std::size_t i = 0; i < N; ++i) {
             result[i] = data[i] - other[i];
         }
         return result;
@@ -190,7 +190,7 @@ struct [[nodiscard]] Vector {
 
     // Subtraction assignment operator
     Vector& operator-=(const Vector& other) {
-        for (size_t i = 0; i < N; ++i) {
+        for (std::size_t i = 0; i < N; ++i) {
             data[i] = data[i] - other[i];
         }
         return *this;
@@ -199,7 +199,7 @@ struct [[nodiscard]] Vector {
     // Multiplication operator
     [[nodiscard]] constexpr Vector operator*(double scalar) const noexcept {
         Vector result;
-        for (size_t i = 0; i < N; ++i) {
+        for (std::size_t i = 0; i < N; ++i) {
             result[i] = data[i] * scalar;
         }
         return result;
@@ -207,7 +207,7 @@ struct [[nodiscard]] Vector {
 
     // Multiplication assignment operator
     constexpr Vector& operator*=(double scalar) noexcept {
-        for (size_t i = 0; i < N; ++i) {
+        for (std::size_t i = 0; i < N; ++i) {
             data[i] = data[i] * scalar;
         }
         return *this;
@@ -216,7 +216,7 @@ struct [[nodiscard]] Vector {
     // Division operator
     [[nodiscard]] Vector operator/(double scalar) const noexcept {
         Vector result;
-        for (size_t i = 0; i < N; ++i) {
+        for (std::size_t i = 0; i < N; ++i) {
             result[i] = data[i] / scalar;
         }
         return result;
@@ -224,7 +224,7 @@ struct [[nodiscard]] Vector {
 
     // Division assignment operator
     Vector& operator/=(double scalar) noexcept {
-        for (size_t i = 0; i < N; ++i) {
+        for (std::size_t i = 0; i < N; ++i) {
             data[i] = data[i] / scalar;
         }
         return *this;
@@ -242,7 +242,7 @@ struct [[nodiscard]] Vector {
             return result;
         }
 
-        for (size_t i = 1; i < N; ++i) {
+        for (std::size_t i = 1; i < N; ++i) {
             result += data[i] * other[i];
         }
 
@@ -280,7 +280,7 @@ struct [[nodiscard]] Vector {
     // Print method
     void print() const {
         std::cout << "(";
-        for (size_t i = 0; i < N; i++) {
+        for (std::size_t i = 0; i < N; i++) {
             if (i > 0) {
                 std::cout << ", ";
             }
@@ -291,9 +291,9 @@ struct [[nodiscard]] Vector {
 };
 
 // Stream operator
-template <size_t N>std::ostream& operator<<(std::ostream& outputStream, const Vector<N>& vector) {
+template <std::size_t N>std::ostream& operator<<(std::ostream& outputStream, const Vector<N>& vector) {
     outputStream << "(";
-    for (size_t i = 0; i < N; ++i) {
+    for (std::size_t i = 0; i < N; ++i) {
         if (i > 0) {
             outputStream << ", ";
         }
@@ -304,7 +304,7 @@ template <size_t N>std::ostream& operator<<(std::ostream& outputStream, const Ve
 }
 
 // Multiplication operator
-template <size_t N>
+template <std::size_t N>
 [[nodiscard]] constexpr Vector<N> operator*(double scalar, const Vector<N>& vector) noexcept {
     return vector * scalar;
 }
@@ -322,7 +322,7 @@ template <std::size_t N>
         return result;
     }
 
-    for (size_t i = 1; i < N; ++i) {
+    for (std::size_t i = 1; i < N; ++i) {
         result += vector1[i] * vector2[i];
     }
 
@@ -330,7 +330,7 @@ template <std::size_t N>
 }
 
 // Cross product method
-template <size_t N>
+template <std::size_t N>
 [[nodiscard]] Vector<N> cross(const Vector<N>& vector1, const Vector<N>& vector2) {
     static_assert(N == 3, "Cross product is only defined for 3D vectors");
 

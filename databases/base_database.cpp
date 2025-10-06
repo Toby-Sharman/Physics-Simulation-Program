@@ -32,13 +32,13 @@ void BaseDatabase::loadFromBinary(const std::string& filepath) {
         throw std::runtime_error(std::format("Cannot open database file '{}'", filepath));
     }
 
-    uint16_t numberOfUnits; // uint8_t (255) would do, but 1 byte extra per file to futureproof is fine
+    std::uint16_t numberOfUnits; // uint8_t (255) would do, but 1 byte extra per file to futureproof is fine
     if (!BinaryIO::read(in, numberOfUnits)) {
         throw std::runtime_error("Failed to read number of units");
     }
 
     std::vector<Unit> unitTable(numberOfUnits);
-    for (uint16_t i = 0; i < numberOfUnits; ++i) {
+    for (std::uint16_t i = 0; i < numberOfUnits; ++i) {
         BinaryIO::read(in, unitTable[i]);
     }
 
@@ -50,7 +50,7 @@ void BaseDatabase::loadFromBinary(const std::string& filepath) {
             break;
         }
 
-        uint32_t propertyCount; // Kept large as if wanting to add save state to program 4, 294, 967, 295 is plenty
+        std::uint32_t propertyCount; // Kept large as if wanting to add save state to program 4, 294, 967, 295 is plenty
 
         // Read next section of file and assign to variable propertyCount
         if (!BinaryIO::read(in, propertyCount)) {
@@ -61,7 +61,7 @@ void BaseDatabase::loadFromBinary(const std::string& filepath) {
 
         entry.properties.reserve(propertyCount); // Avoid reallocation for large amounts of properties
 
-        for (uint32_t i = 0; i < propertyCount; ++i) {
+        for (std::uint32_t i = 0; i < propertyCount; ++i) {
             DatabaseProperty property;
             if (!BinaryIO::readString(in, property.name)) {
                 throw std::runtime_error(
@@ -76,7 +76,7 @@ void BaseDatabase::loadFromBinary(const std::string& filepath) {
 
             switch (property.type) {
                 case PropertyType::BOOL: {
-                    uint8_t boolean;
+                    std::uint8_t boolean;
                     if (!BinaryIO::read(in, boolean)) {
                         throw std::runtime_error(
                             std::format("Unexpected EOF reading bool '{}.{}'", entry.name, property.name)
@@ -112,7 +112,7 @@ void BaseDatabase::loadFromBinary(const std::string& filepath) {
                             std::format("Unexpected EOF reading Quantity value '{}.{}'", entry.name, property.name)
                             );
                     }
-                    uint16_t idx;
+                    std::uint16_t idx;
                     if (!BinaryIO::read(in, idx) || idx >= unitTable.size()) {
                         throw std::runtime_error(
                             std::format("Invalid unit index for '{}.{}'", entry.name, property.name)
@@ -151,14 +151,14 @@ void BaseDatabase::saveToBinary(const std::string& filepath) {
         throw std::runtime_error(std::format("Cannot open file '{}'", filepath));
     }
 
-    std::map<Unit, uint16_t> unitIndexMap;
+    std::map<Unit, std::uint16_t> unitIndexMap;
     std::vector<Unit> unitTable;
 
     for (const auto& [entryName, entryProperties] : this->m_db) {
         for (const auto& property : entryProperties) {
             if (property.type == PropertyType::QUANTITY) {
                 if (const auto& u = std::get<Quantity>(property.value).unit; !unitIndexMap.contains(u)) {
-                    const auto idx = static_cast<uint16_t>(unitTable.size());
+                    const auto idx = static_cast<std::uint16_t>(unitTable.size());
                     unitIndexMap[u] = idx;
                     unitTable.push_back(u);
                 }
@@ -166,7 +166,7 @@ void BaseDatabase::saveToBinary(const std::string& filepath) {
         }
     }
 
-    const auto numUnits = static_cast<uint16_t>(unitTable.size());
+    const auto numUnits = static_cast<std::uint16_t>(unitTable.size());
     BinaryIO::write(out, numUnits);
     for (const auto& unit : unitTable) {
         BinaryIO::write(out, unit);
@@ -175,7 +175,7 @@ void BaseDatabase::saveToBinary(const std::string& filepath) {
 
     for (const auto&[entryName, entryProperties] : this->m_db) {
         BinaryIO::writeString(out, entryName);
-        auto propCount = static_cast<uint32_t>(entryProperties.size());
+        auto propCount = static_cast<std::uint32_t>(entryProperties.size());
         BinaryIO::write(out, propCount);
 
         for (const auto&[propertyName, propertyType, propertyValue] : entryProperties) {
@@ -184,7 +184,7 @@ void BaseDatabase::saveToBinary(const std::string& filepath) {
 
             switch (propertyType) {
                 case PropertyType::BOOL:
-                    BinaryIO::write(out, static_cast<uint8_t>(std::get<bool>(propertyValue)));
+                    BinaryIO::write(out, static_cast<std::uint8_t>(std::get<bool>(propertyValue)));
                     break;
                 case PropertyType::INT:
                     BinaryIO::write(out, std::get<int64_t>(propertyValue));

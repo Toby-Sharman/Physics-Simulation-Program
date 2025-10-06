@@ -104,7 +104,7 @@ inline constexpr std::array<Prefix, 24> prefixes = {{
 //
 //   std::cout << "Speed: " << speed.toString() << "\n"; // Output: "L T^-1"
 struct [[nodiscard]] Unit {
-    std::array<int8_t, 7> exponents; // L, M, T, I, Θ, N, J
+    std::array<std::int8_t, 7> exponents; // L, M, T, I, Θ, N, J
 
     // Default Constructor
     constexpr Unit() noexcept : exponents{0,0,0,0,0,0,0} {}
@@ -118,17 +118,17 @@ struct [[nodiscard]] Unit {
     }
 
     // Constructor method from array
-    explicit constexpr Unit(const std::array<int8_t, 7> exps) noexcept : exponents(exps) {}
+    explicit constexpr Unit(const std::array<std::int8_t, 7> exps) noexcept : exponents(exps) {}
 
     // Constructor method from values
     constexpr Unit(
-        const int8_t l,
-        const int8_t m,
-        const int8_t t,
-        const int8_t i,
-        const int8_t theta,
-        const int8_t n,
-        const int8_t j
+        const std::int8_t l,
+        const std::int8_t m,
+        const std::int8_t t,
+        const std::int8_t i,
+        const std::int8_t theta,
+        const std::int8_t n,
+        const std::int8_t j
     ) noexcept
         : exponents{l, m, t, i, theta, n, j} {}
 
@@ -137,13 +137,13 @@ struct [[nodiscard]] Unit {
     // Multiplies two Units by adding their corresponding exponents
     [[nodiscard]] constexpr Unit operator*(const Unit& other) const noexcept {
         return Unit{
-            static_cast<int8_t>(this->exponents[0] + other.exponents[0]),
-            static_cast<int8_t>(this->exponents[1] + other.exponents[1]),
-            static_cast<int8_t>(this->exponents[2] + other.exponents[2]),
-            static_cast<int8_t>(this->exponents[3] + other.exponents[3]),
-            static_cast<int8_t>(this->exponents[4] + other.exponents[4]),
-            static_cast<int8_t>(this->exponents[5] + other.exponents[5]),
-            static_cast<int8_t>(this->exponents[6] + other.exponents[6])
+            static_cast<std::int8_t>(this->exponents[0] + other.exponents[0]),
+            static_cast<std::int8_t>(this->exponents[1] + other.exponents[1]),
+            static_cast<std::int8_t>(this->exponents[2] + other.exponents[2]),
+            static_cast<std::int8_t>(this->exponents[3] + other.exponents[3]),
+            static_cast<std::int8_t>(this->exponents[4] + other.exponents[4]),
+            static_cast<std::int8_t>(this->exponents[5] + other.exponents[5]),
+            static_cast<std::int8_t>(this->exponents[6] + other.exponents[6])
         };
     }
 
@@ -151,13 +151,13 @@ struct [[nodiscard]] Unit {
     //
     // Adds the exponents of another Unit to this Unit in-place
     constexpr Unit& operator*=(const Unit& other) noexcept {
-        this->exponents[0] = static_cast<int8_t>(this->exponents[0] + other.exponents[0]);
-        this->exponents[1] = static_cast<int8_t>(this->exponents[1] + other.exponents[1]);
-        this->exponents[2] = static_cast<int8_t>(this->exponents[2] + other.exponents[2]);
-        this->exponents[3] = static_cast<int8_t>(this->exponents[3] + other.exponents[3]);
-        this->exponents[4] = static_cast<int8_t>(this->exponents[4] + other.exponents[4]);
-        this->exponents[5] = static_cast<int8_t>(this->exponents[5] + other.exponents[5]);
-        this->exponents[6] = static_cast<int8_t>(this->exponents[6] + other.exponents[6]);
+        this->exponents[0] = static_cast<std::int8_t>(this->exponents[0] + other.exponents[0]);
+        this->exponents[1] = static_cast<std::int8_t>(this->exponents[1] + other.exponents[1]);
+        this->exponents[2] = static_cast<std::int8_t>(this->exponents[2] + other.exponents[2]);
+        this->exponents[3] = static_cast<std::int8_t>(this->exponents[3] + other.exponents[3]);
+        this->exponents[4] = static_cast<std::int8_t>(this->exponents[4] + other.exponents[4]);
+        this->exponents[5] = static_cast<std::int8_t>(this->exponents[5] + other.exponents[5]);
+        this->exponents[6] = static_cast<std::int8_t>(this->exponents[6] + other.exponents[6]);
         return *this;
     }
 
@@ -166,13 +166,13 @@ struct [[nodiscard]] Unit {
     // Divides two Units by subtracting the exponents of the right-hand side from the left-hand side
     [[nodiscard]] constexpr Unit operator/(const Unit& other) const noexcept {
         return Unit{
-            static_cast<int8_t>(this->exponents[0] - other.exponents[0]),
-            static_cast<int8_t>(this->exponents[1] - other.exponents[1]),
-            static_cast<int8_t>(this->exponents[2] - other.exponents[2]),
-            static_cast<int8_t>(this->exponents[3] - other.exponents[3]),
-            static_cast<int8_t>(this->exponents[4] - other.exponents[4]),
-            static_cast<int8_t>(this->exponents[5] - other.exponents[5]),
-            static_cast<int8_t>(this->exponents[6] - other.exponents[6])
+            static_cast<std::int8_t>(this->exponents[0] - other.exponents[0]),
+            static_cast<std::int8_t>(this->exponents[1] - other.exponents[1]),
+            static_cast<std::int8_t>(this->exponents[2] - other.exponents[2]),
+            static_cast<std::int8_t>(this->exponents[3] - other.exponents[3]),
+            static_cast<std::int8_t>(this->exponents[4] - other.exponents[4]),
+            static_cast<std::int8_t>(this->exponents[5] - other.exponents[5]),
+            static_cast<std::int8_t>(this->exponents[6] - other.exponents[6])
         };
     }
 
@@ -180,13 +180,13 @@ struct [[nodiscard]] Unit {
     //
     // Subtracts the exponents of another Unit from this Unit in-place
     constexpr Unit& operator/=(const Unit& other) noexcept {
-        this->exponents[0] = static_cast<int8_t>(this->exponents[0] - other.exponents[0]);
-        this->exponents[1] = static_cast<int8_t>(this->exponents[1] - other.exponents[1]);
-        this->exponents[2] = static_cast<int8_t>(this->exponents[2] - other.exponents[2]);
-        this->exponents[3] = static_cast<int8_t>(this->exponents[3] - other.exponents[3]);
-        this->exponents[4] = static_cast<int8_t>(this->exponents[4] - other.exponents[4]);
-        this->exponents[5] = static_cast<int8_t>(this->exponents[5] - other.exponents[5]);
-        this->exponents[6] = static_cast<int8_t>(this->exponents[6] - other.exponents[6]);
+        this->exponents[0] = static_cast<std::int8_t>(this->exponents[0] - other.exponents[0]);
+        this->exponents[1] = static_cast<std::int8_t>(this->exponents[1] - other.exponents[1]);
+        this->exponents[2] = static_cast<std::int8_t>(this->exponents[2] - other.exponents[2]);
+        this->exponents[3] = static_cast<std::int8_t>(this->exponents[3] - other.exponents[3]);
+        this->exponents[4] = static_cast<std::int8_t>(this->exponents[4] - other.exponents[4]);
+        this->exponents[5] = static_cast<std::int8_t>(this->exponents[5] - other.exponents[5]);
+        this->exponents[6] = static_cast<std::int8_t>(this->exponents[6] - other.exponents[6]);
         return *this;
     }
 
@@ -216,12 +216,12 @@ struct [[nodiscard]] Unit {
     // Raises a Unit to any real power and throws an error if the resultant exponent is non-integer
     [[nodiscard]] Unit raisedTo(const double power) const {
         Unit result = {0, 0, 0, 0, 0, 0, 0};
-        for (size_t i = 0; i < 7; ++i) { const double newExponent = static_cast<double>(exponents[i]) * power;
+        for (std::size_t i = 0; i < 7; ++i) { const double newExponent = static_cast<double>(exponents[i]) * power;
             if (std::round(newExponent) != newExponent) {
                 throw std::domain_error("New exponent is non-integer");
             }
 
-            result.exponents[i] = static_cast<int8_t>(std::round(newExponent));
+            result.exponents[i] = static_cast<std::int8_t>(std::round(newExponent));
         }
 
         return result;
@@ -232,13 +232,13 @@ struct [[nodiscard]] Unit {
     // Negates all exponents, equivalent to raising the Unit to the power -1
     [[nodiscard]] constexpr Unit inverse() const noexcept {
         return Unit{
-            static_cast<int8_t>(-this->exponents[0]),
-            static_cast<int8_t>(-this->exponents[1]),
-            static_cast<int8_t>(-this->exponents[2]),
-            static_cast<int8_t>(-this->exponents[3]),
-            static_cast<int8_t>(-this->exponents[4]),
-            static_cast<int8_t>(-this->exponents[5]),
-            static_cast<int8_t>(-this->exponents[6])
+            static_cast<std::int8_t>(-this->exponents[0]),
+            static_cast<std::int8_t>(-this->exponents[1]),
+            static_cast<std::int8_t>(-this->exponents[2]),
+            static_cast<std::int8_t>(-this->exponents[3]),
+            static_cast<std::int8_t>(-this->exponents[4]),
+            static_cast<std::int8_t>(-this->exponents[5]),
+            static_cast<std::int8_t>(-this->exponents[6])
         };
     }
 
@@ -251,7 +251,7 @@ struct [[nodiscard]] Unit {
         std::string s;
         s.reserve(32); // Rough estimate to reduce reallocations
 
-        for (size_t i = 0; i < symbols.size(); ++i) {
+        for (std::size_t i = 0; i < symbols.size(); ++i) {
             if (const int exponent = this->exponents[i]; exponent != 0) { // Ignore warning there is no issue with usage here
                 s.append(symbols[i]);
                 if (exponent != 1) {

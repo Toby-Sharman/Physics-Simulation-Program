@@ -14,7 +14,7 @@
 #ifndef PHYSICS_SIMULATION_PROGRAM_BINARY_FILE_IO_H
 #define PHYSICS_SIMULATION_PROGRAM_BINARY_FILE_IO_H
 
-#include <cstdint> // For uint_t types ignore warning
+#include <cstdint> // For std::uint_t types ignore warning
 #include <fstream>
 #include <string>
 #include <type_traits>
@@ -41,14 +41,14 @@ namespace BinaryIO {
 
     // Write a string with length prefix
     inline void writeString(std::ofstream& out, const std::string& string) {
-        const auto length = static_cast<uint16_t>(string.size());
+        const auto length = static_cast<std::uint16_t>(string.size());
         write(out, length);
         out.write(string.data(), length);
     }
 
     // Read a string with length prefix
     inline bool readString(std::ifstream& in, std::string& string) {
-        uint16_t length;
+        std::uint16_t length;
         if (!read(in, length)) {
             return false;
         }
