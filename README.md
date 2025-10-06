@@ -6,7 +6,8 @@ All particle and object attributes are stored as a `Quantity` struct data type t
 For operations involving quantities, **the unit of the left hand operand is conserved**.
 
 There is no preservation of unit context, since the program tracks units in terms of their SI dimensions and 
-factor/scale to base SI units (m, kg, s, A, K, mol, cd). 
+factor/scale to base SI units (m, kg, s, A, K, mol, cd). The unit dimensions are stored as integers and an error will be
+thrown if an operation would make a non integer exponent.
 
 ---
 
@@ -55,7 +56,8 @@ to how the code is used.
 Classes will keep a general description of all of their methods and an example of usage. For methods in classes
 there will be a brief description of what the method does but any important details will be kept in a class wide comment
 to avoid duplication of comments for similar function (for example addition and subtraction overloads having the
-condition that the units have the same dimensions).
+condition that the units have the same dimensions). Any private class methods will not be described in the class header
+as to be more clear it is not a callable option.
 
 ---
 
