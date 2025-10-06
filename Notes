@@ -1,18 +1,27 @@
 To do:
     - Formulae for vapour photon interaction
     - Documentation & implement project wide unit handling
-        - Add license to github?
+        - app
+        - core
+        - databases ✅
+        - objects
+        - particles
+        - physics
+        - simulation
+    - Wrap some of the core files, in particular vector, in namespaces???
+    - Get a reference for where my db particle and material info are from
     - Plan gas
     - Get relevant gas attributes and add them to material_database.json
     - Implement gas
     - Implement gas and photon interaction
     - Create photons with a frequency value
-    - Implement multithreading for stepping
+    - Implement multithreading for stepping; gpu too?
         - Have some way to override use of max allowed cores so user can set a lower amount of threads?
         - Probably have this thread determination in main file and alter a global var that is used in the stepping function
     - Considerations for photons slow down in non-vacuum
     - Add in polarisation to output
     - Data processing
+    - Update unit printing to be actual units and not si dimension representations
     - Add in doppler shift/broadening for interaction
 
 Model for photon absorption/emission:
