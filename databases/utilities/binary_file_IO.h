@@ -41,14 +41,14 @@ namespace BinaryIO {
 
     // Write a string with length prefix
     inline void writeString(std::ofstream& out, const std::string& string) {
-        const auto length = static_cast<uint32_t>(string.size());
+        const auto length = static_cast<uint16_t>(string.size());
         write(out, length);
         out.write(string.data(), length);
     }
 
     // Read a string with length prefix
     inline bool readString(std::ifstream& in, std::string& string) {
-        uint32_t length;
+        uint16_t length;
         if (!read(in, length)) {
             return false;
         }
