@@ -59,8 +59,8 @@
 //   - Subtraction:            operator-, operator-=
 //   - Multiplication:         operator*, operator*=
 //   - Division:               operator/, operator/=
-//   - Dot product:            dot()
-//   - Cross product:          cross()
+//   - Dot product:            dot(vector)
+//   - Cross product:          cross(vector)
 //   - Length squared:         lengthSquared()
 //   - Length:                 length()
 //   - Unit vector:            unitVector()
