@@ -11,7 +11,7 @@
 //
 
 #include <algorithm>
-#include <cstdint> // For uint types ignore warning
+#include <cstdint> // For uint_t types ignore warning
 #include <format>
 #include <fstream>
 #include <map>

@@ -14,7 +14,7 @@
 #ifndef PHYSICS_SIMULATION_PROGRAM_BINARY_FILE_IO_H
 #define PHYSICS_SIMULATION_PROGRAM_BINARY_FILE_IO_H
 
-#include <cstdint> // For uint32_t ignore warning
+#include <cstdint> // For uint_t types ignore warning
 #include <fstream>
 #include <string>
 #include <type_traits>
