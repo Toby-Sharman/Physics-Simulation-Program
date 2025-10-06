@@ -1,49 +1,39 @@
 //
-// Created by Tobias Sharman on 28/08/2025.
+// Physics Simulation Program
+// File: main.cpp
+// Created by Tobias Sharman on 28/08/2025
+//
+// Description:
+//   - Main entry point for the program
+//
+// Copyright (c) 2025, Tobias Sharman
+// Licensed under a Non-Commercial License. See LICENSE file for details
 //
 
-#include "config.h"
+// Reminder: what includes am I missing? Can I mark any functions nodiscard, noexcept, constexpr, or static?
 
-#include "vector.h"
-#include "matrix.h"
-#include "rotation_helpers.h"
-#include "unit_utilities.h"
-
-#include "globals.h"
-#include "material_database.h"
-#include "particle_database.h"
-
-#include "object_tags.h"
-#include "object.h"
-#include "box.h"
-#include "sphere.h" // FIXME
-#include "point.h"  // FIXME
-
-#include "particle.h"
-#include "particle_manager.h"
-#include "particle_source.h"
-
-#include "field_solver.h"
-
-#include "step.h"
-
-#include <memory>
-#include <iostream>
 #include <iomanip>
+#include <iostream>
+#include <memory>
 
-// TODO: Unit handling
-// TODO: Add some description to headers
-// TODO: Boundary conditions for fields - neglect ferromagnetic effects
-// TODO: Unit handling for vector operations and printing functions
+#include "core/maths/vector.h"
+#include "objects/box.h"
+#include "objects/object.h"
+#include "objects/utilities/object_tags.h"
+#include "particles/particle.h"
+#include "particles/particle_manager.h"
+#include "particles/particle_source.h"
+#include "simulation/step.h"
+
+// TODO: Think on taking the particle dbs out of memory once there use is done. Is this any good; will need to create new particles from interactions so would have to load up again. Maybe later implement a way to keep only particles that have been loaded up in a shorter kept db and once the big d is used remove it from memory
 // TODO: Update Matrix class to handle units too
+// TODO: Boundary conditions for fields - neglect ferromagnetic effects
 // TODO: Fold particle class into object class???
 // TODO: Charged particle handling in B/H fields
 // TODO: Object overlap - especially child being through parent
 // TODO: See what includes I really need/want - especially in files or their dependencies that won't be changed meaningfully
 
 int main() {
-    MaterialDB::loadFromBinary(MATERIAL_DATABASE_DB_PATH);
-    ParticleDB::loadFromBinary(PARTICLE_DATABASE_DB_PATH);
 
     // try {
     //
@@ -82,7 +72,7 @@ int main() {
     // }
     //
     // return 0;
-    
+
     // Objects
     /* Not to scale
      * + -------------------------------------------------- +
