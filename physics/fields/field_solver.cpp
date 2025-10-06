@@ -2,21 +2,21 @@
 // Created by Tobias Sharman on 10/09/2025.
 //
 
-#include "vector.h"
-
+#include "field_solver.h"
 #include "globals.h"
 #include "material_database.h"
+#include "vector.h"
 
-#include "field_solver.h"
-
-#include "globals.h"
-
-auto GLOBAL_B = Vector<3>{{0.0, 0.0, 1.0},"T"};
-auto Global_H = GLOBAL_B / Globals::Constant::Physics::mu0;
+auto globalB = Vector<3>{{0.0, 0.0, 1.0},"T"};
+auto globalH = globalB / Globals::Constant::Physics::mu0;
 
 Vector<3> getFieldAtPoint(const Vector<3>& point, const std::shared_ptr<Object>& root) {
-    if (!root) return GLOBAL_B;
+    if (!root) {
+        return globalB;
+    }
     const auto obj = root->findObjectContainingPoint(point);
-    if (!obj) return GLOBAL_B;
-    return GLOBAL_B * MaterialDB::getRelativePermeability(obj->getMaterial());
+    if (!obj) {
+        return globalB;
+    }
+    return globalB * materialDatabase.getRelativePermeability(obj->getMaterial());
 }

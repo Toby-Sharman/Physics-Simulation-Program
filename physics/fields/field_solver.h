@@ -9,7 +9,7 @@
 
 #include "object.h"
 
-extern Vector<3> GLOBAL_B;
+extern Vector<3> globalB;
 
 Vector<3> getFieldAtPoint(const Vector<3>& point, const std::shared_ptr<Object>& root);
 

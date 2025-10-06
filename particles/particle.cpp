@@ -49,14 +49,14 @@ Particle::Particle(std::string particleName,
                    Vector<4> momentum,
                    Vector<3> polarisation)
 : m_particleName(std::move(particleName)),
-  m_position(std::move(position)),
-  m_momentum(std::move(momentum)),
-  m_polarisation(std::move(polarisation))
+  m_position(position),
+  m_momentum(momentum),
+  m_polarisation(polarisation)
 {
-    m_symbol = ParticleDB::getSymbol(particleName);
-    m_restMass = ParticleDB::getRestMass(particleName);
-    m_charge = Quantity(ParticleDB::getCharge(particleName), "e");
-    m_spin = Quantity(ParticleDB::getSpin(particleName), "ℏ");
+    m_symbol = particleDatabase.getSymbol(m_particleName);
+    m_restMass = particleDatabase.getRestMass(m_particleName);
+    m_charge = Quantity(particleDatabase.getCharge(m_particleName), "e");
+    m_spin = Quantity(particleDatabase.getSpin(m_particleName), "ℏ");
 }
 
 // Getters

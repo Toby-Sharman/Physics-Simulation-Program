@@ -54,7 +54,7 @@ void Object::setRotationMatrix(const Matrix<double,3,3>& R) {
     m_transformation[3][3] = 1.0;
 }
 void Object::setMaterial(std::string material) {
-    if (!MaterialDB::contains(material))
+    if (!materialDatabase.contains(material))
         throw std::runtime_error("Material \"" + material + "\" is not in the material database.");
     m_material = std::move(material);
 }

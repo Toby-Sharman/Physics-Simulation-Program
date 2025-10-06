@@ -48,6 +48,7 @@ add_executable(Simulation_program)
 target_sources(Simulation_program PRIVATE
         app/main.cpp
         core/maths/utilities/unit_utilities.cpp
+        databases/base_database.cpp
         objects/box.cpp
         objects/object.cpp
         objects/sphere.cpp
@@ -107,11 +108,17 @@ set(CONFIG_INCLUDE_GUARD "PHYSICS_SIMULATION_PROGRAM_CONFIG_H")
 # json_to_bin helper
 add_executable(json_to_bin EXCLUDE_FROM_ALL databases/json_to_bin.cpp)
 
+target_sources(json_to_bin PRIVATE
+        core/maths/utilities/unit_utilities.cpp
+        databases/base_database.cpp
+)
+
 target_include_directories(json_to_bin PRIVATE
         ${CMAKE_SOURCE_DIR}
         databases
         databases/utilities
         core
+        core/maths
         core/maths/utilities
 )
 
@@ -146,7 +153,7 @@ foreach(JSON_FILE IN LISTS JSON_FILES)
     file(RELATIVE_PATH REL_BIN_PATH "${CONFIG_DIR}" "${BIN_FILE}")
     get_filename_component(FILE_NAME_WE "${JSON_FILE}" NAME_WE)
     string(TOUPPER "${FILE_NAME_WE}" FILE_NAME_UPPER)
-    set(DB_DEFINE_NAME "${FILE_NAME_UPPER}_DB_PATH")
+    set(DB_DEFINE_NAME "${FILE_NAME_UPPER}_PATH")
     set(DB_PATH_DEFINES "${DB_PATH_DEFINES}#define ${DB_DEFINE_NAME} \"${REL_BIN_PATH}\"\n")
 endforeach()
 
