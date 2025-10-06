@@ -1,32 +1,51 @@
 //
-// Created by Tobias Sharman on 13/09/2025.
+// Physics Simulation Program
+// File: particle_database.h
+// Created by Tobias Sharman on 13/09/2025
+//
+// Description:
+//   - Child class to add specific access methods for database type
+//
+// Copyright (c) 2025, Tobias Sharman
+// Licensed under a Non-Commercial License. See LICENSE file for details
 //
 
 #ifndef PHYSICS_SIMULATION_PROGRAM_PARTICLE_DATABASE_H
 #define PHYSICS_SIMULATION_PROGRAM_PARTICLE_DATABASE_H
 
-#include "base_database.h"
+#include <string>
 
-struct ParticleDB : BaseDB<ParticleDB> {
-    static std::string getSymbol(const std::string& particle) {
+#include "config/config.h"
+#include "databases/base_database.h"
+
+// ParticleDatabase
+//
+// Child of BaseDatabase adding specific access methods
+struct ParticleDatabase final : BaseDatabase {
+    using BaseDatabase::BaseDatabase; // Inherit constructors
+
+    [[nodiscard]] std::string getSymbol(const std::string& particle) const {
         return getStringProperty(particle, "symbol");
     }
 
-    static Quantity getRestMass(const std::string& particle) {
-        return getQuantity(particle, "rest mass");
+    [[nodiscard]] Quantity getRestMass(const std::string& particle) const {
+        return getQuantityProperty(particle, "rest mass");
     }
 
-    static double getCharge(const std::string& particle) {
+    [[nodiscard]] double getCharge(const std::string& particle) const {
         return getNumericProperty(particle, "charge");
     }
 
-    static double getSpin(const std::string& particle) {
+    [[nodiscard]] double getSpin(const std::string& particle) const {
         return getNumericProperty(particle, "spin");
     }
 
-    static std::string getParticleType(const std::string& particle) {
+    [[nodiscard]] std::string getParticleType(const std::string& particle) const {
         return getStringProperty(particle, "particle type");
     }
 };
+
+// Create a reusable instance of the particle database
+inline ParticleDatabase particleDatabase{PARTICLE_DATABASE_PATH};
 
 #endif //PHYSICS_SIMULATION_PROGRAM_PARTICLE_DATABASE_H
