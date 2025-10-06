@@ -19,9 +19,12 @@
 
 #include <array>
 #include <cmath>
+#include <cstddef> // For std::size_t ignore warning
+#include <initializer_list>
 #include <limits>
 #include <ostream>
 #include <stdexcept>
+#include <utility> // For std::swap ignore warning
 
 // Matrix<Rows, Columns>
 //
@@ -48,13 +51,13 @@
 //   std::cout << rotation[0];
 //   auto inverse = rotation.inverse()
 template <std::size_t Rows, std::size_t Columns>
-struct Matrix {
+struct [[nodiscard]] Matrix {
     std::array<std::array<Quantity, Columns>, Rows> data; // Internal storage
 
     // Default constructor
     //
     // Dimensionless Quantity types with value 0.0
-    Matrix() : data{} {
+    Matrix() noexcept : data{} {
         for (std::size_t i = 0; i < Rows; ++i) {
             for (std::size_t j = 0; j < Columns; ++j) {
                 this->data[i][j] = Quantity(0.0);
@@ -63,7 +66,7 @@ struct Matrix {
     }
 
     // Constructor from a single Quantity (fills entire with that Quantity)
-    explicit Matrix(const Quantity& value) : data {} {
+    explicit Matrix(const Quantity& value) noexcept : data {} {
         for (std::size_t i = 0; i < Rows; ++i) {
             for (std::size_t j = 0; j < Columns; ++j) {
                 this->data[i][j] = value;
@@ -89,14 +92,14 @@ struct Matrix {
     // Indexing
     //
     // Return mutable rows
-    std::array<Quantity, Columns>& operator[](std::size_t row) {
+    std::array<Quantity, Columns>& operator[](std::size_t row) noexcept {
         return this->data[row];
     }
 
     // Indexing
     //
     // Return read-only rows
-    const std::array<Quantity, Columns>& operator[](std::size_t row) const {
+    const std::array<Quantity, Columns>& operator[](std::size_t row) const noexcept {
         return this->data[row];
     }
 
@@ -104,7 +107,7 @@ struct Matrix {
     //
     // Matrix * Vector
     template<std::size_t N>
-    Vector<Rows> operator*(const Vector<N>& vector) const {
+    [[nodiscard]] constexpr Vector<Rows> operator*(const Vector<N>& vector) const {
         static_assert( N == Columns, "Matrix column and vector size mismatch");
         Vector<Rows> result;
         for (std::size_t i = 0; i < Rows; ++i) {
@@ -120,7 +123,7 @@ struct Matrix {
     //
     // Matrix * matrix
     template<std::size_t OtherColumns>
-    Matrix<Rows, OtherColumns> operator*(const Matrix<Columns, OtherColumns>& other) const {
+    [[nodiscard]] constexpr Matrix<Rows, OtherColumns> operator*(const Matrix<Columns, OtherColumns>& other) const {
         Matrix<Rows, OtherColumns> result;
         for (std::size_t i = 0; i < Rows; ++i) {
             for (std::size_t j = 0; j < OtherColumns; ++j) {
@@ -133,7 +136,7 @@ struct Matrix {
     }
 
     // Identity matrix creation method
-    static Matrix identity() {
+    static constexpr Matrix identity() {
         static_assert(Rows == Columns, "Identity only valid for square matrices");
         Matrix identityMatrix;
         for (std::size_t i = 0; i < Rows; ++i) {
@@ -150,8 +153,8 @@ struct Matrix {
         Matrix<n, n> matrixA;     // raw numeric values
         Matrix<n, n> unitsMatrix; // corresponding units
 
-        for (size_t i = 0; i < Rows; ++i) {
-            for (size_t j = 0; j < Columns; ++j) {
+        for (std::size_t i = 0; i < Rows; ++i) {
+            for (std::size_t j = 0; j < Columns; ++j) {
                 matrixA[i][j] = Quantity(this->data[i][j].value);         // numeric values
                 unitsMatrix[i][j] = Quantity(1.0, this->data[i][j].unit); // units
             }
@@ -245,7 +248,7 @@ struct TransformationMatrix {
     // Multiplication operator
     //
     // Multiply transformation matrix by 3D vector (homogeneous transform)
-    Vector<3> operator*(const Vector<3>& vector) {
+    [[nodiscard]] constexpr Vector<3> operator*(const Vector<3>& vector) noexcept {
         Vector<3> result;
         for (int i = 0; i < 3; ++i) {
             result[i] = this->translation[i];
@@ -259,7 +262,7 @@ struct TransformationMatrix {
     // Multiplication operator
     //
     // Combine transformation matrices into one matrix
-    TransformationMatrix operator*(const TransformationMatrix& other) const {
+    [[nodiscard]] constexpr TransformationMatrix operator*(const TransformationMatrix& other) const noexcept {
         TransformationMatrix result;
         result.rotation = this->rotation * other.rotation;
         result.translation = this->rotation * other.translation + this->translation;
@@ -269,7 +272,7 @@ struct TransformationMatrix {
     // As matrix method
     //
     // Converts the Transformation matrix into the standard 4x4 matrix
-    [[nodiscard]] Matrix<4, 4> asMatrix() const {
+    [[nodiscard]] constexpr Matrix<4, 4> asMatrix() const noexcept {
         Matrix<4, 4> matrix;
         for (int i = 0; i < 3; ++i) {
             for (int j = 0; j < 3; ++j) {
@@ -292,8 +295,6 @@ struct TransformationMatrix {
             for (int j = 0; j < 3; ++j) {
                 inverted.rotation[i][j] = matrixInverse[i][j];
             }
-            inverted.translation[i] = matrixInverse[i][3];
-            inverted.translation[i] = matrixInverse[i][3];
             inverted.translation[i] = matrixInverse[i][3];
         }
 
