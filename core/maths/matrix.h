@@ -1,161 +1,304 @@
 //
-// Created by Tobias Sharman on 03/09/2025.
+// Physics Simulation Program
+// File: matrix.h
+// Created by Tobias Sharman on 03/09/2025
+//
+// Description:
+//   - Describes Matrix custom data type and a specialised transformation matrix
+//
+// Copyright (c) 2025,
+// Tobias Sharman
+// Licensed under a Non-Commercial License. See LICENSE file for details
 //
 
-// TODO: For the typename add options for multiple data types. i.e. float, double, int, etc. to keep it general for future projects
-// TODO: Add concepts
+#ifndef PHYSICS_SIMULATION_PROGRAM_MATRIX_H
+#define PHYSICS_SIMULATION_PROGRAM_MATRIX_H
 
-#ifndef MATRIX_H
-#define MATRIX_H
+#include "core/maths/vector.h"
+#include "core/maths/utilities/quantity.h"
 
-#include "vector.h"
-
-#include <stdexcept>
-#include <cmath> // Ignore error, used for std::abs I think
+#include <array>
+#include <cmath>
 #include <limits>
-#include <type_traits>
+#include <ostream>
+#include <stdexcept>
 
-template <typename T, size_t Rows, size_t Cols>
+// Matrix<Rows, Columns>
+//
+// Represents a mathematical matrix in the form of an array of arrays of quantities as described by Quantity
+//
+// This class supports very basic matrix operations
+//
+// Notes on initialisation:
+//
+// Notes on algorithms:
+//
+// Notes on output:
+//
+// Supported overloads / operations and functions / methods:
+//   - Constructor:            Matrix()
+//   - Subscript:              operator[]
+//   - Multiplication:         operator* (matrix * vector, matrix * matrix)
+//   - Identity:               Matrix<rows, columns>::identity()
+//   - Inverse:                inverse()
+//   - Stream output:          operator<<
+//
+// Example usage: TODO
+//   Matrix<3,3> rotation = Matrix<3,3>::identity();
+//   std::cout << rotation[0];
+//   auto inverse = rotation.inverse()
+template <std::size_t Rows, std::size_t Columns>
 struct Matrix {
-    std::array<std::array<T, Cols>, Rows> data{}; // Internal storage
+    std::array<std::array<Quantity, Columns>, Rows> data; // Internal storage
+
+    // Default constructor
+    //
+    // Dimensionless Quantity types with value 0.0
+    Matrix() : data{} {
+        for (std::size_t i = 0; i < Rows; ++i) {
+            for (std::size_t j = 0; j < Columns; ++j) {
+                this->data[i][j] = Quantity(0.0);
+            }
+        }
+    }
+
+    // Constructor from a single Quantity (fills entire with that Quantity)
+    explicit Matrix(const Quantity& value) : data {} {
+        for (std::size_t i = 0; i < Rows; ++i) {
+            for (std::size_t j = 0; j < Columns; ++j) {
+                this->data[i][j] = value;
+            }
+        }
+    }
+
+    // Constructor from initializer list of initializer lists
+    Matrix(const std::initializer_list<std::initializer_list<Quantity>>& init) : data{} {
+        std::size_t i = 0;
+        for (auto& row : init) {
+            std::size_t j = 0;
+            for (auto& value : row) {
+                if (i < Rows && j < Columns) {
+                    this->data[i][j] = value;
+                }
+                ++j;
+            }
+            ++i;
+        }
+    }
 
     // Indexing
-    std::array<T, Cols>& operator[](int row) { return data[row]; }
-    const std::array<T, Cols>& operator[](int row) const { return data[row]; }
+    //
+    // Return mutable rows
+    std::array<Quantity, Columns>& operator[](std::size_t row) {
+        return this->data[row];
+    }
 
-    [[nodiscard]] static size_t rows() { return Rows; }
-    [[nodiscard]] static size_t cols() { return Cols; }
+    // Indexing
+    //
+    // Return read-only rows
+    const std::array<Quantity, Columns>& operator[](std::size_t row) const {
+        return this->data[row];
+    }
 
-    // Identity Matrix
-    static Matrix<T, Rows, Cols> Identity() {
-        static_assert(Rows == Cols, "Identity only valid for square matrices");
-        Matrix<T, Rows, Cols> I{};
+    // Multiplication operator
+    //
+    // Matrix * Vector
+    template<std::size_t N>
+    Vector<Rows> operator*(const Vector<N>& vector) const {
+        static_assert( N == Columns, "Matrix column and vector size mismatch");
+        Vector<Rows> result;
+        for (std::size_t i = 0; i < Rows; ++i) {
+            result[i] = this->data[i][0] * vector[0];
+            for (std::size_t j = 1; j < Columns; ++j) {
+                result[i] += this->data[i][j] * vector[j];
+            }
+        }
+        return result;
+    }
+
+    // Multiplication operator
+    //
+    // Matrix * matrix
+    template<std::size_t OtherColumns>
+    Matrix<Rows, OtherColumns> operator*(const Matrix<Columns, OtherColumns>& other) const {
+        Matrix<Rows, OtherColumns> result;
+        for (std::size_t i = 0; i < Rows; ++i) {
+            for (std::size_t j = 0; j < OtherColumns; ++j) {
+                for (std::size_t k = 0; k < Columns; ++k) {
+                    result[i][j] += this->data[i][k] * other[k][j];
+                }
+            }
+        }
+        return result;
+    }
+
+    // Identity matrix creation method
+    static Matrix identity() {
+        static_assert(Rows == Columns, "Identity only valid for square matrices");
+        Matrix identityMatrix;
+        for (std::size_t i = 0; i < Rows; ++i) {
+            identityMatrix[i][i] = Quantity(1.0); // dimensionless Quantity types with value 1.0
+        }
+        return identityMatrix;
+    }
+
+    // Matrix inversion method
+    [[nodiscard]] Matrix inverse() const {
+        static_assert(Rows == Columns, "Matrix must be square for inversion");
+        constexpr std::size_t n = Rows;
+
+        Matrix<n, n> matrixA;     // raw numeric values
+        Matrix<n, n> unitsMatrix; // corresponding units
 
         for (size_t i = 0; i < Rows; ++i) {
-            I[i][i] = T(1); // diagonal elements set to 1
+            for (size_t j = 0; j < Columns; ++j) {
+                matrixA[i][j] = Quantity(this->data[i][j].value);         // numeric values
+                unitsMatrix[i][j] = Quantity(1.0, this->data[i][j].unit); // units
+            }
         }
-        return I;
-    }
 
-    // Matrix * Vector multiplication
-    template<int N>
-    Vector<N> operator*(const Vector<N>& v) const {
-        static_assert(N == Rows && N == Cols, "Matrix and vector dimension mismatch");
-        Vector<N> result{{}, v.labels};
-        for(int i=0;i<N;i++)
-            for(int j=0;j<N;j++)
-                result[i] += data[i][j] * v[j];
-        return result;
-    }
+        auto matrixI = Matrix::identity();
 
-    // Matrix multiplication
-    template<size_t OtherCols>
-    Matrix<T,Rows,OtherCols> operator*(const Matrix<T,Cols,OtherCols>& other) const {
-        Matrix<T,Rows,OtherCols> result{};
-        for(int i=0;i<Rows;i++)
-            for(int j=0;j<OtherCols;j++)
-                for(int k=0;k<Cols;k++)
-                    result[i][j] += data[i][k] * other[k][j];
-        return result;
-    }
+        constexpr double eps = std::numeric_limits<double>::epsilon() * 100.0; // Account for double limited precision
 
-    [[nodiscard]] Matrix<T, Rows, Cols> inverse() const {
-        static_assert(Rows == Cols, "Matrix must be square for inversion");
-        static_assert(std::is_floating_point_v<T>, "Matrix inverse requires floating-point type");
-
-        constexpr size_t N = Rows;
-        Matrix<T, N, N> A = *this;
-        Matrix<T, N, N> I = Matrix<T, N, N>::Identity();
-
-        const T eps = std::numeric_limits<T>::epsilon() * T(100); // tolerance
-
-        for (size_t i = 0; i < N; ++i) {
-            // Partial pivot: find max element in column i
-            size_t pivotRow = i;
-            T maxVal = std::abs(A[i][i]);
-            for (size_t r = i + 1; r < N; ++r) {
-                T val = std::abs(A[r][i]);
-                if (val > maxVal) {
-                    maxVal = val;
-                    pivotRow = r;
+        for (std::size_t pivot = 0; pivot < n; ++pivot) {
+            // Partial pivot: find max element in column pivot
+            std::size_t maxRow = pivot;
+            double maxValue = std::abs(matrixA[pivot][pivot].value);
+            for (std::size_t candidateRow = pivot + 1; candidateRow < n; ++candidateRow) {
+                if (const double value = std::abs(matrixA[candidateRow][pivot].value); value > maxValue) {
+                    maxValue = value;
+                    maxRow = candidateRow;
                 }
             }
 
-            if (maxVal <= eps)
+            if (maxValue <= eps) {
                 throw std::runtime_error("Matrix is singular or nearly singular");
+            }
 
-            // Swap rows in matrices A and I if needed
-            if (pivotRow != i) {
-                std::swap(A.data_[i], A.data_[pivotRow]);
-                std::swap(I.data_[i], I.data_[pivotRow]);
+            // Swap rows if needed
+            if (maxRow != pivot) {
+                std::swap(matrixA.data[pivot], matrixA.data[maxRow]);
+                std::swap(matrixI.data[pivot], matrixI.data[maxRow]);
             }
 
             // Normalize pivot row
-            T pivot = A[i][i];
-            for (size_t j = 0; j < N; ++j) {
-                A[i][j] /= pivot;
-                I[i][j] /= pivot;
+            Quantity pivotValue = matrixA[pivot][pivot];
+            for (std::size_t column = 0; column < n; ++column) {
+                matrixA[pivot][column] /= pivotValue;
+                matrixI[pivot][column] /= pivotValue;
             }
 
-            // Eliminate column i from all other rows
-            for (size_t k = 0; k < N; ++k) {
-                if (k == i) continue;
-                T factor = A[k][i];
-                for (size_t j = 0; j < N; ++j) {
-                    A[k][j] -= factor * A[i][j];
-                    I[k][j] -= factor * I[i][j];
+            // Eliminate pivot column from all other rows
+            for (std::size_t targetRow = 0; targetRow < n; ++targetRow) {
+                if (targetRow == pivot) {
+                    continue;
+                }
+                Quantity factor = matrixA[targetRow][pivot];
+                for (std::size_t column = 0; column < n; ++column) {
+                    matrixA[targetRow][column] -= factor * matrixA[pivot][column];
+                    matrixI[targetRow][column] -= factor * matrixI[pivot][column];
                 }
             }
         }
-        return I;
-    }
 
-private:
-    Vector<Cols> data_[Rows];
+        return matrixI * unitsMatrix;
+    }
 };
 
-template<typename T, size_t R, size_t C>
-std::ostream& operator<<(std::ostream& os, const Matrix<T,R,C>& m) {
-    for (size_t i = 0; i < R; ++i) {
+// Stream operator
+template<std::size_t Rows, std::size_t Columns>
+std::ostream& operator<<(std::ostream& os, const Matrix<Rows, Columns>& matrix) {
+    for (std::size_t i = 0; i < Rows; ++i) {
         os << "[ ";
-        for (size_t j = 0; j < C; ++j) {
-            os << m[i][j] << " ";
+        for (std::size_t j = 0; j < Columns; ++j) {
+            os << matrix[i][j] << " ";
         }
         os << "]\n";
     }
     return os;
 }
 
-// Specialization: Multiply 4x4 matrix by 3D vector (homogeneous transform
-inline Vector<3> operator*(const Matrix<double,4,4>& m, const Vector<3>& v) {
-    auto result =  Vector<3>{};
-    for (int i = 0; i < 3; i++) {
-        result[i] = Quantity(
-            m[i][0] * v[0].asDouble() +
-            m[i][1] * v[1].asDouble() +
-            m[i][2] * v[2].asDouble() +
-            m[i][3]); // translation
+// TransformationMatrix
+//
+// Represents a transformation matrix encapsulating rotation and translation components
+// TODO: Add scale component
+//
+// This class supports very basic transformations operations
+//
+// Notes on initialisation:
+//
+// Notes on algorithms:
+//
+// Notes on output:
+//
+// Supported overloads / operations and functions / methods:
+//   - Multiplication:         operator* (transformation matrix * vector, transformation matrix * transformation matrix)
+//   - As matrix:              asMatrix()
+//   - Inverse:                inverse()
+//
+// Example usage: TODO
+struct TransformationMatrix {
+    Matrix<3,3> rotation;
+    Vector<3> translation;
+
+    // Multiplication operator
+    //
+    // Multiply transformation matrix by 3D vector (homogeneous transform)
+    Vector<3> operator*(const Vector<3>& vector) {
+        Vector<3> result;
+        for (int i = 0; i < 3; ++i) {
+            result[i] = this->translation[i];
+            for (int j = 0; j < 3; ++j) {
+                result[i] += this->rotation[i][j] * vector[j];
+            }
+        }
+        return result;
     }
-    return result;
-}
 
+    // Multiplication operator
+    //
+    // Combine transformation matrices into one matrix
+    TransformationMatrix operator*(const TransformationMatrix& other) const {
+        TransformationMatrix result;
+        result.rotation = this->rotation * other.rotation;
+        result.translation = this->rotation * other.translation + this->translation;
+        return result;
+    }
 
-// Non-member operator for Matrix * Matrix
-// TODO: Do I need this? Commented out until tested
-// template<typename T, size_t Rows, size_t Cols, size_t OtherCols>
-// Matrix<T,Rows,OtherCols> operator*(const Matrix<T,Rows,Cols>& a,
-//                                           const Matrix<T,Cols,OtherCols>& b) {
-//     Matrix<T, Rows, OtherCols> result{};
-//     for (int i = 0; i < Rows; i++) {
-//         for (int j = 0; j < OtherCols; j++) {
-//             T sum = T(0);
-//             for (int k = 0; k < Cols; k++) {
-//                 sum += a[i][k] * b[k][j];
-//             }
-//             result[i][j] = sum;
-//         }
-//     }
-//     return result;
-// }
+    // As matrix method
+    //
+    // Converts the Transformation matrix into the standard 4x4 matrix
+    [[nodiscard]] Matrix<4, 4> asMatrix() const {
+        Matrix<4, 4> matrix;
+        for (int i = 0; i < 3; ++i) {
+            for (int j = 0; j < 3; ++j) {
+                matrix[i][j] = this->rotation[i][j];
+            }
+        }
+        matrix[0][3] = this->translation[0];
+        matrix[1][3] = this->translation[1];
+        matrix[2][3] = this->translation[2];
+        matrix[3][0] = matrix[3][1] = matrix[3][2] = Quantity(0.0);
+        matrix[3][3] = Quantity(1.0);
+        return matrix;
+    }
 
-#endif //MATRIX_H
+    [[nodiscard]] TransformationMatrix inverse() const {
+        auto matrixInverse = asMatrix().inverse();
+
+        TransformationMatrix inverted;
+        for (int i = 0; i < 3; ++i) {
+            for (int j = 0; j < 3; ++j) {
+                inverted.rotation[i][j] = matrixInverse[i][j];
+            }
+            inverted.translation[i] = matrixInverse[i][3];
+            inverted.translation[i] = matrixInverse[i][3];
+            inverted.translation[i] = matrixInverse[i][3];
+        }
+
+        return inverted;
+    }
+};
+
+#endif // PHYSICS_SIMULATION_PROGRAM_MATRIX_H
