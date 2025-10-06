@@ -31,6 +31,9 @@
 // product, length, squared length, unit vector, and printing methods
 //
 // Notes on initialisation:
+//   - To make construction more general, i.e. typename T in the template for any T, would come at the cost of easy
+//     Quantity type Vector construction via initializer list and optional shared unit since deduction guides cannot get
+//     the size of an initializer list at compile time
 //   - Can be constructed as a series of Quantity types
 //   - Can be constructed as an array or initializer list of values with an optional shared unit
 //   - Construction requires the same amount of values as the size of the Vector
