@@ -7,5 +7,60 @@
   },
   "glass": {
     "relativePermeability": 1.05
+  },
+  "Rb85": {
+    "relativePermeability": 1.0,
+    "abundance": 0.72,
+    "nuclearSpin": 2.5,
+    "mass": {"value": 84.9117893, "unit": "u"},
+    "D1_wavelength": {"value": 794.979, "unit": "nm"},
+    "D1_lifetime": {"value": 27e-9, "unit": "s"},
+    "D2_wavelength": {"value": 780.241, "unit": "nm"},
+    "D2_lifetime": {"value": 27e-9, "unit": "s"},
+    "numberDensity": {"value": 1e20, "unit": "m^-3"}
+  },
+  "Rb87": {
+    "relativePermeability": 1.0,
+    "abundance": 0.28,
+    "nuclearSpin": 1.5,
+    "mass": {"value": 86.9091805, "unit": "u"},
+    "D1_wavelength": {"value": 794.978, "unit": "nm"},
+    "D1_lifetime": {"value": 27e-9, "unit": "s"},
+    "D2_wavelength": {"value": 780.241, "unit": "nm"},
+    "D2_lifetime": {"value": 27e-9, "unit": "s"},
+    "numberDensity": {"value": 1e20, "unit": "m^-3"}
+  },
+  "Cs133": {
+    "relativePermeability": 1.0,
+    "abundance": 1.0,
+    "nuclearSpin": 3.5,
+    "mass": {"value": 132.90545196, "unit": "u"},
+    "D1_wavelength": {"value": 894.592, "unit": "nm"},
+    "D1_lifetime": {"value": 34.7e-9, "unit": "s"},
+    "D2_wavelength": {"value": 852.347, "unit": "nm"},
+    "D2_lifetime": {"value": 30.5e-9, "unit": "s"},
+    "numberDensity": {"value": 1e19, "unit": "m^-3"}
+  },
+  "K39": {
+    "relativePermeability": 1.0,
+    "abundance": 0.9326,
+    "nuclearSpin": 1.5,
+    "mass": {"value": 38.96370668, "unit": "u"},
+    "D1_wavelength": {"value": 770.108, "unit": "nm"},
+    "D1_lifetime": {"value": 26.7e-9, "unit": "s"},
+    "D2_wavelength": {"value": 766.701, "unit": "nm"},
+    "D2_lifetime": {"value": 26.7e-9, "unit": "s"},
+    "numberDensity": {"value": 1e18, "unit": "m^-3"}
+  },
+  "K41": {
+    "relativePermeability": 1.0,
+    "abundance": 0.0673,
+    "nuclearSpin": 1.5,
+    "mass": {"value": 40.96182526, "unit": "u"},
+    "D1_wavelength": {"value": 770.108, "unit": "nm"},
+    "D1_lifetime": {"value": 26.7e-9, "unit": "s"},
+    "D2_wavelength": {"value": 766.701, "unit": "nm"},
+    "D2_lifetime": {"value": 26.7e-9, "unit": "s"},
+    "numberDensity": {"value": 1e18, "unit": "m^-3"}
   }
 }
