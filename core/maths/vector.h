@@ -66,7 +66,7 @@
 //   - Unit vector:            unitVector()
 //   - Printing:               print()
 //   - Stream output:          operator<<
-
+//
 // Example usage: (The units have been described qualitatively when in reality they would be an array of dimensions)
 //   std::array<double, 3> vals = {1.0, 2.0, 3.0};
 //   Vector<3> v1(vals, "m");                      // v1 contains 3 Quantity types: {1.0 ,2.0 ,3.0}, dimensions of "m"
