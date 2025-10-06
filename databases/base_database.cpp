@@ -25,7 +25,7 @@
 #include "databases/utilities/binary_file_IO.h"
 
 void BaseDatabase::loadFromBinary(const std::string& filepath) {
-    m_db.clear(); // Clear previous content to: prevent duplicates if reusing the same binary; or a merge of 2 databases
+    this->m_db.clear(); // Clear previous content to: prevent duplicates if reusing the same binary; or a merge of 2 databases
 
     std::ifstream in(filepath, std::ios::binary);
     if (!in) {
@@ -141,7 +141,7 @@ void BaseDatabase::loadFromBinary(const std::string& filepath) {
             entry.properties.push_back(std::move(property));
         }
 
-        m_db.push_back(std::move(entry));
+        this->m_db.push_back(std::move(entry));
     }
 }
 
@@ -154,7 +154,7 @@ void BaseDatabase::saveToBinary(const std::string& filepath) {
     std::map<Unit, uint16_t> unitIndexMap;
     std::vector<Unit> unitTable;
 
-    for (const auto& [entryName, entryProperties] : m_db) {
+    for (const auto& [entryName, entryProperties] : this->m_db) {
         for (const auto& property : entryProperties) {
             if (property.type == PropertyType::QUANTITY) {
                 if (const auto& u = std::get<Quantity>(property.value).unit; !unitIndexMap.contains(u)) {
@@ -173,7 +173,7 @@ void BaseDatabase::saveToBinary(const std::string& filepath) {
     }
 
 
-    for (const auto&[entryName, entryProperties] : m_db) {
+    for (const auto&[entryName, entryProperties] : this->m_db) {
         BinaryIO::writeString(out, entryName);
         auto propCount = static_cast<uint32_t>(entryProperties.size());
         BinaryIO::write(out, propCount);
@@ -209,7 +209,7 @@ void BaseDatabase::saveToBinary(const std::string& filepath) {
 }
 
 bool BaseDatabase::contains(const std::string& entryName) const noexcept {
-    return std::ranges::any_of(m_db, [&](const DatabaseEntry& entry){ return entry.name == entryName; });
+    return std::ranges::any_of(this->m_db, [&](const DatabaseEntry& entry){ return entry.name == entryName; });
 }
 
 std::string BaseDatabase::getStringProperty(const std::string& entryName, const std::string& propertyName) const {
@@ -222,13 +222,13 @@ double BaseDatabase::getNumericProperty(const std::string& entryName, const std:
     const auto& entry = findEntry(entryName);
     const auto& property  = findProperty(entry, propertyName);
 
-    return std::visit([]<typename T0>(T0&& val) -> double {
+    return std::visit([]<typename T0>(T0&& value) -> double {
         using T = std::decay_t<T0>;
         if constexpr (std::is_same_v<T, int64_t> || std::is_same_v<T, float> || std::is_same_v<T, double>) {
-            return static_cast<double>(val);
+            return static_cast<double>(value);
         }
         else if constexpr (std::is_same_v<T, Quantity>) {
-            return val.value;
+            return value.value;
         }
         else {
             throw std::runtime_error("Property is not numeric");
@@ -240,10 +240,10 @@ Quantity BaseDatabase::getQuantityProperty(const std::string& entryName, const s
     const auto& entry = findEntry(entryName);
     const auto& property  = findProperty(entry, propertyName);
 
-    return std::visit([]<typename T0>(T0&& val) -> Quantity {
+    return std::visit([]<typename T0>(T0&& value) -> Quantity {
         using T = std::decay_t<T0>;
         if constexpr (std::is_same_v<T, Quantity>) {
-            return val;
+            return value;
         }
         else {
             throw std::runtime_error("Property is not a Quantity");
@@ -253,8 +253,8 @@ Quantity BaseDatabase::getQuantityProperty(const std::string& entryName, const s
 
 const DatabaseEntry& BaseDatabase::findEntry(const std::string& entryName) const{
     const auto itEntry = std::ranges::find_if(
-        m_db, [&](const DatabaseEntry& entry){ return entry.name == entryName; });
-    if (itEntry == m_db.end()) {
+        this->m_db, [&](const DatabaseEntry& entry){ return entry.name == entryName; });
+    if (itEntry == this->m_db.end()) {
         throw std::runtime_error(std::format("Unknown entry '{}'", entryName));
     }
     return *itEntry;
