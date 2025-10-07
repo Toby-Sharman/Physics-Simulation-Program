@@ -20,7 +20,6 @@
 
 // Getters
 const std::string& Object::getName() const { return m_name; }
-const std::string& Object::getType() const { return m_type; }
 Vector<3> Object::getPosition() const { return m_transformation.translation; }
 Matrix<3,3> Object::getRotationMatrix() const { return m_transformation.rotation; }
 const std::string& Object::getMaterial() const { return m_material; }
@@ -38,7 +37,6 @@ TransformationMatrix Object::getWorldTransform() const {
 } // Recursively transform the child by all the adults transformations to go from local to world position
 
 // Setters
-void Object::setType(const std::string &type) { m_type = type; }
 void Object::setName(const std::string &name) { m_name = name; }
 void Object::setPosition(const Vector<3> &position) { m_transformation.translation = position; }
 void Object::setRotationMatrix(const Matrix<3,3> &rotation) { m_transformation.rotation = rotation; }
@@ -55,9 +53,13 @@ Vector<3> Object::worldToLocal(const Vector<3>& worldPoint) const { return getWo
 
 std::shared_ptr<Object> Object::findObjectContainingPoint(const Vector<3>& worldPoint) {
     for (const auto& child : m_children) {
-        if (auto found = child->findObjectContainingPoint(worldPoint)) return found;
+        if (auto found = child->findObjectContainingPoint(worldPoint)) {
+            return found;
+        }
     }
-    if (containsPoint(worldPoint)) return shared_from_this();
+    if (containsPoint(worldPoint)) {
+        return shared_from_this();
+    }
     return nullptr;
 }
 
@@ -67,32 +69,8 @@ concept HasSizeDescription = requires(const T &object)
     { object.getSizeDescription() } -> std::same_as<std::string>;
 };
 
-void Object::describeSelf(const int indent) const {
-    const std::string pad(indent, ' ');
-    const auto material = m_material.empty() ? "material unknown" : m_material;
-    const auto localPosition = m_transformation.translation;
-    auto worldPositionM = getWorldTransform();
-    auto worldPosition = worldPositionM * Vector<3>({0.0, 0.0, 0.0}, "m");
-
-    auto line = std::format( "{}{} \"{}\" | Material: {} | Local Pos = ({}, {}, {}) | World Pos = ({}, {}, {})",
-        pad,
-        m_type,
-        m_name,
-        material,
-        localPosition[0].asDouble(), localPosition[1].asDouble(), localPosition[2].asDouble(),
-        worldPosition[0].asDouble(), worldPosition[1].asDouble(), worldPosition[2].asDouble()
-    );
-
-    // Append size if available (concept-based design)
-    if constexpr (HasSizeDescription<std::remove_cvref_t<decltype(*this)>>) {
-        line += " " + this->getSizeDescription();
-    }
-
-    std::cout << line << "\n";
-}
-
 void Object::printHierarchy(const int indent) const {
-    describeSelf(indent);
+    std::cout << describeSelf(indent);
     for (const auto& child : m_children) {
         child->printHierarchy(indent + 2);
     }

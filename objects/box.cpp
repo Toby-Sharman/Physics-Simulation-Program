@@ -15,8 +15,8 @@ void Box::setSizeFromParameters(const Vector<3>& dimensions) {
     // bounding_radius_ = std::sqrt(size_[0]*size_[0] + size_[1]*size_[1] + size_[2]*size_[2])/2.0f;
 }
 
-bool Box::containsPoint(const Vector<3>& world_point) const {
-    Vector<3> local = worldToLocal(world_point);
+bool Box::containsPoint(const Vector<3>& worldPoint) const {
+    Vector<3> local = worldToLocal(worldPoint);
     return std::abs(local[0].asDouble()) <= m_size[0].asDouble()/2 &&
            std::abs(local[1].asDouble()) <= m_size[1].asDouble()/2 &&
            std::abs(local[2].asDouble()) <= m_size[2].asDouble()/2;
@@ -24,4 +24,24 @@ bool Box::containsPoint(const Vector<3>& world_point) const {
 
 std::string Box::getSizeDescription() const {
     return std::format("| Size = ({}, {}, {})", m_size[0].asDouble(), m_size[1].asDouble(), m_size[2].asDouble());
+}
+
+std::string Box::describeSelf(const int indent) const {
+    const std::string pad(indent, ' ');
+    const auto material = m_material.empty() ? "material unknown" : m_material;
+    const auto localPosition = m_transformation.translation;
+    auto worldPositionM = getWorldTransform();
+    auto worldPosition = worldPositionM * Vector<3>({0.0, 0.0, 0.0}, "m");
+
+    auto line = std::format( "{}Box: \"{}\" | Material: {} | Local Pos = ({}, {}, {}) | World Pos = ({}, {}, {})",
+        pad,
+        m_name,
+        material,
+        localPosition[0].asDouble(), localPosition[1].asDouble(), localPosition[2].asDouble(),
+        worldPosition[0].asDouble(), worldPosition[1].asDouble(), worldPosition[2].asDouble()
+    );
+
+    line += " " + this->getSizeDescription() + "\n";
+
+    return line;
 }

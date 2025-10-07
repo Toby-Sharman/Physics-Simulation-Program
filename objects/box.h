@@ -5,15 +5,14 @@
 #ifndef PHYSICS_SIMULATION_PROGRAM_BOX_H
 #define PHYSICS_SIMULATION_PROGRAM_BOX_H
 
-#include "quantity.h"
-
 #include "object.h"
 #include "vector.h"
 
 class Box final : public Object {
-public:
-    void setSizeFromParameters(const Vector<3>& dimensions);
-    bool containsPoint(const Vector<3>& world_point) const override;
+    public:
+        void setSizeFromParameters(const Vector<3>& dimensions);
+        bool containsPoint(const Vector<3>& worldPoint) const override;
+        std::string describeSelf(int indent) const override;
 
 protected:
     std::string getSizeDescription() const override;

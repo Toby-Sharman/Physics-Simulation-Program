@@ -7,18 +7,69 @@
 #ifndef PHYSICS_SIMULATION_PROGRAM_OBJECT_H
 #define PHYSICS_SIMULATION_PROGRAM_OBJECT_H
 
-#include "quantity.h"
-
 #include "vector.h"
 #include "matrix.h"
 
 #include "object_types.h"
-#include "object_attribute_assigners.h"
 
 #include <iostream>
 #include <memory>
 #include <string>
 #include <vector>
+
+struct NameTag { std::string value; };
+inline NameTag name(const std::string& s) { return NameTag{s}; }
+template <typename T> concept NameArg = std::same_as<std::decay_t<T>, NameTag>;
+
+struct MaterialTag { std::string value; };
+inline MaterialTag material(const std::string& s) { return MaterialTag{s}; }
+template <typename T> concept MaterialArg = std::same_as<std::decay_t<T>, MaterialTag>;
+
+struct PositionTag { Vector<3> value; };
+inline PositionTag position(const Vector<3>& v) { return PositionTag{v}; }
+template <typename T> concept PositionArg = std::same_as<std::decay_t<T>, PositionTag>;
+
+struct RotationTag { Matrix<3,3> value; };
+inline RotationTag rotation(const Matrix<3,3>& m) { return RotationTag{m}; }
+template <typename T> concept RotationArg = std::same_as<std::decay_t<T>, RotationTag>;
+
+struct SizeTag { Vector<3> value; };
+inline SizeTag size(const Vector<3>& v) { return SizeTag{v}; }
+template <typename T> concept SizeArg = std::same_as<std::decay_t<T>, SizeTag>;
+
+struct ObjectConstructionContext {
+    std::string name = "Unnamed";
+    std::string material;
+    Vector<3> position = Vector<3>({0, 0, 0}, "m");
+    Matrix<3,3> rotation = Matrix<3,3>::identity();
+    std::optional<Vector<3>> size;
+};
+
+template <NameArg A>
+void assignObjectArgs(ObjectConstructionContext& ctx, A&& arg) {
+    ctx.name = std::forward<A>(arg).value;
+}
+
+template <MaterialArg A>
+void assignObjectArgs(ObjectConstructionContext& ctx, A&& arg) {
+    ctx.material = std::forward<A>(arg).value;
+}
+
+template <PositionArg A>
+void assignObjectArgs(ObjectConstructionContext& ctx, A&& arg) {
+    ctx.position = std::forward<A>(arg).value;
+}
+
+template <RotationArg A>
+void assignObjectArgs(ObjectConstructionContext& ctx, A&& arg) {
+    ctx.rotation = std::forward<A>(arg).value;
+}
+
+template <SizeArg A>
+void assignObjectArgs(ObjectConstructionContext& ctx, A&& arg) {
+    ctx.size = std::forward<A>(arg).value;
+}
+
 
 class Object : public std::enable_shared_from_this<Object> {
     public:
@@ -27,7 +78,6 @@ class Object : public std::enable_shared_from_this<Object> {
 
         // Getters
         const std::string& getName() const;
-        const std::string& getType() const;
         Vector<3> getPosition() const;
         Matrix<3, 3> getRotationMatrix() const;
         const std::string& getMaterial() const;
@@ -37,7 +87,6 @@ class Object : public std::enable_shared_from_this<Object> {
         TransformationMatrix getWorldTransform() const;
 
         // Setters
-        void setType(const std::string &type);
         void setName(const std::string &name);
         void setPosition(const Vector<3> &position);
         void setRotationMatrix(const Matrix<3,3> &rotation);
@@ -56,7 +105,7 @@ class Object : public std::enable_shared_from_this<Object> {
             return child;
         }
 
-        void describeSelf(int indent) const;
+        virtual std::string describeSelf(int indent) const { return ""; };
         void printHierarchy(int indent = 0) const;
 
         // Must be implemented by derived objects
@@ -66,7 +115,6 @@ class Object : public std::enable_shared_from_this<Object> {
 
     protected:
         std::string m_name;
-        std::string m_type;
         std::string m_material;
         TransformationMatrix m_transformation;
         std::weak_ptr<Object> m_parent;
@@ -75,14 +123,13 @@ class Object : public std::enable_shared_from_this<Object> {
 
 // Templated helper: create child in place with constructor arguments
 template<typename T, typename... Args>
-std::shared_ptr<T> construct(Args&&... args) {
+std::shared_ptr<T> construct(Args&&... args) { // TODO: Should first object be a shared pointer
     static_assert(std::is_base_of_v<Object, T>,
                   "construct: T must derive from Object");
     auto object = std::make_shared<T>();
     ObjectConstructionContext ctx;
     (assignObjectArgs(ctx, std::forward<Args>(args)), ...);
 
-    object->setType(ObjectTypeName<T>::name);
     object->setName(ctx.name);
     object->setPosition(ctx.position);
     object->setRotationMatrix(ctx.rotation);
@@ -103,6 +150,5 @@ std::shared_ptr<T> construct(Args&&... args) {
     }
     return object;
 }
-
 
 #endif //PHYSICS_SIMULATION_PROGRAM_OBJECT_H
