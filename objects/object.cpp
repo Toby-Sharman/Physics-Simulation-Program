@@ -5,18 +5,18 @@
 // TODO: Add remove object functionality
 // TODO: Add a cache for world and inverse world transforms to reduce computations
 
-#include "vector.h"
 #include "matrix.h"
+#include "vector.h"
 
 #include "material_database.h"
 
 #include "object.h"
 
+#include <format>
 #include <iostream>
 #include <memory> // Do I need this?
-#include <string>
-#include <format>
 #include <stdexcept>
+#include <string>
 
 // Getters
 const std::string& Object::getName() const { return m_name; }
@@ -48,8 +48,12 @@ void Object::setMaterial(std::string material) {
 }
 
 // Hierarchy
-Vector<3> Object::localToWorld(const Vector<3>& localPoint) const { return getWorldTransform() * localPoint; }
-Vector<3> Object::worldToLocal(const Vector<3>& worldPoint) const { return getWorldTransform().inverse() * worldPoint; }
+Vector<3> Object::localToWorld(const Vector<3>& localPoint) const {
+    return getWorldTransform() * localPoint;
+}
+Vector<3> Object::worldToLocal(const Vector<3>& worldPoint) const {
+    return getWorldTransform().inverse() * worldPoint;
+}
 
 std::shared_ptr<Object> Object::findObjectContainingPoint(const Vector<3>& worldPoint) {
     for (const auto& child : m_children) {
