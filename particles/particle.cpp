@@ -18,8 +18,8 @@ Particle::Particle()
   m_restMass(Quantity(0.0, "kg")),
   m_charge(Quantity(0.0, "e")),
   m_spin(Quantity(0.0, "ℏ")),
-  m_position(Quantity(0.0, ""), Quantity(0.0, ""), Quantity(0.0, ""), Quantity(0.0, "")),
-  m_momentum(Quantity(0.0, ""), Quantity(0.0, ""), Quantity(0.0, ""), Quantity(0.0, "")),
+  m_position(Quantity(0.0, "m"), Quantity(0.0, "m"), Quantity(0.0, "m"), Quantity(0.0, "m")),
+  m_momentum(Quantity(0.0, "kg m s^-1"), Quantity(0.0, "kg m s^-1"), Quantity(0.0, "kg m s^-1"), Quantity(0.0, "kg m s^-1")),
   m_polarisation(Quantity(0.0, ""), Quantity(0.0, ""), Quantity(0.0, ""))
 {}
 
@@ -35,19 +35,19 @@ Particle::Particle(
     Vector<3> polarisation)
 : m_particleName(std::move(particleName)),
   m_symbol(std::move(symbol)),
-  m_restMass(std::move(restMass)),
-  m_charge(std::move(charge)),
-  m_spin(std::move(spin)),
-  m_position(std::move(position)),
-  m_momentum(std::move(momentum)),
-  m_polarisation(std::move(polarisation))
+  m_restMass(restMass),
+  m_charge(charge),
+  m_spin(spin),
+  m_position(position),
+  m_momentum(momentum),
+  m_polarisation(polarisation)
 {}
 
 // Constructor for specific predefined particle types in db
 Particle::Particle(std::string particleName,
-                   Vector<4> position,
-                   Vector<4> momentum,
-                   Vector<3> polarisation)
+                   const Vector<4> &position,
+                   const Vector<4> &momentum,
+                   const Vector<3> &polarisation)
 : m_particleName(std::move(particleName)),
   m_position(position),
   m_momentum(momentum),
@@ -60,25 +60,25 @@ Particle::Particle(std::string particleName,
 }
 
 // Getters
-const std::string &Particle::getParticleName() const { return m_particleName; }
-const std::string &Particle::getSymbol() const { return m_symbol; }
-Quantity Particle::getRestMass() const { return m_restMass; }
-Quantity Particle::getCharge() const { return m_charge; }
-Quantity Particle::getSpin() const { return m_spin; }
-Vector<4> Particle::getPosition() const { return m_position; }
-Vector<4> Particle::getMomentum() const { return m_momentum; }
-Vector<3> Particle::getPolarisation() const { return m_polarisation; }
+const std::string& Particle::getParticleName() const { return m_particleName; }
+const std::string& Particle::getSymbol() const { return m_symbol; }
+const Quantity& Particle::getRestMass() const { return m_restMass; }
+const Quantity& Particle::getCharge() const { return m_charge; }
+const Quantity& Particle::getSpin() const { return m_spin; }
+const Vector<4>& Particle::getPosition() const { return m_position; }
+const Vector<4>& Particle::getMomentum() const { return m_momentum; }
+const Vector<3>& Particle::getPolarisation() const { return m_polarisation; }
 
 
 // Setters
 void Particle::setParticleName(std::string particleName) { m_particleName = std::move(particleName); }
 void Particle::setSymbol(std::string symbol) { m_symbol = std::move(symbol); }
-void Particle::setRestMass(Quantity restMass) { m_restMass = std::move(restMass); }
-void Particle::setCharge(Quantity charge) { m_charge = std::move(charge); }
-void Particle::setSpin(Quantity spin) { m_spin = std::move(spin); }
-void Particle::setPosition(Vector<4> position) { m_position = std::move(position); }
-void Particle::setMomentum(Vector<4> momentum) { m_momentum = std::move(momentum); }
-void Particle::setPolarisation(Vector<3> polarisation) { m_polarisation = std::move(polarisation); }
+void Particle::setRestMass(const Quantity restMass) { m_restMass = restMass; }
+void Particle::setCharge(const Quantity charge) { m_charge = charge; }
+void Particle::setSpin(const Quantity spin) { m_spin = spin; }
+void Particle::setPosition(const Vector<4> &position) { m_position = position; }
+void Particle::setMomentum(const Vector<4> &momentum) { m_momentum = momentum; }
+void Particle::setPolarisation(const Vector<3> &polarisation) { m_polarisation = polarisation; }
 
 // Print function
 void Particle::print() const {
@@ -96,6 +96,8 @@ void Particle::print() const {
 
 // Lorentz factor
 Quantity Particle::gamma() const {
-    if (isMassless()) return Quantity(1.0, "kg"); // Not used for photons
-    return Quantity(m_momentum[0].asDouble() / m_restMass.asDouble(), "FIXME"); // Using natural units // FIXME
+    if (isMassless()) {
+        return {1.0, "kg"}; // Not used for photons
+    }
+    return {m_momentum[0] / m_restMass}; // Using natural units
 }

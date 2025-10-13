@@ -32,9 +32,9 @@ class Particle {
     // Constructor for specific predefined particle types in db
     explicit Particle(
         std::string particleName,
-        Vector<4> position = Vector<4>(),    // (ct, x, y, z)
-        Vector<4> momentum = Vector<4>(),    // (E/c, p_x, p_y, p_z)
-        Vector<3> polarisation = Vector<3>() // (P_x, P_y, P_z)
+        const Vector<4> &position = Vector<4>(),    // (ct, x, y, z)
+        const Vector<4> &momentum = Vector<4>(),    // (E/c, p_x, p_y, p_z)
+        const Vector<3> &polarisation = Vector<3>() // (P_x, P_y, P_z)
         );
 
     // Destructor
@@ -46,12 +46,12 @@ class Particle {
     //      Safer than direct alteration with pass by reference
     [[nodiscard]] const std::string& getParticleName() const; // Using "const &" keeps memory usage down as getName may be called lots
     [[nodiscard]] const std::string& getSymbol() const; // Keep string convention consistent
-    [[nodiscard]] Quantity getRestMass() const;
-    [[nodiscard]] Quantity getCharge() const;
-    [[nodiscard]] Quantity getSpin() const;
-    [[nodiscard]] Vector<4> getPosition() const;
-    [[nodiscard]] Vector<4> getMomentum() const;
-    [[nodiscard]] Vector<3> getPolarisation() const;
+    [[nodiscard]] const Quantity& getRestMass() const;
+    [[nodiscard]] const Quantity& getCharge() const;
+    [[nodiscard]] const Quantity& getSpin() const;
+    [[nodiscard]] const Vector<4>& getPosition() const;
+    [[nodiscard]] const Vector<4>& getMomentum() const;
+    [[nodiscard]] const Vector<3>& getPolarisation() const;
 
     // Setters
     // Pass copies of inputs for all types. Using move will keep overhead close to const reference
@@ -60,9 +60,9 @@ class Particle {
     void setRestMass(Quantity restMass);
     void setCharge(Quantity charge);
     void setSpin(Quantity spin);
-    void setPosition(Vector<4> position);
-    void setMomentum(Vector<4> momentum);
-    void setPolarisation(Vector<3> polarisation);
+    void setPosition(const Vector<4> &position);
+    void setMomentum(const Vector<4> &momentum);
+    void setPolarisation(const Vector<3> &polarisation);
 
     // Print function
     void print() const;
