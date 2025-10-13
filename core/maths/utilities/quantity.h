@@ -250,9 +250,13 @@ inline std::ostream& operator<<(std::ostream& outputStream, const Quantity& quan
 }
 
 // Table of some common physical constants
-[[nodiscard]] inline const std::unordered_map<std::string_view, UnitInfo>& quantityTable() {
+[[nodiscard]] inline const std::unordered_map<std::string_view, Quantity>& quantityTable() {
     using PhysConst = Globals::Constant::Physics;
-    static const std::unordered_map<std::string_view, UnitInfo> table = {
+    using ProgramConst = Globals::Constant::Program;
+    static const std::unordered_map<std::string_view, Quantity> table = {
+        {"time step",          {ProgramConst::timeStep,          Unit(0, 0, 1, 0, 0, 0, 0)}}, // time step for simulation in seconds
+        {"massless tolerance", {ProgramConst::masslessTolerance, Unit(0, 1, 0, 0, 0, 0, 0)}}, // massless tolerance in kg
+
         {"c",    {PhysConst::c,    Unit(1, 0, -1, 0,  0, 0, 0)}}, // speed of light in vacuum
         {"e",    {PhysConst::e,    Unit(0, 0, 1,  1,  0, 0, 0)}}, // elementary electric charge
         {"h",    {PhysConst::h,    Unit(2, 1, -2, 0,  0, 0, 0)}}, // planck constant
