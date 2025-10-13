@@ -18,9 +18,9 @@ Particle::Particle()
   m_restMass(Quantity(0.0, "kg")),
   m_charge(Quantity(0.0, "e")),
   m_spin(Quantity(0.0, "ℏ")),
-  m_position(Quantity(0.0, "m"), Quantity(0.0, "m"), Quantity(0.0, "m"), Quantity(0.0, "m")),
-  m_momentum(Quantity(0.0, "kg m s^-1"), Quantity(0.0, "kg m s^-1"), Quantity(0.0, "kg m s^-1"), Quantity(0.0, "kg m s^-1")),
-  m_polarisation(Quantity(0.0, ""), Quantity(0.0, ""), Quantity(0.0, ""))
+  m_position({0.0, 0.0, 0.0, 0.0}, "m"),
+  m_momentum({0.0, 0.0, 0.0, 0.0}, "kg m s^-1"),
+  m_polarisation({0.0, 0.0, 0.0}, "")
 {}
 
 // Constructor for custom particles - have to assign basic attributes
