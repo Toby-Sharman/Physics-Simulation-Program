@@ -40,8 +40,8 @@ class Globals {
                 static constexpr std::string_view filenamePrefix = "Energies";        // Data output file name prefix
                 static constexpr std::string_view outputFolder = "Output";            // Data output folder name (in Build)
 
-                static constexpr double timeStep = 1e-8;                              // Increment of time in each step of the program in seconds
-                static constexpr double masslessTolerance = 0;                        // Tolerance for trating particles as massless
+                static constexpr double timeStep = 1e-8;                              // Increment of time in each step of the program (in seconds)
+                static constexpr double masslessTolerance = 0;                        // Tolerance for treating particles as massless (in kg)
             };
             // Common maths constants to ensure same value is used program wide
             struct Maths {
