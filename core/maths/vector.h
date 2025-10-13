@@ -123,7 +123,6 @@ struct [[nodiscard]] Vector {
         static_assert(sizeof...(Args) == N, "Number of arguments must match Vector size");
     }
 
-
     // Constructor from array of values and optional shared unit
     constexpr explicit Vector(const std::array<double, N>& values, const std::string& unit = "") : data{} {
         for (std::size_t i = 0; i < N; i++) {
@@ -196,7 +195,7 @@ struct [[nodiscard]] Vector {
         return *this;
     }
 
-    // Multiplication operator
+    // Multiplication operator (double)
     [[nodiscard]] constexpr Vector operator*(double scalar) const noexcept {
         Vector result;
         for (std::size_t i = 0; i < N; ++i) {
@@ -205,7 +204,16 @@ struct [[nodiscard]] Vector {
         return result;
     }
 
-    // Multiplication assignment operator
+    // Multiplication operator (Quantity)
+    [[nodiscard]] constexpr Vector operator*(Quantity quantity) const noexcept {
+        Vector result;
+        for (std::size_t i = 0; i < N; ++i) {
+            result[i] = data[i] * quantity;
+        }
+        return result;
+    }
+
+    // Multiplication assignment operator (double)
     constexpr Vector& operator*=(double scalar) noexcept {
         for (std::size_t i = 0; i < N; ++i) {
             data[i] = data[i] * scalar;
@@ -213,7 +221,15 @@ struct [[nodiscard]] Vector {
         return *this;
     }
 
-    // Division operator
+    // Multiplication assignment operator (Quantity)
+    constexpr Vector& operator*=(Quantity quantity) noexcept {
+        for (std::size_t i = 0; i < N; ++i) {
+            data[i] = data[i] * quantity;
+        }
+        return *this;
+    }
+
+    // Division operator (double)
     [[nodiscard]] Vector operator/(double scalar) const noexcept {
         Vector result;
         for (std::size_t i = 0; i < N; ++i) {
@@ -222,10 +238,27 @@ struct [[nodiscard]] Vector {
         return result;
     }
 
-    // Division assignment operator
+    // Division operator (Quantity)
+    [[nodiscard]] Vector operator/(Quantity quantity) const noexcept {
+        Vector result;
+        for (std::size_t i = 0; i < N; ++i) {
+            result[i] = data[i] / quantity;
+        }
+        return result;
+    }
+
+    // Division assignment operator (double)
     Vector& operator/=(double scalar) noexcept {
         for (std::size_t i = 0; i < N; ++i) {
             data[i] = data[i] / scalar;
+        }
+        return *this;
+    }
+
+    // Division assignment operator (Quantity)
+    Vector& operator/=(Quantity quantity) noexcept {
+        for (std::size_t i = 0; i < N; ++i) {
+            data[i] = data[i] / quantity;
         }
         return *this;
     }
