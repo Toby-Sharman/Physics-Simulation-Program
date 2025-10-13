@@ -18,9 +18,10 @@
 #include "core/maths/utilities/quantity.h"
 
 #include <array>
-#include <cmath>
+#include <cmath> // For std::abs ignore warning
 #include <cstddef> // For std::size_t ignore warning
 #include <initializer_list>
+#include <iostream>
 #include <limits>
 #include <ostream>
 #include <stdexcept>
@@ -35,6 +36,7 @@
 // Notes on initialisation:
 //
 // Notes on algorithms:
+//   - Ignore unreachable calls for multiplication operators by IDEs
 //
 // Notes on output:
 //
@@ -107,7 +109,7 @@ struct [[nodiscard]] Matrix {
     //
     // Matrix * Vector
     template<std::size_t N>
-    [[nodiscard]] constexpr Vector<Rows> operator*(const Vector<N>& vector) const {
+    [[nodiscard]] constexpr Vector<Rows> operator*(const Vector<N>& vector) const { // Ignore warning
         static_assert( N == Columns, "Matrix column and vector size mismatch");
         Vector<Rows> result;
         for (std::size_t i = 0; i < Rows; ++i) {
@@ -123,7 +125,7 @@ struct [[nodiscard]] Matrix {
     //
     // Matrix * matrix
     template<std::size_t OtherColumns>
-    [[nodiscard]] constexpr Matrix<Rows, OtherColumns> operator*(const Matrix<Columns, OtherColumns>& other) const {
+    [[nodiscard]] constexpr Matrix<Rows, OtherColumns> operator*(const Matrix<Columns, OtherColumns>& other) const { // Ignore warning
         Matrix<Rows, OtherColumns> result;
         for (std::size_t i = 0; i < Rows; ++i) {
             for (std::size_t j = 0; j < OtherColumns; ++j) {
@@ -205,7 +207,14 @@ struct [[nodiscard]] Matrix {
             }
         }
 
-        return matrixI * unitsMatrix;
+        // Readd units
+        for (std::size_t i = 0; i < Rows; ++i) {
+            for (std::size_t j = 0; j < Columns; ++j) {
+                matrixI[i][j].unit = unitsMatrix[i][j].unit;
+            }
+        }
+
+        return matrixI;
     }
 };
 
@@ -250,9 +259,9 @@ struct TransformationMatrix {
     // Multiply transformation matrix by 3D vector (homogeneous transform)
     [[nodiscard]] constexpr Vector<3> operator*(const Vector<3>& vector) noexcept {
         Vector<3> result;
-        for (int i = 0; i < 3; ++i) {
+        for (std::size_t i = 0; i < 3; ++i) {
             result[i] = this->translation[i];
-            for (int j = 0; j < 3; ++j) {
+            for (std::size_t j = 0; j < 3; ++j) {
                 result[i] += this->rotation[i][j] * vector[j];
             }
         }
@@ -274,8 +283,8 @@ struct TransformationMatrix {
     // Converts the Transformation matrix into the standard 4x4 matrix
     [[nodiscard]] constexpr Matrix<4, 4> asMatrix() const noexcept {
         Matrix<4, 4> matrix;
-        for (int i = 0; i < 3; ++i) {
-            for (int j = 0; j < 3; ++j) {
+        for (std::size_t i = 0; i < 3; ++i) {
+            for (std::size_t j = 0; j < 3; ++j) {
                 matrix[i][j] = this->rotation[i][j];
             }
         }
@@ -291,8 +300,8 @@ struct TransformationMatrix {
         auto matrixInverse = asMatrix().inverse();
 
         TransformationMatrix inverted;
-        for (int i = 0; i < 3; ++i) {
-            for (int j = 0; j < 3; ++j) {
+        for (std::size_t i = 0; i < 3; ++i) {
+            for (std::size_t j = 0; j < 3; ++j) {
                 inverted.rotation[i][j] = matrixInverse[i][j];
             }
             inverted.translation[i] = matrixInverse[i][3];
