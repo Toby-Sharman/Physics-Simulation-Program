@@ -6,7 +6,7 @@
 #include "core/maths/vector.h"
 #include "core/maths/utilities/quantity.h"
 
-void moveParticle(Particle& particle, const Quantity dt) {
+void moveParticle(Particle& particle, const Quantity& dt) {
     auto& momentum4Vector = particle.getMomentum();
     const auto& energy = momentum4Vector[0];
     const auto& momentum = *reinterpret_cast<Vector<3> const*>(&momentum4Vector[1]);
