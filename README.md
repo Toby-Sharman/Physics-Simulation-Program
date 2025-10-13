@@ -16,6 +16,9 @@ thrown if an operation would make a non integer exponent.
 Movement has relativistic considerations.
 
 ### Natural unit usage
+
+Do I still bother with any natural units?
+
 - Speed of light (c)
 - Elementary charge (e)
 - Planck constant (ℏ)
@@ -38,6 +41,13 @@ Can be auto created based on standard particle attributes defined in `particle_d
 
 ### Supported types 
 - Box
+
+---
+
+## Improvements to make
+
+- For transformations between objects add lazy computation
+- Bounding radius for quicker computations for contains function
 
 ---
 
