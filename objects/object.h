@@ -10,7 +10,6 @@
 #include "vector.h"
 #include "matrix.h"
 
-#include "object_types.h"
 
 #include <iostream>
 #include <memory>
