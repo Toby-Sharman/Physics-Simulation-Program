@@ -303,8 +303,8 @@ struct [[nodiscard]] Vector {
 
     // Unit vector method
     [[nodiscard]] Vector unitVector() const {
-        const double len = length().value;
-        if (len == 0) {
+        const auto len = length();
+        if (len.value == 0) {
             throw std::invalid_argument("Cannot create a unit vector for a 0 length vector");
         }
         return *this / len;
