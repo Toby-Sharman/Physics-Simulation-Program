@@ -76,7 +76,7 @@ UnitInfo extractPrefix(const std::string_view unit) {
 
     // Search for a standalone quantity; to handle cases like ev/c^2
     if (const auto it = quantitiesTable.find(unit); it != quantitiesTable.end()) {
-        return it->second;
+        return UnitInfo{it->second.value, it->second.unit};
     }
 
     // Throw error for if no valid unit was found
