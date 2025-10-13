@@ -50,6 +50,7 @@
 //   - Subtraction:            operator-, operator-=
 //   - Multiplication:         operator*, operator*= (Quantity * Quantity, Quantity * scalar, scalar * Quantity)
 //   - Division:               operator/, operator/= (Quantity / Quantity, Quantity / scalar, scalar / Quantity)
+//   - Comparison:             operator<, operator<=, operator>, operator>=
 //   - Exponentiation:         raisedTo(n)
 //   - Printing:               print()
 //   - Stream output:          operator<<
@@ -67,6 +68,8 @@
 //
 //   Quantity totalLength = length + Quantity{3.0, meter};   // 8 L^1
 //   Quantity smallLength = length - Quantity{3.0, meter};   // 2 L^1
+//
+//   bool double > speed;                                    // true
 //
 //   Quantity squaredLength = length.raisedTo(2);            // 25 L^2
 //
@@ -214,6 +217,38 @@ struct [[nodiscard]] Quantity {
         this->value /= other.value;
         this->unit /= other.unit;
         return *this;
+    }
+
+    // Less than operator
+    bool operator<(const Quantity& other) const {
+        if (this->unit != other.unit) {
+            throw std::invalid_argument("Cannot evaluate less than for quantities of different units");
+        }
+        return this->value < other.value;
+    }
+
+    // Less than or equal to operator
+    bool operator<=(const Quantity& other) const {
+        if (this->unit != other.unit) {
+            throw std::invalid_argument("Cannot evaluate less than or equal to for quantities of different units");
+        }
+        return this->value <= other.value;
+    }
+
+    // Greater than operator
+    bool operator>(const Quantity& other) const {
+        if (this->unit != other.unit) {
+            throw std::invalid_argument("Cannot evaluate greater than for quantities of different units");
+        }
+        return this->value > other.value;
+    }
+
+    // Greater than or equal to operator
+    bool operator>=(const Quantity& other) const {
+        if (this->unit != other.unit) {
+            throw std::invalid_argument("Cannot evaluate greater than or equal to for quantities of different units");
+        }
+        return this->value >= other.value;
     }
 
     // Exponentiation method
