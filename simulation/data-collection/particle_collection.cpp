@@ -11,22 +11,24 @@
 #include <map>
 
 void logEnergyIfInside(std::unique_ptr<Particle>& p, const Box& box,
-                       const std::string_view &baseFolder,
-                       const std::string_view &baseFilename)
+                       const std::string_view& baseFolder,
+                       const std::string_view& baseFilename)
 {
-    if (!p) return; // already deleted
+    if (!p) {
+        return; // already deleted
+    }
 
-    Vector<4> pos4 = p->getPosition();
+    auto pos4 = p->getPosition();
 
-    if (const auto pos3 = Vector<3>(pos4[1], pos4[2], pos4[3]); box.containsPoint(pos3)) {
+    if (const auto pos3 = *reinterpret_cast<Vector<3> const*>(&pos4[1]); box.containsPoint(pos3)) {
 
         static std::map<std::string, std::unique_ptr<std::ofstream>> fileMap;
         static std::map<std::string, int> fileCounter;
 
-        const std::string& type = p->getParticleName();
+        const auto& type = p->getParticleName();
 
         if (!fileMap.contains(type)) {
-            const std::filesystem::path folder = std::filesystem::path(baseFolder) / type;
+            const auto folder = std::filesystem::path(baseFolder) / type;
             std::filesystem::create_directories(folder);
 
             int counter = 1;
