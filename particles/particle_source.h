@@ -23,7 +23,7 @@ class ParticleSource {
     public:
     template <typename PosT, typename MomT, typename PolT>
     std::vector<Particle> generateParticles(
-        const std::string& particle_name,
+        const std::string& particleName,
         const int count,
         const PosT& position,
         const MomT& momentum,
@@ -46,8 +46,9 @@ class ParticleSource {
                 pos = position;
             } else if constexpr (std::is_same_v<PosT, std::pair<Vector<4>, Vector<4>>>) {
                 pos = position.first;
-                for (int j = 0; j < 4; ++j)
+                for (int j = 0; j < 4; ++j) {
                     pos[j] += position.second[j] * dist(gen);
+                }
             }
 
             // --- Momentum ---
@@ -55,8 +56,9 @@ class ParticleSource {
                 mom = momentum;
             } else if constexpr (std::is_same_v<MomT, std::pair<Vector<4>, Vector<4>>>) {
                 mom = momentum.first;
-                for (int j = 0; j < 4; ++j)
+                for (int j = 0; j < 4; ++j) {
                     mom[j] += momentum.second[j] * dist(gen);
+                }
             }
 
             // --- Polarisation ---
@@ -64,11 +66,12 @@ class ParticleSource {
                 pol = polarisation;
             } else if constexpr (std::is_same_v<PolT, std::pair<Vector<3>, Vector<3>>>) {
                 pol = polarisation.first;
-                for (int j = 0; j < 3; ++j)
+                for (int j = 0; j < 3; ++j) {
                     pol[j] += polarisation.second[j] * dist(gen);
+                }
             }
 
-            particles.emplace_back(particle_name, pos, mom, pol);
+            particles.emplace_back(particleName, pos, mom, pol);
         }
 
         return particles;
