@@ -7,9 +7,8 @@
 
 #include "globals.h"
 #include "particle.h"
-#include "globals.h"
 
 // Moves a single particle forward by dt
-void moveParticle(Particle& p, double dt = Globals::Constant::Program::timeStep);
+void moveParticle(Particle& particle, const Quantity& dt = quantityTable().at("time step"));
 
 #endif //PHYSICS_SIMULATION_PROGRAM_PARTICLE_MOVEMENT_H
