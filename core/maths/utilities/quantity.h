@@ -51,6 +51,7 @@
 //   - Multiplication:         operator*, operator*= (Quantity * Quantity, Quantity * scalar, scalar * Quantity)
 //   - Division:               operator/, operator/= (Quantity / Quantity, Quantity / scalar, scalar / Quantity)
 //   - Comparison:             operator<, operator<=, operator>, operator>=
+//   - Absolute value:         abs()
 //   - Exponentiation:         raisedTo(n)
 //   - Printing:               print()
 //   - Stream output:          operator<<
@@ -70,6 +71,8 @@
 //   Quantity smallLength = length - Quantity{3.0, meter};   // 2 L^1
 //
 //   bool double > speed;                                    // true
+//
+//   Quantity absolute = speed.abs();                        // 2.5 L^1 T^-1
 //
 //   Quantity squaredLength = length.raisedTo(2);            // 25 L^2
 //
@@ -159,14 +162,14 @@ struct [[nodiscard]] Quantity {
 
     // Multiplication operator
     //
-    // Quantity * scalar
+    // Quantity * double
     [[nodiscard]] constexpr Quantity operator*(const double scalar) const noexcept {
         return {this->value * scalar, this->unit};
     }
 
     // Multiplication assignment operator
     //
-    // Quantity *= scalar
+    // Quantity *= double
     constexpr Quantity& operator*=(const double scalar) noexcept {
         this->value *= scalar;
         return *this;
@@ -190,14 +193,14 @@ struct [[nodiscard]] Quantity {
 
     // Division operator
     //
-    // Quantity / scalar
+    // Quantity / double
     [[nodiscard]] Quantity operator/(const double scalar) const noexcept {
         return {this->value / scalar, this->unit};
     }
 
     // Division assignment operator
     //
-    // Quantity /= scalar
+    // Quantity /= double
     Quantity& operator/=(const double scalar) noexcept {
         this->value /= scalar;
         return *this;
@@ -249,6 +252,11 @@ struct [[nodiscard]] Quantity {
             throw std::invalid_argument("Cannot evaluate greater than or equal to for quantities of different units");
         }
         return this->value >= other.value;
+    }
+
+    // Absolute value method
+    Quantity abs() const {
+        return {std::fabs(this->value), this->unit};
     }
 
     // Exponentiation method
