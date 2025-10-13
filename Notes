@@ -1,16 +1,15 @@
 To do:
-    - Formulae for vapour photon interaction
+    - Formulae for vapour photon interaction ✅
     - Documentation & implement project wide unit handling
-        - app
+        - app ✅
         - core
         - databases ✅
         - objects
         - particles
         - physics
         - simulation
-    - Wrap some of the core files, in particular vector, in namespaces???
     - Get a reference for where my db particle and material info are from
-    - Plan gas
+    - Plan gas ✅
     - Get relevant gas attributes and add them to material_database.json
     - Implement gas
     - Implement gas and photon interaction
