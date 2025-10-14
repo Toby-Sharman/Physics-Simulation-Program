@@ -25,7 +25,7 @@ void logEnergyIfInside(std::unique_ptr<Particle>& p, const Box& box,
         static std::map<std::string, std::unique_ptr<std::ofstream>> fileMap;
         static std::map<std::string, int> fileCounter;
 
-        const auto& type = p->getParticleName();
+        const auto& type = p->getType();
 
         if (!fileMap.contains(type)) {
             const auto folder = std::filesystem::path(baseFolder) / type;
