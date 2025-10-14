@@ -96,6 +96,7 @@ class Object : public std::enable_shared_from_this<Object> {
         Vector<3> worldToLocal(const Vector<3>& worldPoint) const;
 
         std::shared_ptr<Object> findObjectContainingPoint(const Vector<3>& worldPoint);
+
         template<typename T, typename... Args>
         std::shared_ptr<T> addChild(Args&&... args) {
             auto child = construct<T>(std::forward<Args>(args)...); // Constructor is below
@@ -108,9 +109,7 @@ class Object : public std::enable_shared_from_this<Object> {
         void printHierarchy(int indent = 0) const;
 
         // Must be implemented by derived objects
-        virtual bool containsPoint(const Vector<3>& world_point) const = 0;
-        virtual std::string getSizeDescription() const { return ""; }
-        // Set size from params not included as it can take a variety of inputs depending on object type
+        virtual bool containsPoint(const Vector<3>& worldPoint) const = 0;
 
     protected:
         std::string m_name;
