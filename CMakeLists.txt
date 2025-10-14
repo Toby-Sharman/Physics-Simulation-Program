@@ -54,7 +54,6 @@ target_sources(Simulation_program PRIVATE
         objects/sphere.cpp
         objects/point.cpp
         particles/particle.cpp
-        particles/particle_manager.cpp
         particles/particle_source.cpp
         physics/fields/field_solver.cpp
         physics/fields/field_boundary_handling.cpp
