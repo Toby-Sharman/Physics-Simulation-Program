@@ -11,9 +11,10 @@
 #define PHYSICS_SIMULATION_PROGRAM_PARTICLE_INTERACTION_H
 
 #include "particles/particle.h"
+#include "box.h"
 
-double interactionProbability(const Particle& particle, const Vector<3> &displacement);
+double interactionProbability(const Particle& particle, const Vector<3> &displacement,  const std::shared_ptr<Box>& world);
 
-void interaction(const Particle& particle, Vector<3> displacement);
+void interaction(const Particle& particle, const Vector<3> &displacement, const std::shared_ptr<Box>& world);
 
 #endif //PHYSICS_SIMULATION_PROGRAM_PARTICLE_INTERACTION_H
