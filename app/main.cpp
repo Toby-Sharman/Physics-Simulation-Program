@@ -20,18 +20,8 @@
 #include "objects/box.h"
 #include "objects/object.h"
 #include "particles/particle.h"
-#include "particles/particle_manager.h"
 #include "particles/particle_source.h"
 #include "simulation/step.h"
-
-// TODO: Think on taking the particle dbs out of memory once there use is done. Is this any good; will need to create new particles from interactions so would have to load up again. Maybe later implement a way to keep only particles that have been loaded up in a shorter kept db and once the big d is used remove it from memory
-// TODO: Update Matrix class to handle units too
-// TODO: Boundary conditions for fields - neglect ferromagnetic effects
-// TODO: Fold particle class into object class???
-// TODO: Enforce dimensions on certain parameters
-// TODO: Charged particle handling in B/H fields
-// TODO: Object overlap - especially child being through parent
-// TODO: See what includes I really need/want - especially in files or their dependencies that won't be changed meaningfully
 
 int main() {
 
@@ -66,10 +56,10 @@ int main() {
         );
     const auto vapourCell = cell->addChild<Box>(
         name("Vapour Cell"),
-        material("glass"), // TODO
+        material("gas"),
         size(Vector<3>({3.0, 3.0, 3.0}, "mm"))
         );
-    const auto collection = world->addChild<Box>( // TODO: Change collection from a box to if particle x > 12.5mm
+    const auto collection = world->addChild<Box>(
         name("Collection"),
         material("vacuum"),
         position(Vector<3>({12.5+37.5/2, 0.0, 0.0}, "m")),
@@ -84,27 +74,21 @@ int main() {
     // field.print();
 
     // Particles
-     ParticleManager manager;
      ParticleSource source;
 
      // Generate 100 photons around a mean position/momentum
-     const auto photonBatch = source.generateParticles(
+     source.generateParticles(
          "photon",
          1000000,
-         Vector<4>({0,0,0,0}, "m"),
+         Vector<4>({-(5+12.5+37.5/2),0,0,0}, "mm"),
          Vector<4>({1,1,0,0}, "kg m s^-1"),
-         Vector<3>({0,0,0})
+         Vector<4>({1,0,0, 1}) // Right hand circular polarised TODO: Think on units
      );
 
-     manager.addParticles(photonBatch);
-
      // Simulation loop
-     for (int i = 0; i < 50; ++i) {
-         if (manager.empty()) {
-             break;
-         }
-         stepAll(collection, manager.getParticles()); // all particles automatically stepped
-     }
+    while (!particleManager.empty()) { // TODO: NEED to add a check for particles are outside world to delete them
+        stepAll(particleManager.getParticles(), world, collection); // all particles automatically stepped
+    }
 
     return 0;
 }
