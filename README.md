@@ -15,6 +15,9 @@ thrown if an operation would make a non integer exponent.
 
 Movement has relativistic considerations.
 
+Interaction probability from optical depth (or mean free path = 1/optical depth), via the optical depth = number density x cross-section x distance, P = 1 - 
+e^(-optical depth)
+
 ### Natural unit usage
 
 Do I still bother with any natural units?
@@ -34,6 +37,8 @@ constants: 2022](https://tsapps.nist.gov/publication/get_pdf.cfm?pub_id=958143)
 Construct **individual particles** or a **bunch as a source**
 
 Can be auto created based on standard particle attributes defined in `particle_database.json`
+
+Photon momenta stored as a Stoke's vector
 
 ---
 
