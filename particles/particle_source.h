@@ -33,7 +33,7 @@ class ParticleSource {
         particles.reserve(count);
 
         std::random_device rd;
-        std::mt19937 gen(rd());
+        std::ranlux48 gen(rd());
         std::uniform_real_distribution<double> dist(-1.0, 1.0);
 
         for (int i = 0; i < count; ++i) {
