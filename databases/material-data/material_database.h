@@ -25,6 +25,10 @@ struct MaterialDatabase final : BaseDatabase {
     [[nodiscard]] double getRelativePermeability(const std::string& material) const {
         return getNumericProperty(material, "relativePermeability");
     }
+
+    [[nodiscard]] Quantity getNumberDensity(const std::string& material) const {
+        return getQuantityProperty(material, "numberDensity");
+    }
 };
 
 // Create a reusable instance of the material database
