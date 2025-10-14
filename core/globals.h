@@ -15,6 +15,7 @@
 #ifndef PHYSICS_SIMULATION_PROGRAM_GLOBALS_H
 #define PHYSICS_SIMULATION_PROGRAM_GLOBALS_H
 
+#include <numbers>
 #include <string_view>
 
 // Globals
@@ -40,12 +41,13 @@ class Globals {
                 static constexpr std::string_view filenamePrefix = "Energies";        // Data output file name prefix
                 static constexpr std::string_view outputFolder = "Output";            // Data output folder name (in Build)
 
-                static constexpr double timeStep = 1e-8;                              // Increment of time in each step of the program (in seconds)
+                static constexpr double timeStep = 1e-15;                              // Increment of time in each step of the program (in seconds)
                 static constexpr double masslessTolerance = 0;                        // Tolerance for treating particles as massless (in kg)
             };
             // Common maths constants to ensure same value is used program wide
             struct Maths {
-                static constexpr double pi = 3.141592653589793238462643383279502884L; // Pi
+                static constexpr double e = std::numbers::e;                          // Euler's number
+                static constexpr double pi = std::numbers::pi;                        // Pi
                 static constexpr double deg2rad = pi / 180.0;                         // Degree to radian ratio
                 static constexpr double rad2deg = 180.0 / pi;                         // Radian to degree ratio
             };
