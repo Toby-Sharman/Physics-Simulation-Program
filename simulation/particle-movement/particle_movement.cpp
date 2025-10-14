@@ -3,10 +3,11 @@
 //
 
 #include "particle_movement.h"
+#include "particle_interaction.h"
 #include "core/maths/vector.h"
 #include "core/maths/utilities/quantity.h"
 
-void moveParticle(Particle& particle, const Quantity& dt) {
+Vector<4> displacement(const Particle& particle, const Quantity dt) {
     auto& momentum4Vector = particle.getMomentum();
     const auto& momentum = *reinterpret_cast<Vector<3> const*>(&momentum4Vector[1]);
 
@@ -16,7 +17,7 @@ void moveParticle(Particle& particle, const Quantity& dt) {
 
     Vector<4> finalPosition;
 
-     const auto lightDistance = dt * quantityTable().at("c");
+    const auto lightDistance = dt * quantityTable().at("c");
 
     if (particle.isMassless()) {
         const auto displacement = momentum.unitVector() * lightDistance;
@@ -25,7 +26,7 @@ void moveParticle(Particle& particle, const Quantity& dt) {
             finalPosition[i + 1] = initialPosition[i] + displacement[i];
         }
         finalPosition[0] = initialTime + lightDistance;
-        particle.setPosition(finalPosition);
+        return finalPosition;
     } else { // massive particle
         const auto& energy = momentum4Vector[0];
 
@@ -35,6 +36,12 @@ void moveParticle(Particle& particle, const Quantity& dt) {
             finalPosition[i + 1] = initialPosition[i] + displacement[i];
         }
         finalPosition[0] = initialTime + lightDistance;
-        particle.setPosition(finalPosition);
+        return finalPosition;
     }
+}
+
+void moveParticle(Particle& particle, const Quantity& dt) {
+    const auto movementVector = displacement(particle, dt);
+    //interaction(Particle& particle, movementVector);
+    particle.setPosition(movementVector + particle.getPosition());
 }

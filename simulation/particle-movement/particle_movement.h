@@ -8,6 +8,8 @@
 #include "globals.h"
 #include "particle.h"
 
+Vector<4> displacement(const Particle& particle, Quantity dt);
+
 // Moves a single particle forward by dt
 void moveParticle(Particle& particle, const Quantity& dt = quantityTable().at("time step"));
 
