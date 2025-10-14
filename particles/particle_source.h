@@ -39,7 +39,7 @@ class ParticleSource {
         for (int i = 0; i < count; ++i) {
             Vector<4> pos{};
             Vector<4> mom{};
-            Vector<3> pol{};
+            Vector<4> pol{};
 
             // --- Position ---
             if constexpr (std::is_same_v<PosT, Vector<4>>) {
@@ -66,7 +66,7 @@ class ParticleSource {
                 pol = polarisation;
             } else if constexpr (std::is_same_v<PolT, std::pair<Vector<3>, Vector<3>>>) {
                 pol = polarisation.first;
-                for (int j = 0; j < 3; ++j) {
+                for (int j = 0; j < 4; ++j) {
                     pol[j] += polarisation.second[j] * dist(gen);
                 }
             }

@@ -55,7 +55,7 @@ class [[nodiscard]] Particle {
             Quantity spin,
             Vector<4> position,    // (ct, x, y, z)
             Vector<4> momentum,    // (E/c, p_x, p_y, p_z)
-            Vector<3> polarisation // (P_x, P_y, P_z)
+            Vector<4> polarisation // (I, Q, U, V) Stoke's vector
             );
 
         // Constructor for specific predefined particle types in particle database
@@ -63,7 +63,7 @@ class [[nodiscard]] Particle {
             std::string type,
             const Vector<4> &position = Vector<4>(),    // (ct, x, y, z)
             const Vector<4> &momentum = Vector<4>(),    // (E/c, p_x, p_y, p_z)
-            const Vector<3> &polarisation = Vector<3>() // (P_x, P_y, P_z)
+            const Vector<4> &polarisation = Vector<4>() // (I, Q, U, V) Stoke's vector
             );
 
         // Getters
@@ -74,7 +74,7 @@ class [[nodiscard]] Particle {
         [[nodiscard]] const Quantity& getSpin() const;
         [[nodiscard]] const Vector<4>& getPosition() const;
         [[nodiscard]] const Vector<4>& getMomentum() const;
-        [[nodiscard]] const Vector<3>& getPolarisation() const;
+        [[nodiscard]] const Vector<4>& getPolarisation() const;
 
         // Setters
         void setType(std::string type);
@@ -84,7 +84,7 @@ class [[nodiscard]] Particle {
         void setSpin(Quantity spin);
         void setPosition(const Vector<4> &position);
         void setMomentum(const Vector<4> &momentum);
-        void setPolarisation(const Vector<3> &polarisation);
+        void setPolarisation(const Vector<4> &polarisation);
 
         // Lorentz factor method
         [[nodiscard]] Quantity gamma() const;
@@ -103,7 +103,7 @@ class [[nodiscard]] Particle {
         Quantity m_spin;
         Vector<4> m_position; // (ct, x, y, z)
         Vector<4> m_momentum; // (E/c, p_x, p_y, p_z)
-        Vector<3> m_polarisation; // (P_x, P_y, P_z)
+        Vector<4> m_polarisation; // (I, Q, U, V) Stoke's vector
 };
 
 // ParticleManager

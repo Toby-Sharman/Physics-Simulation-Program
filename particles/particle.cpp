@@ -21,26 +21,26 @@ Particle::Particle(
     Quantity spin,
     Vector<4> position,
     Vector<4> momentum,
-    Vector<3> polarisation)
-: m_type(std::move(type)),
-  m_symbol(std::move(symbol)),
-  m_restMass(restMass),
-  m_charge(charge),
-  m_spin(spin),
-  m_position(position),
-  m_momentum(momentum),
-  m_polarisation(polarisation)
+    Vector<4> polarisation)
+    : m_type(std::move(type)),
+      m_symbol(std::move(symbol)),
+      m_restMass(restMass),
+      m_charge(charge),
+      m_spin(spin),
+      m_position(position),
+      m_momentum(momentum),
+      m_polarisation(polarisation)
 {}
 
 // Constructor for specific predefined particle types in db
 Particle::Particle(std::string type,
                    const Vector<4> &position,
                    const Vector<4> &momentum,
-                   const Vector<3> &polarisation)
-: m_type(std::move(type)),
-  m_position(position),
-  m_momentum(momentum),
-  m_polarisation(polarisation)
+                   const Vector<4> &polarisation)
+    : m_type(std::move(type)),
+      m_position(position),
+      m_momentum(momentum),
+      m_polarisation(polarisation)
 {
     m_symbol = particleDatabase.getSymbol(m_type);
     m_restMass = particleDatabase.getRestMass(m_type);
@@ -56,7 +56,7 @@ const Quantity& Particle::getCharge() const { return m_charge; }
 const Quantity& Particle::getSpin() const { return m_spin; }
 const Vector<4>& Particle::getPosition() const { return m_position; }
 const Vector<4>& Particle::getMomentum() const { return m_momentum; }
-const Vector<3>& Particle::getPolarisation() const { return m_polarisation; }
+const Vector<4>& Particle::getPolarisation() const { return m_polarisation; }
 
 
 // Setters
@@ -67,7 +67,19 @@ void Particle::setCharge(const Quantity charge) { m_charge = charge; }
 void Particle::setSpin(const Quantity spin) { m_spin = spin; }
 void Particle::setPosition(const Vector<4> &position) { m_position = position; }
 void Particle::setMomentum(const Vector<4> &momentum) { m_momentum = momentum; }
-void Particle::setPolarisation(const Vector<3> &polarisation) { m_polarisation = polarisation; }
+void Particle::setPolarisation(const Vector<4> &polarisation) { m_polarisation = polarisation; }
+
+// Lorentz factor
+Quantity Particle::gamma() const {
+    if (isMassless()) {
+        return {1.0, ""}; // Not used for photons
+    }
+    return m_momentum[0] / m_restMass; // Using natural units // TODO CHECK
+}
+
+bool Particle::isMassless() const {
+    return m_restMass.abs() <= quantityTable().at("massless tolerance");
+}
 
 // Print function
 void Particle::print() const {
@@ -81,16 +93,4 @@ void Particle::print() const {
     m_momentum.print();
     std::cout << "Polarisation: ";
     m_polarisation.print();
-}
-
-// Lorentz factor
-Quantity Particle::gamma() const {
-    if (isMassless()) {
-        return {1.0, "kg"}; // Not used for photons
-    }
-    return {m_momentum[0] / m_restMass}; // Using natural units // TODO CHECK
-}
-
-bool Particle::isMassless() const {
-    return m_restMass.abs() <= quantityTable().at("massless tolerance");
 }
