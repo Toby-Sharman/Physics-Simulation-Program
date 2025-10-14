@@ -60,6 +60,7 @@ target_sources(Simulation_program PRIVATE
         simulation/step.cpp
         simulation/data-collection/particle_collection.cpp
         simulation/particle-movement/particle_movement.cpp
+        simulation/particle-movement/particle_interaction.cpp
 )
 
 # Include directories
