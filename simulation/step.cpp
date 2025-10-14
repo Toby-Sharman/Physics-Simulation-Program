@@ -8,17 +8,17 @@
 
 #include "particle_collection.h"
 
-void step(const std::shared_ptr<Box>& collectionBox, std::unique_ptr<Particle>& p, const Quantity& dt) {
-    if (!p) {
+void step(std::unique_ptr<Particle>& particles, const std::shared_ptr<Box>& world, const std::shared_ptr<Box>& collectionBox, const Quantity& dt) {
+    if (!particles) {
         return; // already deleted
     }
-    moveParticle(*p, dt); // Move particle
-    logEnergyIfInside(p, *collectionBox); // Log energy and delete particle if inside box
+    moveParticle(*particles, world, dt); // Move particle
+    logEnergyIfInside(particles, *collectionBox); // Log energy and delete particle if inside box
 }
 
-void stepAll(const std::shared_ptr<Box>& collectionBox, std::vector<std::unique_ptr<Particle>>& particles, const Quantity& dt) {
-    for (auto& p : particles) {
-        step(collectionBox, p, dt);
+void stepAll(std::vector<std::unique_ptr<Particle>>& particles, const std::shared_ptr<Box>& world, const std::shared_ptr<Box>& collectionBox, const Quantity& dt) {
+    for (auto& particle : particles) {
+        step(particle, world, collectionBox,  dt);
     }
 
     std::erase(particles, nullptr); // Remove all deleted particles

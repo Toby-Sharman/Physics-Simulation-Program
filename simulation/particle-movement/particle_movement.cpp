@@ -19,6 +19,7 @@ Vector<4> displacement(const Particle& particle, const Quantity dt) {
 
     const auto lightDistance = dt * quantityTable().at("c");
 
+    // massless particle
     if (particle.isMassless()) {
         const auto displacement = momentum.unitVector() * lightDistance;
 
@@ -27,20 +28,20 @@ Vector<4> displacement(const Particle& particle, const Quantity dt) {
         }
         finalPosition[0] = initialTime + lightDistance;
         return finalPosition;
-    } else { // massive particle
-        const auto& energy = momentum4Vector[0];
-
-        const auto displacement = momentum / energy * dt * quantityTable().at("c");
-
-        for (size_t i = 0; i < 3; ++i) {
-            finalPosition[i + 1] = initialPosition[i] + displacement[i];
-        }
-        finalPosition[0] = initialTime + lightDistance;
-        return finalPosition;
     }
+    // massive particle
+    const auto& energy = momentum4Vector[0];
+
+    const auto displacement = momentum / energy * dt * quantityTable().at("c");
+
+    for (size_t i = 0; i < 3; ++i) {
+        finalPosition[i + 1] = initialPosition[i] + displacement[i];
+    }
+    finalPosition[0] = initialTime + lightDistance;
+    return finalPosition;
 }
 
-void moveParticle(Particle& particle, const Quantity& dt) {
+void moveParticle(Particle& particle, const std::shared_ptr<Box>& world, const Quantity& dt) {
     const auto movementVector = displacement(particle, dt);
     //interaction(Particle& particle, movementVector);
     particle.setPosition(movementVector + particle.getPosition());
