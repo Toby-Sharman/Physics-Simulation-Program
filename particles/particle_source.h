@@ -9,10 +9,10 @@
 
 #include "particle.h"
 
-#include <vector>
 #include <random>
-#include <utility>
 #include <type_traits>
+#include <utility>
+#include <vector>
 
 template <typename T>
 constexpr auto range(T base, T spread) {
@@ -22,7 +22,7 @@ constexpr auto range(T base, T spread) {
 class ParticleSource {
     public:
     template <typename PosT, typename MomT, typename PolT>
-    std::vector<Particle> generateParticles(
+    void generateParticles(
         const std::string& particleName,
         const int count,
         const PosT& position,
@@ -74,9 +74,8 @@ class ParticleSource {
             particles.emplace_back(particleName, pos, mom, pol);
         }
 
-        return particles;
+        particleManager.addParticles(particles);
     }
 };
-
 
 #endif //PHYSICS_SIMULATION_PROGRAM_PARTICLE_SOURCE_H
