@@ -89,5 +89,52 @@
     "charge": 0.0,
     "spin": 0.5,
     "particle type": "baryon"
+  },
+  "Rb85": {
+    "nuclearSpin": 2.5,
+    "mass": {"value": 84.9117893, "unit": "u"},
+    "D1_wavelength": {"value": 794.979, "unit": "nm"},
+    "D1_lifetime": {"value": 27e-9, "unit": "s"},
+    "D2_wavelength": {"value": 780.241, "unit": "nm"},
+    "D2_lifetime": {"value": 27e-9, "unit": "s"}
+  },
+  "Rb87": {
+    "nuclearSpin": 1.5,
+    "mass": {"value": 86.9091805, "unit": "u"},
+    "D1_wavelength": {"value": 794.978, "unit": "nm"},
+    "D1_lifetime": {"value": 27e-9, "unit": "s"},
+    "D2_wavelength": {"value": 780.241, "unit": "nm"},
+    "D2_lifetime": {"value": 27e-9, "unit": "s"}
+  },
+  "Cs133": {
+    "nuclearSpin": 3.5,
+    "mass": {"value": 132.90545196, "unit": "u"},
+    "D1_wavelength": {"value": 894.592, "unit": "nm"},
+    "D1_lifetime": {"value": 34.7e-9, "unit": "s"},
+    "D2_wavelength": {"value": 852.347, "unit": "nm"},
+    "D2_lifetime": {"value": 30.5e-9, "unit": "s"}
+  },
+  "K39": {
+    "nuclearSpin": 1.5,
+    "mass": {"value": 38.96370668, "unit": "u"},
+    "D1_wavelength": {"value": 770.108, "unit": "nm"},
+    "D1_lifetime": {"value": 26.7e-9, "unit": "s"},
+    "D2_wavelength": {"value": 766.701, "unit": "nm"},
+    "D2_lifetime": {"value": 26.7e-9, "unit": "s"}
+  },
+  "K41": {
+    "nuclearSpin": 1.5,
+    "mass": {"value": 40.96182526, "unit": "u"},
+    "D1_wavelength": {"value": 770.108, "unit": "nm"},
+    "D1_lifetime": {"value": 26.7e-9, "unit": "s"},
+    "D2_wavelength": {"value": 766.701, "unit": "nm"},
+    "D2_lifetime": {"value": 26.7e-9, "unit": "s"}
+  },
+  "gas": {
+    "symbol": "THIS PARTICLE IS NOT FOR ACTUAL USE",
+    "rest mass": { "value": 1, "unit": "u" },
+    "charge": 0.0,
+    "spin": 0.5,
+    "particle type": "baryon"
   }
 }
