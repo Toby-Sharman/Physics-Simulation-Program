@@ -61,6 +61,7 @@ class Globals {
                 static constexpr double mu0 = 1.25663706127e-6;                       // Vacuum permeability
                 static constexpr double u = 1.66053906892e-27;                        // Atomic mass unit in kg
                 static constexpr double Da = u;                                       // Dalton
+                static constexpr double k_b = 1.380649e-23;                           // Boltzmann constant
             };
         };
 
