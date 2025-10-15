@@ -5,9 +5,9 @@
 #ifndef PHYSICS_SIMULATION_PROGRAM_STEP_H
 #define PHYSICS_SIMULATION_PROGRAM_STEP_H
 
-#include "globals.h"
 #include "particle.h"
-#include "box.h"
+#include "core/maths/utilities/quantity.h"
+#include "objects/object-types/box.h"
 
 #include <memory>
 

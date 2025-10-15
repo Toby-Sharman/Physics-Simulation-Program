@@ -17,8 +17,8 @@
 #include <memory>
 
 #include "core/maths/vector.h"
-#include "objects/box.h"
 #include "objects/object.h"
+#include "objects/object-types/box.h"
 #include "particles/particle.h"
 #include "particles/particle_source.h"
 #include "simulation/step.h"
