@@ -10,8 +10,8 @@
 #ifndef PHYSICS_SIMULATION_PROGRAM_PARTICLE_INTERACTION_H
 #define PHYSICS_SIMULATION_PROGRAM_PARTICLE_INTERACTION_H
 
+#include "objects/object-types/box.h"
 #include "particles/particle.h"
-#include "box.h"
 
 double interactionProbability(const Particle& particle, const Vector<3> &displacement,  const std::shared_ptr<Box>& world);
 

@@ -14,8 +14,8 @@
 #include "simulation/particle-movement/particle_interaction.h"
 #include "core/globals.h"
 #include "databases/material-data/material_database.h"
-#include "objects/box.h"
 #include "objects/object.h"
+#include "objects/object-types/box.h"
 #include "particles/particle.h"
 
 double interactionProbability(const Particle& particle, const Vector<3> &displacement,  const std::shared_ptr<Box>& world) {

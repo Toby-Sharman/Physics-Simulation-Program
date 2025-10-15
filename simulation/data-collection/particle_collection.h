@@ -9,10 +9,10 @@
 
 #include "globals.h"
 
-#include "box.h"
+#include "objects/object-types/box.h"
 
-#include <string>
 #include <memory>
+#include <string_view>
 
 // Logs the particle's energy if inside the box and deletes it if condition met
 void logEnergyIfInside(std::unique_ptr<Particle>& p,
