@@ -32,11 +32,7 @@ std::pair<std::string_view, int> extractSuperscript(const std::string_view unit)
 
     // Find the start of the exponent
     while (p != end) {
-        const char c = *p;
-        if ((c >= '0' && c <= '9') || c == '-') {
-            break; // Exponent starts here
-        }
-        if (c == '^') {
+        if (const char c = *p; c == '^') {
             ++p; // Skip caret
             break; // Exponent starts after caret
         }
@@ -47,8 +43,9 @@ std::pair<std::string_view, int> extractSuperscript(const std::string_view unit)
     if (const auto numStart = p; numStart != end) {
         int exponent = 0;
         if (auto [ptr, ec] = std::from_chars(numStart, end, exponent); ec == std::errc()) {
-            const auto baseEnd = (numStart > start && *(numStart - 1) == '^') ? numStart - 1 : numStart;
-            return {std::string_view(start, baseEnd - start), exponent};
+            if (numStart > start && *(numStart - 1) == '^') {
+                return {std::string_view(start, numStart - 1 - start), exponent};
+            }
         }
     }
 
