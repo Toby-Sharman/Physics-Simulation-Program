@@ -291,42 +291,42 @@ struct UnitInfo {
     using PhysConst = Globals::Constant::Physics;
     static const std::unordered_map<std::string_view, UnitInfo> table = {
         // Base SI units (except kg -> g)
-        {"m",   {1.0,  Unit(1,  0,  0,  0,  0, 0, 0)}}, // metre
-        {"g",   {1e-3, Unit(0,  1,  0,  0,  0, 0, 0)}}, // gram
-        {"s",   {1.0,  Unit(0,  0,  1,  0,  0, 0, 0)}}, // second
-        {"A",   {1.0,  Unit(0,  0,  0,  1,  0, 0, 0)}}, // ampere
-        {"K",   {1.0,  Unit(0,  0,  0,  0,  1, 0, 0)}}, // kelvin
-        {"mol", {1.0,  Unit(0,  0,  0,  0,  0, 1, 0)}}, // mole
-        {"cd",  {1.0,  Unit(0,  0,  0,  0,  0, 0, 1)}}, // candela
+        {"m",   {1.0,  Unit(1,  0,  0,  0,  0, 0, 0)}}, // Metre
+        {"g",   {1e-3, Unit(0,  1,  0,  0,  0, 0, 0)}}, // Gram
+        {"s",   {1.0,  Unit(0,  0,  1,  0,  0, 0, 0)}}, // Second
+        {"A",   {1.0,  Unit(0,  0,  0,  1,  0, 0, 0)}}, // Ampere
+        {"K",   {1.0,  Unit(0,  0,  0,  0,  1, 0, 0)}}, // Kelvin
+        {"mol", {1.0,  Unit(0,  0,  0,  0,  0, 1, 0)}}, // Mole
+        {"cd",  {1.0,  Unit(0,  0,  0,  0,  0, 0, 1)}}, // Candela
 
         // Derived SI units
-        {"Hz",  {1.0,  Unit(0,  0,  -1, 0,  0, 0, 0)}}, // hertz
-        {"N",   {1.0,  Unit(1,  1,  -2, 0,  0, 0, 0)}}, // newton
-        {"Pa",  {1.0,  Unit(-1, 1,  -2, 0,  0, 0, 0)}}, // pascal
-        {"J",   {1.0,  Unit(2,  1,  -2, 0,  0, 0, 0)}}, // joule
-        {"W",   {1.0,  Unit(2,  1,  -3, 0,  0, 0, 0)}}, // watt
-        {"C",   {1.0,  Unit(0,  0,  1,  1,  0, 0, 0)}}, // coulomb
-        {"V",   {1.0,  Unit(2,  1,  -3, -1, 0, 0, 0)}}, // volt
-        {"F",   {1.0,  Unit(-2, -1, 4,  2,  0, 0, 0)}}, // farad
-        {"Ω",   {1.0,  Unit(2,  1,  -3, -2, 0, 0, 0)}}, // ohm
-        {"S",   {1.0,  Unit(-2, -1, 3,  2,  0, 0, 0)}}, // siemens
-        {"Wb",  {1.0,  Unit(2,  1,  -2, -1, 0, 0, 0)}}, // weber
-        {"T",   {1.0,  Unit(0,  1,  -2, -1, 0, 0, 0)}}, // tesla
-        {"H",   {1.0,  Unit(2,  1,  -2, -2, 0, 0, 0)}}, // henry
-        {"lm",  {1.0,  Unit(0,  0,  0,  0,  0, 0, 1)}}, // lumen
-        {"lx",  {1.0,  Unit(-2, 0,  0,  0,  0, 0, 1)}}, // lux
-        {"Bq",  {1.0,  Unit(0,  0,  -1, 0,  0, 0, 0)}}, // becquerel
-        {"Gy",  {1.0,  Unit(2,  0,  -2, 0,  0, 0, 0)}}, // gray
-        {"Sv",  {1.0,  Unit(2,  0,  -2, 0,  0, 0, 0)}}, // sievert
-        {"kat", {1.0,  Unit(0,  0,  -1, 0,  0, 1, 0)}}, // katal
+        {"Hz",  {1.0,  Unit(0,  0,  -1, 0,  0, 0, 0)}}, // Hertz
+        {"N",   {1.0,  Unit(1,  1,  -2, 0,  0, 0, 0)}}, // Newton
+        {"Pa",  {1.0,  Unit(-1, 1,  -2, 0,  0, 0, 0)}}, // Pascal
+        {"J",   {1.0,  Unit(2,  1,  -2, 0,  0, 0, 0)}}, // Joule
+        {"W",   {1.0,  Unit(2,  1,  -3, 0,  0, 0, 0)}}, // Watt
+        {"C",   {1.0,  Unit(0,  0,  1,  1,  0, 0, 0)}}, // Coulomb
+        {"V",   {1.0,  Unit(2,  1,  -3, -1, 0, 0, 0)}}, // Volt
+        {"F",   {1.0,  Unit(-2, -1, 4,  2,  0, 0, 0)}}, // Farad
+        {"Ω",   {1.0,  Unit(2,  1,  -3, -2, 0, 0, 0)}}, // Ohm
+        {"S",   {1.0,  Unit(-2, -1, 3,  2,  0, 0, 0)}}, // Siemens
+        {"Wb",  {1.0,  Unit(2,  1,  -2, -1, 0, 0, 0)}}, // Weber
+        {"T",   {1.0,  Unit(0,  1,  -2, -1, 0, 0, 0)}}, // Tesla
+        {"H",   {1.0,  Unit(2,  1,  -2, -2, 0, 0, 0)}}, // Henry
+        {"lm",  {1.0,  Unit(0,  0,  0,  0,  0, 0, 1)}}, // Lumen
+        {"lx",  {1.0,  Unit(-2, 0,  0,  0,  0, 0, 1)}}, // Lux
+        {"Bq",  {1.0,  Unit(0,  0,  -1, 0,  0, 0, 0)}}, // Becquerel
+        {"Gy",  {1.0,  Unit(2,  0,  -2, 0,  0, 0, 0)}}, // Gray
+        {"Sv",  {1.0,  Unit(2,  0,  -2, 0,  0, 0, 0)}}, // Sievert
+        {"kat", {1.0,  Unit(0,  0,  -1, 0,  0, 1, 0)}}, // Katal
 
         // Non-SI units
-        {"eV",   {PhysConst::e,    Unit(2, 1, -2, 0,  0, 0, 0)}}, // electronVolt
-        {"u",    {PhysConst::u,    Unit(0, 1, 0,  0,  0, 0, 0)}}, // atomic mass unit
-        {"Da",   {PhysConst::Da,   Unit(0, 1, 0,  0,  0, 0, 0)}}, // dalton
+        {"eV",   {PhysConst::e,    Unit(2, 1, -2, 0,  0, 0, 0)}}, // ElectronVolt
+        {"u",    {PhysConst::u,    Unit(0, 1, 0,  0,  0, 0, 0)}}, // Atomic mass unit
+        {"Da",   {PhysConst::Da,   Unit(0, 1, 0,  0,  0, 0, 0)}}, // Dalton
 
-        {"min", {60.0,   Unit(0, 0, 1, 0, 0, 0, 0)}}, // minute
-        {"h",   {3600.0, Unit(0, 0, 1, 0, 0, 0, 0)}}, // hour
+        {"min", {60.0,   Unit(0, 0, 1, 0, 0, 0, 0)}}, // Minute
+        {"hr",  {3600.0, Unit(0, 0, 1, 0, 0, 0, 0)}}, // Hour
     };
     return table;
 }
