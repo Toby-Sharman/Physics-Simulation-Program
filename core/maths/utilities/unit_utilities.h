@@ -25,13 +25,10 @@
 // Splits a unit string (can include the prefix) into its base unit (can include prefix) and exponent
 //
 // Notes on algorithms:
-//   - Moves a pointer along the string until the character at that index is either a '^', '-', or numeric (0-9) then
-//     breaks the loop
+//   - Moves a pointer along the string until the character at that index is a '^'then breaks the loop
 //         -> TODO: Add support for unicode style superscripts nicely (was in before but taken away as not needed and made logic less legible)
-//         -> In the case of a '^' the contents of the string before it are returned as the base unit and after it are
-//            converted to an int and returned as the exponent
-//         -> For '-' and numeric characters the contents of the string before it are returned as the bae unit and
-//            from that characters index the rest of string after it are returned as the exponent
+//         -> The contents of the string before it are returned as the base unit and after it are converted to an int
+//            and returned as the exponent
 //   - Returning exponent as an int as converting to int8_t or some other smaller data structure would require recasting
 //     or a custom string to int8_t function //TODO
 //
