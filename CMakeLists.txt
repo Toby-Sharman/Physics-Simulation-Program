@@ -49,10 +49,10 @@ target_sources(Simulation_program PRIVATE
         app/main.cpp
         core/maths/utilities/unit_utilities.cpp
         databases/base_database.cpp
-        objects/box.cpp
         objects/object.cpp
-        objects/sphere.cpp
-        objects/point.cpp
+        objects/object-types/box.cpp
+        objects/object-types/point.cpp
+        objects/object-types/sphere.cpp
         particles/particle.cpp
         particles/particle_source.cpp
         physics/fields/field_solver.cpp
@@ -76,7 +76,7 @@ target_include_directories(Simulation_program PRIVATE
         databases/particle-data
         databases/utilities
         objects
-        objects/utilities
+        objects/object-types
         particles
         physics
         physics/fields
