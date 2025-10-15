@@ -297,15 +297,16 @@ inline std::ostream& operator<<(std::ostream& outputStream, const Quantity& quan
     using PhysConst = Globals::Constant::Physics;
     using ProgramConst = Globals::Constant::Program;
     static const std::unordered_map<std::string_view, Quantity> table = {
-        {"time step",          {ProgramConst::timeStep,          Unit(0, 0, 1, 0, 0, 0, 0)}}, // time step for simulation in seconds
-        {"massless tolerance", {ProgramConst::masslessTolerance, Unit(0, 1, 0, 0, 0, 0, 0)}}, // massless tolerance in kg
+        {"time step",          {ProgramConst::timeStep,          Unit(0, 0, 1, 0, 0, 0, 0)}}, // Time step for simulation in seconds
+        {"massless tolerance", {ProgramConst::masslessTolerance, Unit(0, 1, 0, 0, 0, 0, 0)}}, // Massless tolerance in kg
 
-        {"c",    {PhysConst::c,    Unit(1, 0, -1, 0,  0, 0, 0)}}, // speed of light in vacuum
-        {"e",    {PhysConst::e,    Unit(0, 0, 1,  1,  0, 0, 0)}}, // elementary electric charge
-        {"h",    {PhysConst::h,    Unit(2, 1, -2, 0,  0, 0, 0)}}, // planck constant
-        {"hbar", {PhysConst::hbar, Unit(2, 1, -2, 0,  0, 0, 0)}}, // reduced planck constant
-        {"ℏ",    {PhysConst::hbar, Unit(2, 1, -2, 0,  0, 0, 0)}}, // reduced planck constant
-        {"mu0",  {PhysConst::mu0,  Unit(1, 1, -2, -2, 0, 0, 0)}}  // vacuum permeability
+        {"c",    {PhysConst::c,    Unit(1, 0, -1, 0,  0,  0, 0)}}, // Speed of light in vacuum
+        {"e",    {PhysConst::e,    Unit(0, 0, 1,  1,  0,  0, 0)}}, // Elementary electric charge
+        {"h",    {PhysConst::h,    Unit(2, 1, -1, 0,  0,  0, 0)}}, // Planck constant
+        {"hbar", {PhysConst::hbar, Unit(2, 1, -1, 0,  0,  0, 0)}}, // Reduced Planck constant
+        {"ℏ",    {PhysConst::hbar, Unit(2, 1, -1, 0,  0,  0, 0)}}, // Reduced Planck constant
+        {"mu0",  {PhysConst::mu0,  Unit(1, 1, -2, -2, 0,  0, 0)}}, // Vacuum permeability
+        {"k_b",  {PhysConst::k_b,  Unit(2, 1, -2, 0,  -1, 0, 0)}}  // Boltzmann constant
     };
     return table;
 }
