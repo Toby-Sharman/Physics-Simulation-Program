@@ -38,7 +38,7 @@
 //   - If there is a present exponent it is returned with the sign as part of the number
 //
 // Parameters:
-//   unit - an immutable string of characters
+//   - unit - an immutable string of characters
 //
 // Returns:
 //   - pair<string_view,int> - first = base unit, second = exponent
@@ -72,7 +72,7 @@
 //     and its SI dimensions
 //
 // Parameters:
-//   unit - an immutable string of characters
+//   - unit - an immutable string of characters
 //
 // Returns:
 //   - UnitInfo - a factor relative to SI and a representation of the 7 base SI dimensions as an array
