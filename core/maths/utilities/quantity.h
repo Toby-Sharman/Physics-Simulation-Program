@@ -102,9 +102,9 @@ struct [[nodiscard]] Quantity {
     constexpr Quantity(const double value, const Unit& unit) noexcept : value(value), unit(unit) {}
 
     // Construct from value and unit string
-    constexpr Quantity(const double value, const std::string_view unitStr)
+    constexpr Quantity(const double value, const std::string_view unitString)
         : Quantity([&]() constexpr -> Quantity {
-            auto [factor, siUnit] = parseUnits(unitStr);
+            auto [factor, siUnit] = parseUnits(unitString);
             return { value * factor, siUnit };
         }()) {}
 
