@@ -10,7 +10,7 @@
 #include <iostream>
 #include <map>
 
-void logEnergyIfInside(std::unique_ptr<Particle>& p, const Box& box,
+void logEnergyIfInside(std::unique_ptr<Particle>& p, const Object*& detector,
                        const std::string_view& baseFolder,
                        const std::string_view& baseFilename)
 {
@@ -20,7 +20,7 @@ void logEnergyIfInside(std::unique_ptr<Particle>& p, const Box& box,
 
     auto pos4 = p->getPosition();
 
-    if (const auto pos3 = *reinterpret_cast<Vector<3> const*>(&pos4[1]); box.containsPoint(pos3)) {
+    if (const auto pos3 = *reinterpret_cast<Vector<3> const*>(&pos4[1]); detector->containsPoint(pos3)) {
 
         static std::map<std::string, std::unique_ptr<std::ofstream>> fileMap;
         static std::map<std::string, int> fileCounter;
