@@ -23,7 +23,7 @@
 #include "core/maths/utilities/quantity.h"
 #include "core/maths/utilities/units.h"
 
-std::pair<std::string_view, int> extractSuperscript(const std::string_view unit) noexcept {
+[[nodiscard]] std::pair<std::string_view, int> extractSuperscript(const std::string_view unit) noexcept {
     if (unit.empty()) { return {unit, 0}; } // If empty return input with exponent = 0
 
     const auto start = unit.data();
@@ -52,7 +52,7 @@ std::pair<std::string_view, int> extractSuperscript(const std::string_view unit)
     return {unit, 1}; // No numeric exponent found
 }
 
-UnitInfo extractPrefix(const std::string_view unit) {
+[[nodiscard]] UnitInfo extractPrefix(const std::string_view unit) {
     auto& unitsTable = unitTable(); // Load unit table
 
     // Search for prefix, unit combination
@@ -85,7 +85,7 @@ UnitInfo extractPrefix(const std::string_view unit) {
     );
 }
 
-UnitInfo parseUnit(const char* tokenStart, const char* tokenEnd) {
+[[nodiscard]] UnitInfo parseUnit(const char* tokenStart, const char* tokenEnd) {
     // Trim leading spaces
     while (tokenStart < tokenEnd && std::isspace(static_cast<unsigned char>(*tokenStart))) {
         ++tokenStart;
@@ -116,7 +116,7 @@ UnitInfo parseUnit(const char* tokenStart, const char* tokenEnd) {
     return {std::pow(scale, exponent), siUnit.raisedTo(exponent)};
 }
 
-UnitInfo parseUnits(const std::string_view units) {
+[[nodiscard]] UnitInfo parseUnits(const std::string_view units) {
     UnitInfo result = {1.0, Unit::dimensionless()};
 
     auto p = units.data();
