@@ -51,10 +51,10 @@ target_sources(Simulation_program PRIVATE
         databases/base_database.cpp
         objects/object.cpp
         objects/object-types/box.cpp
-        objects/object-types/point.cpp
         objects/object-types/sphere.cpp
         particles/particle.cpp
         particles/particle_source.cpp
+        physics/distributions.cpp
         physics/fields/field_solver.cpp
         physics/fields/field_boundary_handling.cpp
         simulation/step.cpp
