@@ -19,7 +19,7 @@ std::string Sphere::describeSelf(const int indent) const {
     auto worldPositionM = getWorldTransform();
     auto worldPosition = worldPositionM * Vector<3>({0.0, 0.0, 0.0}, "m");
 
-    auto line = std::format( "{}Box: \"{}\" | Material: {} | Local Pos = ({}, {}, {}) | World Pos = ({}, {}, {})",
+    auto line = std::format( "{}Sphere: \"{}\" | Material: {} | Local Pos = ({}, {}, {}) | World Pos = ({}, {}, {})",
                              pad,
                              m_name,
                              material,
