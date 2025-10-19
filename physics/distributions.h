@@ -1,0 +1,46 @@
+//
+// Physics Simulation program
+// File: distributions.h
+// Created by Tobias Sharman on 15/10/2025
+//
+// Description:
+//   - Contains functions based on attaining data from distributions
+//
+// Copyright (c) 2025, Tobias Sharman
+// Licensed under a Non-Commercial License. See LICENSE file for details
+//
+
+#ifndef PHYSICS_SIMULATION_PROGRAM_DISTRIBUTIONS_H
+#define PHYSICS_SIMULATION_PROGRAM_DISTRIBUTIONS_H
+
+#include "core/maths/vector.h"
+#include "core/maths/utilities/quantity.h"
+
+// Velocity sampler from temperature
+//
+// Gives a random velocity for a particle based on the temperature, according to Maxwell-Boltzmann statistics based
+// about a normal distribution
+//
+// Notes on input:
+//   - temperature should be taken from the object attribute
+//   - particleMass should be taken from the particle properties not the particle table for consistency with custom
+//     units
+//
+// Notes on algorithms:
+//   - There is no check here for if the temperature and particle mass are of incorrect units beyond that raisedTo()
+//     doesn't throw an error for fractional units
+//
+// Notes on output:
+//   - Generate velocity not a 4-momentum so it is more general
+//
+// Parameters:
+//   - temperature - a reference to a Quantity (should be a temperature)
+//   - particleMass - a reference to a Quantity (should be a mass)
+//
+// Returns:
+//   - Vector<3> - A 3-velocity vector
+//
+// Example usage:
+[[nodiscard]] Vector<3> sampleThermalVelocity(const Quantity& temperature, const Quantity& particleMass);
+
+#endif //PHYSICS_SIMULATION_PROGRAM_DISTRIBUTIONS_H
