@@ -11,9 +11,9 @@
 
 #include <memory>
 
-void step(std::unique_ptr<Particle>& p, const std::shared_ptr<Box>& world, const std::shared_ptr<Box>& collectionBox, const Quantity& dt = quantityTable().at("time step"));
+void step(std::unique_ptr<Particle>& particle, const Object* world, const Object* detector, const Quantity& dt = quantityTable().at("time step"));
 
 // Step all particles in a vector
-void stepAll(std::vector<std::unique_ptr<Particle>>& particles, const std::shared_ptr<Box>& world, const std::shared_ptr<Box>& collectionBox, const Quantity& dt = quantityTable().at("time step"));
+void stepAll(std::vector<std::unique_ptr<Particle>>& particles, const Object* world, const Object* detector, const Quantity& dt = quantityTable().at("time step"));
 
 #endif //PHYSICS_SIMULATION_PROGRAM_STEP_H
