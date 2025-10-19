@@ -208,17 +208,17 @@ void BaseDatabase::saveToBinary(const std::string& filepath) {
     }
 }
 
-bool BaseDatabase::contains(const std::string& entryName) const noexcept {
+[[nodiscard]] bool BaseDatabase::contains(const std::string& entryName) const noexcept {
     return std::ranges::any_of(this->m_db, [&](const DatabaseEntry& entry){ return entry.name == entryName; });
 }
 
-std::string BaseDatabase::getStringProperty(const std::string& entryName, const std::string& propertyName) const {
+[[nodiscard]] std::string BaseDatabase::getStringProperty(const std::string& entryName, const std::string& propertyName) const {
     const auto& entry = findEntry(entryName);
     const auto& property  = findProperty(entry, propertyName);
     return std::get<std::string>(property.value);
 }
 
-double BaseDatabase::getNumericProperty(const std::string& entryName, const std::string& propertyName) const {
+[[nodiscard]] double BaseDatabase::getNumericProperty(const std::string& entryName, const std::string& propertyName) const {
     const auto& entry = findEntry(entryName);
     const auto& property  = findProperty(entry, propertyName);
 
@@ -236,7 +236,7 @@ double BaseDatabase::getNumericProperty(const std::string& entryName, const std:
     }, property.value);
 }
 
-Quantity BaseDatabase::getQuantityProperty(const std::string& entryName, const std::string& propertyName) const {
+[[nodiscard]] Quantity BaseDatabase::getQuantityProperty(const std::string& entryName, const std::string& propertyName) const {
     const auto& entry = findEntry(entryName);
     const auto& property  = findProperty(entry, propertyName);
 
@@ -251,7 +251,7 @@ Quantity BaseDatabase::getQuantityProperty(const std::string& entryName, const s
     }, property.value);
 }
 
-const DatabaseEntry& BaseDatabase::findEntry(const std::string& entryName) const{
+[[nodiscard]] const DatabaseEntry& BaseDatabase::findEntry(const std::string& entryName) const{
     const auto itEntry = std::ranges::find_if(
         this->m_db, [&](const DatabaseEntry& entry){ return entry.name == entryName; });
     if (itEntry == this->m_db.end()) {
@@ -260,7 +260,7 @@ const DatabaseEntry& BaseDatabase::findEntry(const std::string& entryName) const
     return *itEntry;
 }
 
-const DatabaseProperty& BaseDatabase::findProperty(const DatabaseEntry& entry, const std::string& propertyName) {
+[[nodiscard]] const DatabaseProperty& BaseDatabase::findProperty(const DatabaseEntry& entry, const std::string& propertyName) {
     const auto itProperty = std::ranges::find_if(
         entry.properties, [&](const DatabaseProperty& property){ return property.name == propertyName; });
     if (itProperty == entry.properties.end()) {
