@@ -20,7 +20,7 @@
 
 #include "core/maths/utilities/units.h"
 
-// decodeSuperscript
+// Superscript extractor
 //
 // Splits a unit string (can include the prefix) into its base unit (can include prefix) and exponent
 //
@@ -48,7 +48,7 @@
 //   auto [baseUnit, exponent] = extractSuperscript(unit);
 [[nodiscard]] std::pair<std::string_view, int> extractSuperscript(std::string_view unit) noexcept;
 
-// extractPrefix
+// Prefix extractor
 //
 // Attempts to match an input string against standard SI prefixes (see prefixes in units.h) followed by a valid unit
 // symbol (see unitTable in units.h)
@@ -86,7 +86,7 @@
 //   auto [scale, siUnit] = extractPrefix(baseUnit);
 [[nodiscard]] UnitInfo extractPrefix(std::string_view unit);
 
-// parseUnit
+// Single unit parser
 //
 // Takes an input string, described by start and end pointers and turns it into relative factor to SI and an SI
 // dimensional representation of unit
@@ -128,7 +128,7 @@
 //   auto [factor, siUnit] = parseUnit(tokenStart, tokenEnd);
 [[nodiscard]] UnitInfo parseUnit(const char* tokenStart, const char* tokenEnd);
 
-// parseUnits
+// Compound unit parser
 //
 // Takes a string of units and parses it into a factor/scale relative to SI and its base SI dimension
 //
