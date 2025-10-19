@@ -1,5 +1,13 @@
 //
-// Created by Tobias Sharman on 03/09/2025.
+// Physics Simulation Program
+// File: object.h
+// Created by Tobias Sharman on 03/09/2025
+//
+// Description:
+//   - Describes a general base object class
+//
+// Copyright (c) 2025, Tobias Sharman
+// Licensed under a Non-Commercial License. See LICENSE file for details
 //
 
 // Position and transforms are all about the centre of the above object
@@ -7,146 +15,168 @@
 #ifndef PHYSICS_SIMULATION_PROGRAM_OBJECT_H
 #define PHYSICS_SIMULATION_PROGRAM_OBJECT_H
 
-#include "vector.h"
-#include "matrix.h"
-
+#include "core/maths/matrix.h"
+#include "core/maths/vector.h"
+#include "core/maths/utilities/quantity.h"
 
 #include <iostream>
 #include <memory>
 #include <string>
 #include <vector>
 
-struct NameTag { std::string value; };
-inline NameTag name(const std::string& s) { return NameTag{s}; }
-template <typename T> concept NameArg = std::same_as<std::decay_t<T>, NameTag>;
+struct ParentTag { class Object* parent; };
+constexpr ParentTag parent(Object* ptr) { return {ptr}; }
+template<typename T>
+constexpr ParentTag parent(const std::unique_ptr<T>& object) requires std::derived_from<T, Object> {
+    return {object.get()};
+}
+template<typename T>
+concept ParentArgument = std::same_as<std::decay_t<T>, ParentTag>;
 
-struct MaterialTag { std::string value; };
-inline MaterialTag material(const std::string& s) { return MaterialTag{s}; }
-template <typename T> concept MaterialArg = std::same_as<std::decay_t<T>, MaterialTag>;
+
+struct NameTag { std::string value; };
+constexpr NameTag name(const std::string& name) { return {name}; }
+template <typename T>
+concept NameArgument = std::same_as<std::decay_t<T>, NameTag>;
 
 struct PositionTag { Vector<3> value; };
-inline PositionTag position(const Vector<3>& v) { return PositionTag{v}; }
-template <typename T> concept PositionArg = std::same_as<std::decay_t<T>, PositionTag>;
+constexpr PositionTag position(const Vector<3>& position) { return {position}; }
+template <typename T>
+concept PositionArgument = std::same_as<std::decay_t<T>, PositionTag>;
 
 struct RotationTag { Matrix<3,3> value; };
-inline RotationTag rotation(const Matrix<3,3>& m) { return RotationTag{m}; }
-template <typename T> concept RotationArg = std::same_as<std::decay_t<T>, RotationTag>;
+constexpr RotationTag rotation(const Matrix<3,3>& rotation) { return {rotation}; }
+template <typename T>
+concept RotationArgument = std::same_as<std::decay_t<T>, RotationTag>;
 
-struct SizeTag { Vector<3> value; };
-inline SizeTag size(const Vector<3>& v) { return SizeTag{v}; }
-template <typename T> concept SizeArg = std::same_as<std::decay_t<T>, SizeTag>;
+template <typename T>
+struct SizeTag { T value; };
+template <typename T>
+constexpr SizeTag<T> size(const T& dimensions) { return {dimensions}; }
+template <typename T>
+concept SizeArgument = requires(T type) { type.value; };
 
-struct ObjectConstructionContext {
-    std::string name = "Unnamed";
-    std::string material;
-    Vector<3> position = Vector<3>({0, 0, 0}, "m");
-    Matrix<3,3> rotation = Matrix<3,3>::identity();
-    std::optional<Vector<3>> size;
-};
+struct MaterialTag { std::string value; };
+constexpr MaterialTag material(const std::string& material) { return {material}; }
+template <typename T>
+concept MaterialArgument = std::same_as<std::decay_t<T>, MaterialTag>;
 
-template <NameArg A>
-void assignObjectArgs(ObjectConstructionContext& ctx, A&& arg) {
-    ctx.name = std::forward<A>(arg).value;
-}
+struct TemperatureTag { Quantity value; };
+constexpr TemperatureTag temperature(const Quantity& temperature) { return {temperature}; }
+template <typename T>
+concept TemperatureArgument = std::same_as<std::decay_t<T>, TemperatureTag>;
 
-template <MaterialArg A>
-void assignObjectArgs(ObjectConstructionContext& ctx, A&& arg) {
-    ctx.material = std::forward<A>(arg).value;
-}
-
-template <PositionArg A>
-void assignObjectArgs(ObjectConstructionContext& ctx, A&& arg) {
-    ctx.position = std::forward<A>(arg).value;
-}
-
-template <RotationArg A>
-void assignObjectArgs(ObjectConstructionContext& ctx, A&& arg) {
-    ctx.rotation = std::forward<A>(arg).value;
-}
-
-template <SizeArg A>
-void assignObjectArgs(ObjectConstructionContext& ctx, A&& arg) {
-    ctx.size = std::forward<A>(arg).value;
-}
-
-
-class Object : public std::enable_shared_from_this<Object> {
+class Object {
     public:
         Object() = default;
         virtual ~Object() = default;
 
-        // Getters
-        const std::string& getName() const;
-        Vector<3> getPosition() const;
-        Matrix<3, 3> getRotationMatrix() const;
-        const std::string& getMaterial() const;
-        const std::vector<std::shared_ptr<Object>>& children() const;
+        template<typename... Args>
+        explicit Object(Args&&... args) { (setTag(std::forward<Args>(args)), ...); }
 
-        TransformationMatrix getLocalTransform() const;
-        TransformationMatrix getWorldTransform() const;
+        template<typename T, typename... Args>
+        friend T* construct(Args&&... args);
+
+        // Getters
+        [[nodiscard]] const Object* parent() const { return this->m_parent; }
+        [[nodiscard]] const std::vector<std::unique_ptr<Object>>& children() const { return this->m_children; }
+
+        [[nodiscard]] const std::string& getName() const { return this->m_name; }
+        [[nodiscard]] Vector<3> getPosition() const { return this->m_transformation.translation; }
+        [[nodiscard]] Matrix<3, 3> getRotationMatrix() const { return this->m_transformation.rotation; }
+        [[nodiscard]] const std::string& getMaterial() const { return this->m_material; }
+        [[nodiscard]] const Quantity& getTemperature() const { return this->m_temperature; }
+
+        [[nodiscard]] TransformationMatrix getLocalTransform() const;
+        [[nodiscard]] TransformationMatrix getWorldTransform() const;
 
         // Setters
-        void setName(const std::string &name);
-        void setPosition(const Vector<3> &position);
-        void setRotationMatrix(const Matrix<3,3> &rotation);
+        void setParent(Object* parent) { this->m_parent = parent; }
+
+        void setName(const std::string& name) { this->m_name = name; }
+        void setPosition(const Vector<3>& position) { this->m_transformation.translation = position; }
+        void setRotationMatrix(const Matrix<3,3>& rotation) { this->m_transformation.rotation = rotation; }
         void setMaterial(std::string material);
+        void setTemperature(const Quantity& temperature) { this->m_temperature = temperature; }
 
         // Hierarchy
+        template<typename T, typename... Args>
+        T* addChild(Args&&... args) {
+            static_assert(std::derived_from<T, Object>,
+              "addChild<T>() requires T to derive from Object");
+
+            static_assert(!(std::same_as<std::decay_t<Args>, ParentTag> || ...),
+                          "addChild<T>() should not receive a parent tag as its parent is implicitly 'this' (the object being acted on)");
+            auto object = std::make_unique<T>(std::forward<Args>(args)...);
+            object->m_parent = this;
+            T* pointer = object.get();
+            this->m_children.push_back(std::move(object));
+            return pointer;
+        }
+
+        void addChildObject(std::unique_ptr<Object> child) {
+            child->m_parent = this;
+            m_children.push_back(std::move(child));
+        }
+
         Vector<3> localToWorld(const Vector<3>& localPoint) const;
         Vector<3> worldToLocal(const Vector<3>& worldPoint) const;
 
-        std::shared_ptr<Object> findObjectContainingPoint(const Vector<3>& worldPoint);
+        Object* findObjectContainingPoint(const Vector<3>& worldPoint);
+        [[nodiscard]] const Object* findObjectContainingPoint(const Vector<3>& worldPoint) const;
 
-        template<typename T, typename... Args>
-        std::shared_ptr<T> addChild(Args&&... args) {
-            auto child = construct<T>(std::forward<Args>(args)...); // Constructor is below
-            child->m_parent = shared_from_this();
-            m_children.push_back(child);
-            return child;
-        }
-
-        virtual std::string describeSelf(int indent) const { return ""; };
+        [[nodiscard]] virtual std::string describeSelf(int indent) const { return ""; };
         void printHierarchy(int indent = 0) const;
 
         // Must be implemented by derived objects
-        virtual bool containsPoint(const Vector<3>& worldPoint) const = 0;
+        [[nodiscard]] virtual bool containsPoint(const Vector<3>& worldPoint) const = 0;
 
     protected:
+        Object* m_parent = nullptr;
+        std::vector<std::unique_ptr<Object>> m_children;
         std::string m_name;
-        std::string m_material;
         TransformationMatrix m_transformation;
-        std::weak_ptr<Object> m_parent;
-        std::vector<std::shared_ptr<Object>> m_children;
+        std::string m_material;
+        Quantity m_temperature = Quantity(293, "K");
+
+        // Tag setters
+        void setTag(ParentTag&& tag) { setParent(tag.parent); }
+        void setTag(NameTag&& tag) { setName(tag.value); }
+        void setTag(PositionTag&& tag) { setPosition(tag.value); }
+        void setTag(RotationTag&& tag) { setRotationMatrix(tag.value); }
+        void setTag(MaterialTag&& tag) { setMaterial(tag.value); }
+        void setTag(TemperatureTag&& tag) { setTemperature(tag.value); }
+
+        // Fallback for unknown tags (like SizeTag in base) -> do nothing
+        template<typename T>
+        static void setTag(T&&) {}
 };
 
-// Templated helper: create child in place with constructor arguments
 template<typename T, typename... Args>
-std::shared_ptr<T> construct(Args&&... args) { // TODO: Should first object be a shared pointer
-    static_assert(std::is_base_of_v<Object, T>,
-                  "construct: T must derive from Object");
-    auto object = std::make_shared<T>();
-    ObjectConstructionContext ctx;
-    (assignObjectArgs(ctx, std::forward<Args>(args)), ...);
+requires ((std::same_as<std::decay_t<Args>, ParentTag> || ...))
+T* construct(Args&&... args) {
+    static_assert(std::derived_from<T, Object>, "T must derive from Object");
 
-    object->setName(ctx.name);
-    object->setPosition(ctx.position);
-    object->setRotationMatrix(ctx.rotation);
-    object->setMaterial(ctx.material);
+    auto object = std::make_unique<T>(std::forward<Args>(args)...);
 
-    // Handle size correctly for all combinations
-    if constexpr (requires(T& obj, const Vector<3>& dimensions) { obj.setSizeFromParameters(dimensions); }) {
-        // Object supports size
-        if (!ctx.size.has_value()) {
-            throw std::runtime_error("Size must be specified for this object type");
+    Object* parent = nullptr;
+    (([&] {
+        if constexpr (std::same_as<std::decay_t<Args>, ParentTag>) {
+            parent = args.parent;
         }
-        object->setSizeFromParameters(*ctx.size);
-    } else {
-        // Object does not support size
-        if (ctx.size.has_value()) {
-            throw std::runtime_error("Size provided but not supported by this object type");
-        }
-    }
-    return object;
+    }()), ...);
+
+    T* ptr = object.get();
+    parent->addChildObject(std::move(object));
+    return ptr;
 }
+
+template<typename T, typename... Args>
+requires (!(std::same_as<std::decay_t<Args>, ParentTag> || ...))
+std::unique_ptr<T> construct(Args&&... args) {
+    static_assert(std::derived_from<T, Object>, "T must derive from Object");
+    return std::make_unique<T>(std::forward<Args>(args)...);
+}
+
 
 #endif //PHYSICS_SIMULATION_PROGRAM_OBJECT_H
