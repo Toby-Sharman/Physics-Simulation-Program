@@ -12,6 +12,7 @@
 
 // Reminder: what includes am I missing? Can I mark any functions nodiscard, noexcept, constexpr, or static?
 
+#include <chrono>
 #include <iomanip>
 #include <iostream>
 #include <memory>
@@ -62,8 +63,8 @@ int main() {
     const auto collection = world->addChild<Box>(
         name("Collection"),
         material("vacuum"),
-        position(Vector<3>({12.5+37.5/2, 0.0, 0.0}, "m")),
-        size(Vector<3>({37.5, 50.0, 50.0}, "m"))
+        position(Vector<3>({25.0/2 + 37.5/2, 0.0, 0.0}, "mm")),
+        size(Vector<3>({37.5, 50.0, 50.0}, "mm"))
         );
     // Print hierarchy
     world->printHierarchy();
@@ -74,21 +75,28 @@ int main() {
     // field.print();
 
     // Particles
-     ParticleSource source;
+    ParticleSource source;
 
-     // Generate 100 photons around a mean position/momentum
-     source.generateParticles(
-         "photon",
-         1000000,
-         Vector<4>({-(5+12.5+37.5/2),0,0,0}, "mm"),
-         Vector<4>({1,1,0,0}, "kg m s^-1"),
-         Vector<4>({1,0,0, 1}) // Right hand circular polarised TODO: Think on units
-     );
+    source.generateParticles(
+        "photon",
+        1e3,
+        Vector<4>({0,-(25.0/2 + 10),0,0}, "mm"),
+        Vector<4>({1,1,0,0}, "kg m s^-1"),
+        Vector<4>({1,0,0, 1}) // Right hand circular polarised TODO: Think on units
+        );
 
-     // Simulation loop
-    while (!particleManager.empty()) { // TODO: NEED to add a check for particles are outside world to delete them
-        stepAll(particleManager.getParticles(), world, collection); // all particles automatically stepped
+
+    const auto start = std::chrono::steady_clock::now();
+
+    // Simulation loop
+    while (!particleManager.empty()) {
+        stepAll(particleManager.getParticles(), world.get(), collection); // all particles automatically stepped
     }
+
+    const auto end = std::chrono::steady_clock::now();
+
+    const auto duration = std::chrono::duration_cast<std::chrono::seconds>(end - start);
+    std::cout << "Elapsed time: " << duration.count() << " seconds\n";
 
     return 0;
 }
