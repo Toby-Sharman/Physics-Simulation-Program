@@ -4,7 +4,7 @@
 // Created by Tobias Sharman on 05/10/2025
 //
 // Description:
-//   - Contains functions for handling binary file databases in my format
+//   - Implementation of base_database.h
 //
 // Copyright (c) 2025, Tobias Sharman
 // Licensed under a Non-Commercial License. See LICENSE file for details

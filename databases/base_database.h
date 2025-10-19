@@ -4,7 +4,8 @@
 // Created by Tobias Sharman on 13/09/2025
 //
 // Description:
-//   - Declaration of the basic database class
+//   - Declaration of the base database class
+//   - Contains functions for handling binary file databases in my format
 //
 // Copyright (c) 2025, Tobias Sharman
 // Licensed under a Non-Commercial License. See LICENSE file for details
