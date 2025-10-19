@@ -13,7 +13,6 @@ class Box final : public Object {
         Vector<3> getSize() const { return this->m_size; };
         void setSize(const Vector<3> &size) { this->m_size = size; };
 
-        void setSizeFromParameters(const Vector<3>& dimensions);
         [[nodiscard]] bool containsPoint(const Vector<3>& worldPoint) const override;
         [[nodiscard]] std::string describeSelf(int indent) const override;
 
@@ -26,7 +25,6 @@ class Box final : public Object {
 
     private:
         Vector<3> m_size;
-        // double bounding_radius_{0.0f};
         void setTag(SizeTag<Vector<3>>&& tag) { setSize(tag.value); }
 
         template<typename T>

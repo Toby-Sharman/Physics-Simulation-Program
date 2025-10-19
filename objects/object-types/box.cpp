@@ -10,11 +10,6 @@
 #include <format>
 #include <cmath>
 
-void Box::setSizeFromParameters(const Vector<3>& dimensions) {
-    m_size = Vector<3>{dimensions[0], dimensions[1], dimensions[2]};
-    // bounding_radius_ = std::sqrt(size_[0]*size_[0] + size_[1]*size_[1] + size_[2]*size_[2])/2.0f;
-}
-
 bool Box::containsPoint(const Vector<3>& worldPoint) const {
 
     auto local = worldToLocal(worldPoint);
