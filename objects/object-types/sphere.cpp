@@ -1,27 +1,34 @@
-// //
-// // Created by Tobias Sharman on 03/09/2025.
-// //
 //
-// #include "Sphere.h"
+// Created by Tobias Sharman on 03/09/2025.
 //
-// #include <iostream>
-// #include <cmath>
-//
-// Sphere::Sphere(const std::string& name) : Object(name, "Sphere") {}
-//
-// void Sphere::set_size_from_params(const Vector<3>& dimensions) {
-//     radius_[0] = dimensions[0];
-//     // bounding_radius_ = radius_[0];
-// }
-//
-// bool Sphere::contains_point(const Vector<3>& world_point) const {
-//     Vector<3> local = world_to_local(world_point);
-//     double dist2 = local[0]*local[0] + local[1]*local[1] + local[2]*local[2];
-//     return dist2 <= radius_[0]*radius_[0];
-// }
-//
-// void Sphere::describe_self(int indent) const {
-//     std::string pad(indent,' ');
-//     std::cout << pad << "Sphere \"" << name_ << "\" radius=" << radius_[0] << "\n";
-// }
-//
+
+#include "sphere.h"
+#include "vector.h"
+
+bool Sphere::containsPoint(const Vector<3>& worldPoint) const {
+
+    const auto local = worldToLocal(worldPoint);
+
+    return local.length() <= this->m_radius;
+}
+
+std::string Sphere::describeSelf(const int indent) const {
+    const std::string pad(indent, ' ');
+    const auto material = m_material.empty() ? "material unknown" : m_material;
+    const auto localPosition = m_transformation.translation;
+    auto worldPositionM = getWorldTransform();
+    auto worldPosition = worldPositionM * Vector<3>({0.0, 0.0, 0.0}, "m");
+
+    auto line = std::format( "{}Box: \"{}\" | Material: {} | Local Pos = ({}, {}, {}) | World Pos = ({}, {}, {})",
+                             pad,
+                             m_name,
+                             material,
+                             localPosition[0].asDouble(), localPosition[1].asDouble(), localPosition[2].asDouble(),
+                             worldPosition[0].asDouble(), worldPosition[1].asDouble(), worldPosition[2].asDouble()
+    );
+
+    line += " " + std::format("| Size = ({})", m_radius.asDouble()) + "\n";
+
+    return line;
+}
+

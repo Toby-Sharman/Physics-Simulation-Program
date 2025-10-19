@@ -1,29 +1,37 @@
-// //
-// // Created by Tobias Sharman on 03/09/2025.
-// //
 //
-// #ifndef PHYSICS_SIMULATION_PROGRAM_SPHERE_H
-// #define PHYSICS_SIMULATION_PROGRAM_SPHERE_H
+// Created by Tobias Sharman on 03/09/2025.
 //
-// #include "Vector.h"
-//
-// #include "Object.h"
-//
-// #include <vector>
-//
-// class Sphere : public Object {
-// public:
-//     Sphere(const std::string& name);
-//
-//     void set_size_from_params(const Vector<3>& dimensions);
-//     virtual bool contains_point(const Vector<3>& world_point) const override;
-//
-// protected:
-//     virtual void describe_self(int indent) const override;
-//
-// private:
-//     Vector<1> m_radius{1.0f};  // Using Vector<1> for consistency
-//     // double bounding_radius_{0.0f};
-// };
-//
-// #endif //PHYSICS_SIMULATION_PROGRAM_SPHERE_H
+
+#ifndef PHYSICS_SIMULATION_PROGRAM_SPHERE_H
+#define PHYSICS_SIMULATION_PROGRAM_SPHERE_H
+
+#include "vector.h"
+
+#include "object.h"
+
+#include <vector>
+
+class Sphere final : public Object {
+    public:
+        Quantity getSize() const { return this->m_radius; };
+        void setSize(const Quantity& size) { this->m_radius = size; };
+
+        [[nodiscard]] bool containsPoint(const Vector<3>& worldPoint) const override;
+        [[nodiscard]] std::string describeSelf(int indent) const override;
+
+
+        template<typename... Args>
+        explicit Sphere(Args&&... args) : Object() {
+            (setTag(std::forward<Args>(args)), ...);
+        }
+
+
+    private:
+        Quantity m_radius;
+        void setTag(SizeTag<Quantity>&& tag) { setSize(tag.value); }
+
+        template<typename T>
+        void setTag(T&& tag) { Object::setTag(std::forward<T>(tag)); }
+};
+
+#endif //PHYSICS_SIMULATION_PROGRAM_SPHERE_H
