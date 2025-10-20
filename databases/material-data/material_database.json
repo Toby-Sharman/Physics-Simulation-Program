@@ -1,12 +1,14 @@
 {
   "vacuum": {
-    "relativePermeability": 1.0
+    "relativePermeability": 1.0,
+    "numberDensity": {"value": 0, "unit": "m^-3"}
   },
   "air": {
     "relativePermeability": 1.00000037
   },
   "glass": {
-    "relativePermeability": 1.05
+    "relativePermeability": 1.05,
+    "numberDensity": {"value": 1e14, "unit": "m^-3"}
   },
   "Rb85": {
     "relativePermeability": 1.0,
