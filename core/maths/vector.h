@@ -169,28 +169,28 @@ struct [[nodiscard]] Vector {
     // Begin method
     //
     // Mutable
-    [[nodiscard]] constexpr Quantity* begin() noexcept {
+    [[nodiscard]] constexpr auto begin() noexcept {
         return data.begin();
     }
 
     // Begin method
     //
     // Read-only
-    [[nodiscard]] constexpr Quantity* begin() const noexcept {
+    [[nodiscard]] constexpr auto begin() const noexcept {
         return data.begin();
     }
 
     // End method
     //
     // Mutable
-    [[nodiscard]] constexpr Quantity* end() noexcept {
+    [[nodiscard]] constexpr auto end() noexcept {
         return data.end();
     }
 
     // End method
     //
     // Read-only
-    [[nodiscard]] constexpr Quantity* end() const noexcept {
+    [[nodiscard]] constexpr auto end() const noexcept {
         return data.end();
     }
 
