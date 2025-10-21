@@ -19,7 +19,7 @@
 #include "particles/particle.h"
 
 double interactionProbability(const Particle& particle, const Vector<3> &displacement,  const std::shared_ptr<Box>& world) {
-    const auto material = world->findObjectContainingPoint(*reinterpret_cast<Vector<3> const*>(&particle.getPosition()[1]))->getMaterial();
+    const auto material = world->findObjectContaining(*reinterpret_cast<Vector<3> const*>(&particle.getPosition()[1]))->getMaterial();
 
     const auto crossSection = Quantity(1e-20, "m^2"); // Placeholder FIXME
 

@@ -14,7 +14,7 @@ Vector<3> getFieldAtPoint(const Vector<3>& point, const std::shared_ptr<Object>&
     if (!root) {
         return globalB;
     }
-    const auto obj = root->findObjectContainingPoint(point);
+    const auto obj = root->findObjectContaining(point);
     if (!obj) {
         return globalB;
     }
