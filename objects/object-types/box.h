@@ -26,7 +26,7 @@ class Box final : public Object {
 
 
     private:
-        Vector<3> m_size;
+        Vector<3> m_size = Vector<3>({0, 0, 0}, "m");
         void setTag(SizeTag<Vector<3>>&& tag) { setSize(tag.value); }
 
         template<typename T>
