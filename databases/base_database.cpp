@@ -11,15 +11,11 @@
 //
 
 #include <algorithm>
-#include <cstdint> // For std::uint_t types ignore warning
 #include <format>
 #include <fstream>
 #include <map>
 #include <ranges>
 #include <stdexcept>
-#include <string>
-#include <variant>
-#include <vector>
 
 #include "databases/base_database.h"
 #include "databases/utilities/binary_file_IO.h"
