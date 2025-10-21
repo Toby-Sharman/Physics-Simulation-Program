@@ -16,8 +16,6 @@
 #include <format>
 #include <stdexcept>
 #include <string>
-#include <string_view>
-#include <utility>
 
 #include "core/maths/utilities/unit_utilities.h"
 
