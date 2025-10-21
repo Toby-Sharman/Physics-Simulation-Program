@@ -29,7 +29,7 @@ class Sphere final : public Object {
 
 
     private:
-        Quantity m_radius;
+        Quantity m_radius = Quantity(0, "m");
         void setTag(SizeTag<Quantity>&& tag) { setSize(tag.value); }
 
         template<typename T>
