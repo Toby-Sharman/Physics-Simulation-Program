@@ -171,7 +171,7 @@ class Object {
         // Prints the tree of objects about the object acting on, i.e. prints self and all descendants in the tree
         //
         // For further down the tree there is a greater indent
-        void printHierarchy(int indent = 0) const;
+        void printHierarchy(std::size_t indent = 0) const;
 
     protected:
         Object* m_parent = nullptr;

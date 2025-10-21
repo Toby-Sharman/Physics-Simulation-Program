@@ -13,6 +13,7 @@
 // TODO: Add a cache for world and inverse world transforms to reduce computations
 
 #include "objects/object.h"
+
 #include "core/maths/matrix.h"
 #include "core/maths/vector.h"
 
@@ -45,7 +46,7 @@
     return nullptr;
 }
 
-void Object::printHierarchy(const int indent) const {
+void Object::printHierarchy(const std::size_t indent) const {
     print(indent);
     for (const auto& child : this->m_children) {
         child->printHierarchy(indent + 2);
