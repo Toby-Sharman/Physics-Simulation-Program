@@ -18,6 +18,7 @@
 #include <stdexcept>
 
 #include "databases/base_database.h"
+
 #include "databases/utilities/binary_file_IO.h"
 
 void BaseDatabase::loadFromBinary(const std::string& filepath) {
