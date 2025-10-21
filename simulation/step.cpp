@@ -14,7 +14,7 @@ void step(std::unique_ptr<Particle>& particle, const Object* world, const Object
 
     auto pos4 = particle->getPosition();
 
-    if (const auto pos3 = *reinterpret_cast<Vector<3> const*>(&pos4[1]); !world->containsPoint(pos3)) {
+    if (const auto pos3 = *reinterpret_cast<Vector<3> const*>(&pos4[1]); !world->contains(pos3)) {
         particle.reset(); // deletes particle
         return;
     }
