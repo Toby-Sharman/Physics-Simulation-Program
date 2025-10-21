@@ -37,8 +37,8 @@
 //
 // Supported overloads / operations and functions / methods:
 //   - Constructor:            Particle()
-//   - Getters:                get_____() (type, symbol, restMass, charge, spin, position, momentum, polarisation)
-//   - Setters:                set_____() (type, symbol, restMass, charge, spin, position, momentum, polarisation)
+//   - Getters:                get_____() (Type, Symbol, RestMass, Charge, Spin, Position, Momentum, Polarisation)
+//   - Setters:                set_____() (Type, Symbol, RestMass, Charge, Spin, Position, Momentum, Polarisation)
 //   - Lorentz factor:         gamma()
 //   - Massless check:         isMassless()
 //   - Printing:               print()
