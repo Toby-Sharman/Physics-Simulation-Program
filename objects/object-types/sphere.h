@@ -16,13 +16,15 @@ class Sphere final : public Object {
         Quantity getSize() const { return this->m_radius; };
         void setSize(const Quantity& size) { this->m_radius = size; };
 
-        [[nodiscard]] bool containsPoint(const Vector<3>& worldPoint) const override;
-        [[nodiscard]] std::string describeSelf(int indent) const override;
+        [[nodiscard]] bool contains(const Vector<3>& worldPoint) const override;
+        void print(std::size_t indent) const override;
 
 
         template<typename... Args>
-        explicit Sphere(Args&&... args) : Object() {
+        explicit Sphere(Args&&... args) {
             (setTag(std::forward<Args>(args)), ...);
+
+            attributeAssignmentCheck<Args...>();
         }
 
 

@@ -10,17 +10,19 @@
 
 class Box final : public Object {
     public:
+
+        template<typename... Args>
+        explicit Box(Args&&... args) {
+            (setTag(std::forward<Args>(args)), ...);
+
+            attributeAssignmentCheck<Args...>();
+        }
+
         Vector<3> getSize() const { return this->m_size; };
         void setSize(const Vector<3> &size) { this->m_size = size; };
 
-        [[nodiscard]] bool containsPoint(const Vector<3>& worldPoint) const override;
-        [[nodiscard]] std::string describeSelf(int indent) const override;
-
-
-        template<typename... Args>
-        explicit Box(Args&&... args) : Object() {
-            (setTag(std::forward<Args>(args)), ...);
-        }
+        [[nodiscard]] bool contains(const Vector<3>& worldPoint) const override;
+        void print(std::size_t indent) const override;
 
 
     private:

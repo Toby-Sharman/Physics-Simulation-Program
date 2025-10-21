@@ -5,30 +5,18 @@
 #include "sphere.h"
 #include "vector.h"
 
-bool Sphere::containsPoint(const Vector<3>& worldPoint) const {
+bool Sphere::contains(const Vector<3>& worldPoint) const {
 
     const auto local = worldToLocal(worldPoint);
 
     return local.length() <= this->m_radius;
 }
 
-std::string Sphere::describeSelf(const int indent) const {
+void Sphere::print(const std::size_t indent) const {
     const std::string pad(indent, ' ');
-    const auto material = m_material.empty() ? "material unknown" : m_material;
     const auto localPosition = m_transformation.translation;
-    auto worldPositionM = getWorldTransform();
-    auto worldPosition = worldPositionM * Vector<3>({0.0, 0.0, 0.0}, "m");
+    const auto worldPosition = getWorldTransformation() * Vector<3>({0.0, 0.0, 0.0}, "m");
 
-    auto line = std::format( "{}Sphere: \"{}\" | Material: {} | Local Pos = ({}, {}, {}) | World Pos = ({}, {}, {})",
-                             pad,
-                             m_name,
-                             material,
-                             localPosition[0].asDouble(), localPosition[1].asDouble(), localPosition[2].asDouble(),
-                             worldPosition[0].asDouble(), worldPosition[1].asDouble(), worldPosition[2].asDouble()
-    );
-
-    line += " " + std::format("| Size = ({})", m_radius.asDouble()) + "\n";
-
-    return line;
+    std::cout << pad << "Box: " << m_name << " | Material: " << m_material << " | Local Position: " << localPosition << " | World Position: " << worldPosition << " | Radius: " << m_radius << std::endl;
 }
 
