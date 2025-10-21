@@ -77,6 +77,7 @@ target_include_directories(Simulation_program PRIVATE
         databases/utilities
         objects
         objects/object-types
+        objects/utilities
         particles
         physics
         physics/fields
