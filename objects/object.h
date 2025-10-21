@@ -10,173 +10,253 @@
 // Licensed under a Non-Commercial License. See LICENSE file for details
 //
 
-// Position and transforms are all about the centre of the above object
-
 #ifndef PHYSICS_SIMULATION_PROGRAM_OBJECT_H
 #define PHYSICS_SIMULATION_PROGRAM_OBJECT_H
+
+#include <concepts>
+#include <cstddef> // For std::size_t ignore warning
+#include <memory>
+#include <stdexcept>
+#include <string>
+#include <type_traits>
+#include <utility>
+#include <vector>
 
 #include "core/maths/matrix.h"
 #include "core/maths/vector.h"
 #include "core/maths/utilities/quantity.h"
+#include "databases/material-data/material_database.h"
+#include "objects/utilities/object_initialisation_tags.h"
 
-#include <iostream>
-#include <memory>
-#include <string>
-#include <vector>
-
-struct ParentTag { class Object* parent; };
-constexpr ParentTag parent(Object* ptr) { return {ptr}; }
-template<typename T>
-constexpr ParentTag parent(const std::unique_ptr<T>& object) requires std::derived_from<T, Object> {
-    return {object.get()};
-}
-template<typename T>
-concept ParentArgument = std::same_as<std::decay_t<T>, ParentTag>;
-
-
-struct NameTag { std::string value; };
-constexpr NameTag name(const std::string& name) { return {name}; }
-template <typename T>
-concept NameArgument = std::same_as<std::decay_t<T>, NameTag>;
-
-struct PositionTag { Vector<3> value; };
-constexpr PositionTag position(const Vector<3>& position) { return {position}; }
-template <typename T>
-concept PositionArgument = std::same_as<std::decay_t<T>, PositionTag>;
-
-struct RotationTag { Matrix<3,3> value; };
-constexpr RotationTag rotation(const Matrix<3,3>& rotation) { return {rotation}; }
-template <typename T>
-concept RotationArgument = std::same_as<std::decay_t<T>, RotationTag>;
-
-template <typename T>
-struct SizeTag { T value; };
-template <typename T>
-constexpr SizeTag<T> size(const T& dimensions) { return {dimensions}; }
-template <typename T>
-concept SizeArgument = requires(T type) { type.value; };
-
-struct MaterialTag { std::string value; };
-constexpr MaterialTag material(const std::string& material) { return {material}; }
-template <typename T>
-concept MaterialArgument = std::same_as<std::decay_t<T>, MaterialTag>;
-
-struct TemperatureTag { Quantity value; };
-constexpr TemperatureTag temperature(const Quantity& temperature) { return {temperature}; }
-template <typename T>
-concept TemperatureArgument = std::same_as<std::decay_t<T>, TemperatureTag>;
-
+// Object
+//
+// Describes the base object class
+//
+// Notes on initialisation:
+//   - Construction is done via a general constructor that calls on all object types
+//   - Construction will return a unique pointer for root objects and for any non-root objects a pointer to the object
+//         -> This is due to ownership differences for a root and non-root object
+//         -> Handling access to objects via pointers helps keep overhead lower so functionality implemented works based
+//            on this
+//   - Usage of addChildObject() is not recommended as it creates less clarity than just specifying the parent in the
+//     construction
+//
+// Notes on algorithms:
+//   - Position and transforms are all about the centre of the parent object
+//         -> As such each rotation and position is defined locally
+//   - Getters return const references as they should not be edited and has slightly less overhead
+//
+// Notes on output:
+//   - Output of a singular object is done print and for the entire system use printHierarchy from the object you want
+//     to print from, i.e. printHierarchy prints object acting on and its children
+//   - printHierarchy adds an ident to indicate that an object is a child of the object above in the printed hierarchy
+//
+// Supported overloads / operations and functions / methods:
+//   - Constructor:            addChild<Object type>(), construct<Object type>()
+//   - Attach child object:    addChildObject()
+//   - Getters:                get_____() (Parent, Children, Name, Position, Rotation, Material, Temperature,
+//                                         NumberDensity, RelativePermeability, LocalTransformation,
+//                                         WorldTransformation)
+//   - Setters:                set_____() (Parent, Name, Position, Rotation, Material, Temperature, NumberDensity,
+//                                         RelativePermeability)
+//   - To world transform:     localToWorld()
+//   - To local transform:     worldToLocal()
+//   - Containment check:      containsPoint()
+//   - Locate point:           findObjectContainingPoint()
+//   - Print:                  print()
+//   - Print hierarchy:        printHierarchy()
+//
+// Example usage: TODO
+//   const auto world = construct<Box>(
+//       name("World"),
+//       material("vacuum"),
+//       size(Vector<3>({100.0, 50.0, 50.0}, "mm"))
+//       );
+//   const auto cell = world->addChild<Box>(
+//       name("Cell"),
+//       material("glass"),
+//       size(Vector<3>({25.0, 15.0, 15.0}, "mm"))
+//       );
+//   const auto vapourCell = cell->addChild<Box>(
+//       name("Vapour Cell"),
+//       material("gas"),
+//       size(Vector<3>({3.0, 3.0, 3.0}, "mm"))
+//       );
+//   const auto collection = world->addChild<Box>(
+//       name("Collection"),
+//       material("vacuum"),
+//       position(Vector<3>({25.0/2 + 37.5/2, 0.0, 0.0}, "mm")),
+//       size(Vector<3>({37.5, 50.0, 50.0}, "mm"))
+//       );
+//   // Print hierarchy
+//   world->printHierarchy();
 class Object {
     public:
         Object() = default;
         virtual ~Object() = default;
 
-        template<typename... Args>
-        explicit Object(Args&&... args) { (setTag(std::forward<Args>(args)), ...); }
-
+        // Constructor for child objects
         template<typename T, typename... Args>
-        friend T* construct(Args&&... args);
-
-        // Getters
-        [[nodiscard]] const Object* parent() const { return this->m_parent; }
-        [[nodiscard]] const std::vector<std::unique_ptr<Object>>& children() const { return this->m_children; }
-
-        [[nodiscard]] const std::string& getName() const { return this->m_name; }
-        [[nodiscard]] Vector<3> getPosition() const { return this->m_transformation.translation; }
-        [[nodiscard]] Matrix<3, 3> getRotationMatrix() const { return this->m_transformation.rotation; }
-        [[nodiscard]] const std::string& getMaterial() const { return this->m_material; }
-        [[nodiscard]] const Quantity& getTemperature() const { return this->m_temperature; }
-
-        [[nodiscard]] TransformationMatrix getLocalTransform() const;
-        [[nodiscard]] TransformationMatrix getWorldTransform() const;
-
-        // Setters
-        void setParent(Object* parent) { this->m_parent = parent; }
-
-        void setName(const std::string& name) { this->m_name = name; }
-        void setPosition(const Vector<3>& position) { this->m_transformation.translation = position; }
-        void setRotationMatrix(const Matrix<3,3>& rotation) { this->m_transformation.rotation = rotation; }
-        void setMaterial(std::string material);
-        void setTemperature(const Quantity& temperature) { this->m_temperature = temperature; }
-
-        // Hierarchy
-        template<typename T, typename... Args>
-        T* addChild(Args&&... args) {
-            static_assert(std::derived_from<T, Object>,
-              "addChild<T>() requires T to derive from Object");
+        [[nodiscard]] T* addChild(Args&&... args) {
+            static_assert(std::derived_from<T, Object>, "The object type must derive from Object");
 
             static_assert(!(std::same_as<std::decay_t<Args>, ParentTag> || ...),
                           "addChild<T>() should not receive a parent tag as its parent is implicitly 'this' (the object being acted on)");
+
             auto object = std::make_unique<T>(std::forward<Args>(args)...);
-            object->m_parent = this;
             T* pointer = object.get();
-            this->m_children.push_back(std::move(object));
+            object->m_parent = this;
+            this->m_children.push_back(std::move(object)); // Transfer ownership
             return pointer;
         }
 
-        void addChildObject(std::unique_ptr<Object> child) {
+        // Attach child object method
+        //
+        // Transfers ownership to parent
+        void addChildObject(std::unique_ptr<Object> child) noexcept {
             child->m_parent = this;
             m_children.push_back(std::move(child));
         }
 
-        Vector<3> localToWorld(const Vector<3>& localPoint) const;
-        Vector<3> worldToLocal(const Vector<3>& worldPoint) const;
+        // Getters
+        [[nodiscard]] constexpr const Object* getParent() const noexcept { return this->m_parent; }
+        [[nodiscard]] constexpr const std::vector<std::unique_ptr<Object>>& getChildren() const noexcept { return this->m_children; }
+        [[nodiscard]] constexpr const std::string& getName() const noexcept { return this->m_name; }
+        [[nodiscard]] constexpr const Vector<3>& getPosition() const noexcept { return this->m_transformation.translation; }
+        [[nodiscard]] constexpr const Matrix<3, 3>& getRotation() const noexcept { return this->m_transformation.rotation; }
+        [[nodiscard]] constexpr const std::string& getMaterial() const noexcept { return this->m_material; }
+        [[nodiscard]] constexpr const Quantity& getTemperature() const noexcept { return this->m_temperature; }
+        [[nodiscard]] constexpr const Quantity& getNumberDensity() const noexcept { return this->m_numberDensity; }
+        [[nodiscard]] constexpr const double& getRelativePermeability() const noexcept { return this->m_relativePermeability; }
+        [[nodiscard]] constexpr TransformationMatrix getLocalTransformation() const noexcept { return this->m_transformation; };
+        [[nodiscard]] TransformationMatrix getWorldTransformation() const noexcept; // Recursive combination of transformations
 
-        Object* findObjectContainingPoint(const Vector<3>& worldPoint);
-        [[nodiscard]] const Object* findObjectContainingPoint(const Vector<3>& worldPoint) const;
+        // Setters
+        constexpr void setParent(Object* parent) noexcept { this->m_parent = parent; }
+        constexpr void setName(std::string name) noexcept { this->m_name = std::move(name); }
+        constexpr void setPosition(const Vector<3>& position) noexcept { this->m_transformation.translation = position; }
+        constexpr void setRotation(const Matrix<3,3>& rotation) noexcept { this->m_transformation.rotation = rotation; }
+        constexpr void setMaterial(std::string material) noexcept { this->m_material = std::move(material); };
+        constexpr void setTemperature(const Quantity temperature) noexcept { this->m_temperature = temperature; }
+        constexpr void setNumberDensity(const Quantity numberDensity) noexcept { this->m_numberDensity = numberDensity; }
+        constexpr void setRelativePermeability(const double relativePermeability) noexcept { this->m_relativePermeability = relativePermeability; }
 
-        [[nodiscard]] virtual std::string describeSelf(int indent) const { return ""; };
+        // To world transform method
+        //
+        // Transform Cartesian coordinates from local space to world space
+        [[nodiscard]] Vector<3> localToWorld(const Vector<3>& localPoint) const noexcept;
+
+        // To local transform method
+        //
+        // Transform Cartesian coordinates from world space to local space method
+        [[nodiscard]] Vector<3> worldToLocal(const Vector<3>& worldPoint) const noexcept;
+
+        // Containment check method
+        //
+        // Check a point is within an object
+        [[nodiscard]] virtual bool contains(const Vector<3>& worldPoint) const = 0;
+
+        // Locate point method
+        //
+        // Locates an object a point is in within the object tree
+        [[nodiscard]] const Object* findObjectContaining(const Vector<3>& worldPoint) const noexcept;
+
+        // Print method
+        //
+        // Prints a single object
+        virtual void print(std::size_t indent) const = 0;
+
+        // Print hierarchy method
+        //
+        // Prints the tree of objects about the object acting on, i.e. prints self and all descendants in the tree
+        //
+        // For further down the tree there is a greater indent
         void printHierarchy(int indent = 0) const;
-
-        // Must be implemented by derived objects
-        [[nodiscard]] virtual bool containsPoint(const Vector<3>& worldPoint) const = 0;
 
     protected:
         Object* m_parent = nullptr;
         std::vector<std::unique_ptr<Object>> m_children;
-        std::string m_name;
-        TransformationMatrix m_transformation;
+        std::string m_name = "Unknown";
+        TransformationMatrix m_transformation; // Has default values from definition of TransformationMatrix
         std::string m_material;
-        Quantity m_temperature = Quantity(293, "K");
+        Quantity m_temperature = Quantity(293, "K"); // Room temperature
+        Quantity m_numberDensity;
+        double m_relativePermeability = 1; // Will be set via construction; this is to supress linters or IDEs
 
         // Tag setters
-        void setTag(ParentTag&& tag) { setParent(tag.parent); }
+        //
+        // Based on the tag used (as described in object_initialisation_tags.h) set the corresponding attribute
+        void setTag(ParentTag&& tag) noexcept { setParent(tag.parent); }
         void setTag(NameTag&& tag) { setName(tag.value); }
         void setTag(PositionTag&& tag) { setPosition(tag.value); }
-        void setTag(RotationTag&& tag) { setRotationMatrix(tag.value); }
+        void setTag(RotationTag&& tag) { setRotation(tag.value); }
         void setTag(MaterialTag&& tag) { setMaterial(tag.value); }
         void setTag(TemperatureTag&& tag) { setTemperature(tag.value); }
+        void setTag(NumberDensityTag&& tag) { setNumberDensity(tag.value); }
+        void setTag(RelativePermeabilityTag&& tag) noexcept { setRelativePermeability(tag.value); }
 
-        // Fallback for unknown tags (like SizeTag in base) -> do nothing
-        template<typename T>
-        static void setTag(T&&) {}
+        // Attribute assignment checker method
+        //
+        // Checks if required fields are assigned
+        template<typename... Args>
+        void attributeAssignmentCheck() {
+            // Check if a material was defined
+            if constexpr ((std::same_as<std::decay_t<Args>, MaterialTag> || ...)) {
+                if (!materialDatabase.contains(m_material)) {
+                    throw std::runtime_error("Material \"" + m_material + "\" is not in the material database.");
+                }
+
+                // If number density wasn't given set from the material database
+                if constexpr (!((std::same_as<std::decay_t<Args>, NumberDensityTag> || ...))) {
+                    setNumberDensity(materialDatabase.getNumberDensity(m_material));
+                }
+
+                // If relative permeability wasn't given set from the material database
+                if constexpr (!((std::same_as<std::decay_t<Args>, RelativePermeabilityTag> || ...))) {
+                    setRelativePermeability(materialDatabase.getRelativePermeability(m_material));
+                }
+            } else {
+                std::string missing;
+
+                // If number density didn't have a way to set
+                if constexpr (!((std::same_as<std::decay_t<Args>, NumberDensityTag> || ...))) {
+                    missing += "NumberDensity ";
+                }
+
+                // If relative permeability didn't have a way to set
+                if constexpr (!((std::same_as<std::decay_t<Args>, RelativePermeabilityTag> || ...))) {
+                    if (!missing.empty()) {
+                        missing += "and ";
+                    }
+                    missing += "RelativePermeability";
+                }
+
+                if (!missing.empty()) {
+                    throw std::invalid_argument("Cannot initialize Object: Missing " + missing + " (no MaterialTag provided).");
+                }
+            }
+        }
 };
 
+// Constructor for root objects
 template<typename T, typename... Args>
-requires ((std::same_as<std::decay_t<Args>, ParentTag> || ...))
-T* construct(Args&&... args) {
-    static_assert(std::derived_from<T, Object>, "T must derive from Object");
-
-    auto object = std::make_unique<T>(std::forward<Args>(args)...);
-
-    Object* parent = nullptr;
-    (([&] {
-        if constexpr (std::same_as<std::decay_t<Args>, ParentTag>) {
-            parent = args.parent;
-        }
-    }()), ...);
-
-    T* ptr = object.get();
-    parent->addChildObject(std::move(object));
-    return ptr;
-}
-
-template<typename T, typename... Args>
-requires (!(std::same_as<std::decay_t<Args>, ParentTag> || ...))
-std::unique_ptr<T> construct(Args&&... args) {
-    static_assert(std::derived_from<T, Object>, "T must derive from Object");
+requires (!(std::same_as<std::decay_t<Args>, ParentTag> || ...)) // For if parent is non-specified create root
+[[nodiscard]] std::unique_ptr<T> construct(Args&&... args) {
+    static_assert(std::derived_from<T, Object>, "The object type must derive from Object");
     return std::make_unique<T>(std::forward<Args>(args)...);
 }
 
+// Constructor for child objects
+template<typename T, typename... Args>
+requires ((std::same_as<std::decay_t<Args>, ParentTag> || ...)) // For is parent is specified create child
+[[nodiscard]] T* construct(Args&&... args) {
+    static_assert(std::derived_from<T, Object>, "The object type must derive from Object");
+
+    auto object = std::make_unique<T>(std::forward<Args>(args)...);
+
+    T* pointer = object.get();
+    object.getParent()->addChildObject(std::move(object)); // Transfer ownership
+    return pointer;
+}
 
 #endif //PHYSICS_SIMULATION_PROGRAM_OBJECT_H
