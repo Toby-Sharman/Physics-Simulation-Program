@@ -85,11 +85,16 @@ defined too.
 
 ## Improvements to make
 
+- Readd templated type for matrices for easier creation of rotation matrices and minor overhead improvement
+  - Will require rework of asMatrix function in TransformationMatrix
 - For transformations between objects add lazy computation
 - For computing displacement vector it will be the same across many particles so lazy computation could be good, have an 
 updating table of values that are keyed by the velocity
 - Bounding radius for quicker computations for contains function
 - Review file opening for writing data
+- Unit printing not be the dimension representation
+- Multithreading
+  - In particular for the stepping of multiple particles
 
 ---
 
