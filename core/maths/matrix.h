@@ -68,7 +68,7 @@ struct [[nodiscard]] Matrix {
     }
 
     // Constructor from a single Quantity (fills entire with that Quantity)
-    explicit Matrix(const Quantity& value) noexcept : data {} {
+    explicit Matrix(const Quantity& value) noexcept : data{} {
         for (std::size_t i = 0; i < Rows; ++i) {
             for (std::size_t j = 0; j < Columns; ++j) {
                 this->data[i][j] = value;
@@ -77,9 +77,9 @@ struct [[nodiscard]] Matrix {
     }
 
     // Constructor from initializer list of initializer lists
-    Matrix(const std::initializer_list<std::initializer_list<Quantity>>& init) : data{} {
+    Matrix(const std::initializer_list<std::initializer_list<Quantity>>& values) : data{} {
         std::size_t i = 0;
-        for (auto& row : init) {
+        for (auto& row : values) {
             std::size_t j = 0;
             for (auto& value : row) {
                 if (i < Rows && j < Columns) {
