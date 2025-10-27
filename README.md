@@ -88,6 +88,7 @@ defined too.
 - Readd templated type for matrices for easier creation of rotation matrices and minor overhead improvement
   - Will require rework of asMatrix function in TransformationMatrix
 - For transformations between objects add lazy computation
+- Add renormalisation for matrices after operations to reduce numerical drift
 - For computing displacement vector it will be the same across many particles so lazy computation could be good, have an 
 updating table of values that are keyed by the velocity
 - Bounding radius for quicker computations for contains function
