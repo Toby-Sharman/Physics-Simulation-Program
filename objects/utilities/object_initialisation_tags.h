@@ -14,7 +14,6 @@
 #define PHYSICS_SIMULATION_PROGRAM_OBJECT_INITIALISATION_TAGS_H
 
 #include <concepts>
-#include <cstddef> // For std::size_t ignore warning
 #include <memory>
 #include <string>
 #include <type_traits>
@@ -22,7 +21,6 @@
 #include "core/maths/matrix.h"
 #include "core/maths/vector.h"
 #include "core/maths/utilities/quantity.h"
-#include "core/maths/utilities/units.h"
 
 // Parent tag
 //
@@ -60,11 +58,6 @@ struct PositionTag {
     Vector<3> value;
 };
 [[nodiscard]] constexpr PositionTag position(const Vector<3>& position) {
-    for (auto positionComponent : position) {
-        if (positionComponent.unit != Unit(1,0,0,0,0,0,0)) {
-            throw std::invalid_argument("Position component must be of length dimensions");
-        }
-    }
     return {position};
 }
 template <typename T>
@@ -77,13 +70,6 @@ struct RotationTag {
     Matrix<3,3> value;
 };
 [[nodiscard]] constexpr RotationTag rotation(const Matrix<3,3>& rotation) {
-    for (std::size_t i = 0; i < 3; i++) {
-        for (std::size_t j = 0; j < 3; j++) {
-            if (rotation[i][j].unit != Unit(0,0,0,0,0,0,0)) {
-                throw std::invalid_argument("Rotation components must be dimensionless");
-            }
-        }
-    }
     return {rotation};
 }
 template <typename T>
@@ -99,11 +85,6 @@ struct SizeTag {
 };
 template <typename T>
 [[nodiscard]] constexpr SizeTag<T> size(const T& dimensions) {
-    for (auto dimension : dimensions) {
-        if (dimension.unit != Unit(1,0,0,0,0,0,0)) {
-            throw std::invalid_argument("Size components must be of length dimensions");
-        }
-    }
     return {dimensions};
 }
 template <typename T>
@@ -128,9 +109,6 @@ struct TemperatureTag {
     Quantity value;
 };
 [[nodiscard]] constexpr TemperatureTag temperature(const Quantity& temperature) {
-    if (temperature.unit != Unit(0,0,0,0,1,0,0)) {
-        throw std::invalid_argument("Temperature must be of temperature dimensions");
-    }
     return {temperature};
 }
 template <typename T>
@@ -143,9 +121,6 @@ struct NumberDensityTag {
     Quantity value;
 };
 [[nodiscard]] constexpr NumberDensityTag numberDensity(const Quantity& numberDensity) {
-    if (numberDensity.unit != Unit(-3,0,0,0,0,0,0)) {
-        throw std::invalid_argument("Number Density must be of length^-3 dimensions");
-    }
     return {numberDensity};
 }
 template <typename T>

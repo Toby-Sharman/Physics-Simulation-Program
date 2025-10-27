@@ -16,6 +16,7 @@
 
 #include "core/maths/matrix.h"
 #include "core/maths/vector.h"
+#include "core/maths/utilities/units.h"
 
 // Generates the transformation from a local space to world space by recursively applying transformation matrices of all
 // the parents of the specified child
@@ -24,9 +25,40 @@
         return this->m_parent->getWorldTransformation() * this->m_transformation;
     }
     return getLocalTransformation();
+void Object::setPosition(const Vector<3> &position) {
+    for (auto positionComponent : position) {
+        if (positionComponent.unit != Unit(1,0,0,0,0,0,0)) {
+            throw std::invalid_argument("Position component must be of length dimensions");
+        }
+    }
+    this->m_transformation.translation = position;
 }
 
 [[nodiscard]] Vector<3> Object::localToWorld(const Vector<3>& localPoint) const noexcept {
+void Object::setRotation(const Matrix<3, 3> &rotation) {
+    for (std::size_t i = 0; i < 3; i++) {
+        for (std::size_t j = 0; j < 3; j++) {
+            if (rotation[i][j].unit != Unit(0,0,0,0,0,0,0)) {
+                throw std::invalid_argument("Rotation components must be dimensionless");
+            }
+        }
+    }
+    this->m_transformation.rotation = rotation;
+}
+
+void Object::setTemperature(const Quantity temperature) {
+    if (temperature.unit != Unit(0,0,0,0,1,0,0)) {
+        throw std::invalid_argument("Temperature must be of temperature dimensions");
+    }
+    this->m_temperature = temperature;
+}
+
+void Object::setNumberDensity(const Quantity numberDensity) {
+    if (numberDensity.unit != Unit(-3,0,0,0,0,0,0)) {
+        throw std::invalid_argument("Number Density must be of length^-3 dimensions");
+    }
+    this->m_numberDensity = numberDensity;
+}
     return getWorldTransformation() * localPoint;
 }
 

@@ -128,17 +128,17 @@ class Object {
         [[nodiscard]] constexpr const Quantity& getTemperature() const noexcept { return this->m_temperature; }
         [[nodiscard]] constexpr const Quantity& getNumberDensity() const noexcept { return this->m_numberDensity; }
         [[nodiscard]] constexpr const double& getRelativePermeability() const noexcept { return this->m_relativePermeability; }
-        [[nodiscard]] constexpr TransformationMatrix getLocalTransformation() const noexcept { return this->m_transformation; };
+        [[nodiscard]] constexpr TransformationMatrix getLocalTransformation() const noexcept { return this->m_transformation; }
         [[nodiscard]] TransformationMatrix getWorldTransformation() const noexcept; // Recursive combination of transformations
 
         // Setters
         constexpr void setParent(Object* parent) noexcept { this->m_parent = parent; }
         constexpr void setName(std::string name) noexcept { this->m_name = std::move(name); }
-        constexpr void setPosition(const Vector<3>& position) noexcept { this->m_transformation.translation = position; }
-        constexpr void setRotation(const Matrix<3,3>& rotation) noexcept { this->m_transformation.rotation = rotation; }
-        constexpr void setMaterial(std::string material) noexcept { this->m_material = std::move(material); };
-        constexpr void setTemperature(const Quantity temperature) noexcept { this->m_temperature = temperature; }
-        constexpr void setNumberDensity(const Quantity numberDensity) noexcept { this->m_numberDensity = numberDensity; }
+        void setPosition(const Vector<3>& position);
+        void setRotation(const Matrix<3,3>& rotation);
+        constexpr void setMaterial(std::string material) noexcept { this->m_material = std::move(material); }
+        void setTemperature(Quantity temperature);
+        void setNumberDensity(Quantity numberDensity);
         constexpr void setRelativePermeability(const double relativePermeability) noexcept { this->m_relativePermeability = relativePermeability; }
 
         // To world transform method
