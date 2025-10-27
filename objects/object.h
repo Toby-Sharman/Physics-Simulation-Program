@@ -124,6 +124,7 @@ class Object {
         [[nodiscard]] constexpr const std::string& getName() const noexcept { return this->m_name; }
         [[nodiscard]] constexpr const Vector<3>& getPosition() const noexcept { return this->m_transformation.translation; }
         [[nodiscard]] constexpr const Matrix<3, 3>& getRotation() const noexcept { return this->m_transformation.rotation; }
+        // Must implement getSize() but hard to enforce with the variant input type
         [[nodiscard]] constexpr const std::string& getMaterial() const noexcept { return this->m_material; }
         [[nodiscard]] constexpr const Quantity& getTemperature() const noexcept { return this->m_temperature; }
         [[nodiscard]] constexpr const Quantity& getNumberDensity() const noexcept { return this->m_numberDensity; }
@@ -136,6 +137,7 @@ class Object {
         constexpr void setName(std::string name) noexcept { this->m_name = std::move(name); }
         void setPosition(const Vector<3>& position);
         void setRotation(const Matrix<3,3>& rotation);
+        // Must implement setSize() but hard to enforce with the variant input type
         constexpr void setMaterial(std::string material) noexcept { this->m_material = std::move(material); }
         void setTemperature(Quantity temperature);
         void setNumberDensity(Quantity numberDensity);
