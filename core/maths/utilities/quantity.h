@@ -55,6 +55,7 @@
 //   - Exponentiation:         raisedTo(n)
 //   - Printing:               print()
 //   - Stream output:          operator<<
+//   - Unary negation:         operator-
 //
 // Example usage:
 //   Unit meter(1, 0, 0, 0, 0, 0, 0);
@@ -276,6 +277,11 @@ struct [[nodiscard]] Quantity {
 inline std::ostream& operator<<(std::ostream& outputStream, const Quantity& quantity) {
     outputStream << quantity.value << " " << quantity.unit.toString();
     return outputStream;
+}
+
+// Unitary negation operator
+inline Quantity operator-(const Quantity& q) {
+    return {-q.value, q.unit};
 }
 
 // Multiplication operator
