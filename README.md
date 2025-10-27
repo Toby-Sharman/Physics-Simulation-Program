@@ -89,6 +89,7 @@ defined too.
   - Will require rework of asMatrix function in TransformationMatrix
 - For transformations between objects add lazy computation
 - Add renormalisation for matrices after operations to reduce numerical drift
+- Add unit checks for all functions
 - For computing displacement vector it will be the same across many particles so lazy computation could be good, have an 
 updating table of values that are keyed by the velocity
 - Bounding radius for quicker computations for contains function
