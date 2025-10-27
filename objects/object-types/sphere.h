@@ -14,7 +14,7 @@
 class Sphere final : public Object {
     public:
         Quantity getSize() const { return this->m_radius; };
-        void setSize(const Quantity& size) { this->m_radius = size; };
+        void setSize(const Quantity& radius);
 
         [[nodiscard]] bool contains(const Vector<3>& worldPoint) const override;
         void print(std::size_t indent) const override;

@@ -10,9 +10,18 @@
 #include <format>
 #include <cmath>
 
+void Box::setSize(const Vector<3> &size) {
+    for (auto dimension : size) {
+        if (dimension.unit != Unit(1,0,0,0,0,0,0)) {
+            throw std::invalid_argument("Size components must be of length dimensions");
+        }
+    }
+    this->m_size = size;
+}
+
 bool Box::contains(const Vector<3>& worldPoint) const {
 
-    auto local = worldToLocal(worldPoint);
+    auto local = worldToLocalPoint(worldPoint);
 
     return local[0].abs() <= this->m_size[0]/2 &&
            local[1].abs() <= this->m_size[1]/2 &&

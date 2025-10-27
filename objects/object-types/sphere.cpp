@@ -5,9 +5,16 @@
 #include "sphere.h"
 #include "vector.h"
 
+void Sphere::setSize(const Quantity& radius) {
+    if (radius.unit != Unit(1,0,0,0,0,0,0)) {
+        throw std::invalid_argument("Size components must be of length dimensions");
+    }
+    this->m_radius = radius;
+}
+
 bool Sphere::contains(const Vector<3>& worldPoint) const {
 
-    const auto local = worldToLocal(worldPoint);
+    const auto local = worldToLocalPoint(worldPoint);
 
     return local.length() <= this->m_radius;
 }

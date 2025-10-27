@@ -19,7 +19,7 @@ class Box final : public Object {
         }
 
         Vector<3> getSize() const { return this->m_size; };
-        void setSize(const Vector<3> &size) { this->m_size = size; };
+        void setSize(const Vector<3> &size);
 
         [[nodiscard]] bool contains(const Vector<3>& worldPoint) const override;
         void print(std::size_t indent) const override;
