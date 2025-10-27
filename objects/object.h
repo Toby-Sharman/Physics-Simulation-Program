@@ -144,12 +144,22 @@ class Object {
         // To world transform method
         //
         // Transform Cartesian coordinates from local space to world space
-        [[nodiscard]] Vector<3> localToWorld(const Vector<3>& localPoint) const noexcept;
+        [[nodiscard]] Vector<3> localToWorldPoint(const Vector<3>& localPoint) const noexcept;
+
+        // To world transform method
+        //
+        // Transform Cartesian direction from local space to world space
+        [[nodiscard]] Vector<3> localToWorldDirection(const Vector<3>& localDirection) const noexcept;
 
         // To local transform method
         //
         // Transform Cartesian coordinates from world space to local space method
-        [[nodiscard]] Vector<3> worldToLocal(const Vector<3>& worldPoint) const noexcept;
+        [[nodiscard]] Vector<3> worldToLocalPoint(const Vector<3>& worldPoint) const noexcept;
+
+        // To local transform method
+        //
+        // Transform Cartesian direction from world space to local space method
+        [[nodiscard]] Vector<3> worldToLocalDirection(const Vector<3>& worldDirection) const noexcept;
 
         // Containment check method
         //

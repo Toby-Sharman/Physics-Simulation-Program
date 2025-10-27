@@ -18,13 +18,13 @@
 #include "core/maths/vector.h"
 #include "core/maths/utilities/units.h"
 
-// Generates the transformation from a local space to world space by recursively applying transformation matrices of all
-// the parents of the specified child
 [[nodiscard]] TransformationMatrix Object::getWorldTransformation() const noexcept{
     if (this->m_parent) {
         return this->m_parent->getWorldTransformation() * this->m_transformation;
     }
     return getLocalTransformation();
+}
+
 void Object::setPosition(const Vector<3> &position) {
     for (auto positionComponent : position) {
         if (positionComponent.unit != Unit(1,0,0,0,0,0,0)) {
@@ -34,7 +34,6 @@ void Object::setPosition(const Vector<3> &position) {
     this->m_transformation.translation = position;
 }
 
-[[nodiscard]] Vector<3> Object::localToWorld(const Vector<3>& localPoint) const noexcept {
 void Object::setRotation(const Matrix<3, 3> &rotation) {
     for (std::size_t i = 0; i < 3; i++) {
         for (std::size_t j = 0; j < 3; j++) {
@@ -59,11 +58,21 @@ void Object::setNumberDensity(const Quantity numberDensity) {
     }
     this->m_numberDensity = numberDensity;
 }
+
+[[nodiscard]] Vector<3> Object::localToWorldPoint(const Vector<3>& localPoint) const noexcept {
     return getWorldTransformation() * localPoint;
 }
 
-[[nodiscard]] Vector<3> Object::worldToLocal(const Vector<3>& worldPoint) const noexcept {
+[[nodiscard]] Vector<3> Object::localToWorldDirection(const Vector<3> &localDirection) const noexcept {
+    return getWorldTransformation().rotation * localDirection;
+}
+
+[[nodiscard]] Vector<3> Object::worldToLocalPoint(const Vector<3>& worldPoint) const noexcept {
     return getWorldTransformation().inverse() * worldPoint;
+}
+
+[[nodiscard]] Vector<3> Object::worldToLocalDirection(const Vector<3> &worldDirection) const noexcept {
+    return getWorldTransformation().rotation.transpose() * worldDirection;
 }
 
 [[nodiscard]] const Object* Object::findObjectContaining(const Vector<3>& worldPoint) const noexcept {
