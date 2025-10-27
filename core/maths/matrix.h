@@ -45,6 +45,7 @@
 //   - Subscript:              operator[]
 //   - Multiplication:         operator* (matrix * vector, matrix * matrix)
 //   - Identity:               Matrix<rows, columns>::identity()
+//   - Transpose:              transpose()
 //   - Inverse:                inverse()
 //   - Stream output:          operator<<
 //
@@ -145,6 +146,17 @@ struct [[nodiscard]] Matrix {
             identityMatrix[i][i] = Quantity(1.0); // dimensionless Quantity types with value 1.0
         }
         return identityMatrix;
+    }
+
+    // Matrix transposition method
+    [[nodiscard]] constexpr Matrix<Columns, Rows> transpose() const noexcept {
+        Matrix<Columns, Rows> result;
+        for (std::size_t i = 0; i < Rows; ++i) {
+            for (std::size_t j = 0; j < Columns; ++j) {
+                result[j][i] = this->data[i][j];
+            }
+        }
+        return result;
     }
 
     // Matrix inversion method
