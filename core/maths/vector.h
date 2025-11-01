@@ -386,9 +386,19 @@ template <std::size_t N>std::ostream& operator<<(std::ostream& outputStream, con
 }
 
 // Multiplication operator
+//
+// double * Vector
 template <std::size_t N>
 [[nodiscard]] constexpr Vector<N> operator*(double scalar, const Vector<N>& vector) noexcept {
     return vector * scalar;
+}
+
+// Multiplication operator
+//
+// Quantity * Vector
+template <std::size_t N>
+[[nodiscard]] constexpr Vector<N> operator*(Quantity quantity, const Vector<N>& vector) noexcept {
+    return vector * quantity;
 }
 
 // Dot product method
