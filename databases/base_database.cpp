@@ -10,14 +10,14 @@
 // Licensed under a Non-Commercial License. See LICENSE file for details
 //
 
+#include "databases/base_database.h"
+
 #include <algorithm>
 #include <format>
 #include <fstream>
 #include <map>
 #include <ranges>
 #include <stdexcept>
-
-#include "databases/base_database.h"
 
 #include "databases/utilities/binary_file_IO.h"
 
