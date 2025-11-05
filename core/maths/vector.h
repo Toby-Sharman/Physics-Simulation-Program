@@ -128,14 +128,32 @@ struct [[nodiscard]] Vector {
         static_assert(sizeof...(Args) == N, "Number of arguments must match Vector size");
     }
 
-    // Constructor from array of values and optional shared unit
+    // Constructor from array of values and optional shared unit in Unit format
+    constexpr explicit Vector(const std::array<double, N>& values, const Unit& unit = Unit::dimensionless()) : data{} {
+        for (std::size_t i = 0; i < N; i++) {
+            this->data[i] = Quantity{values[i], unit};
+        }
+    }
+
+    // Constructor from array of values and optional shared unit in string format
     constexpr explicit Vector(const std::array<double, N>& values, const std::string& unit = "") : data{} {
         for (std::size_t i = 0; i < N; i++) {
             this->data[i] = Quantity{values[i], unit};
         }
     }
 
-    // Constructor from initializer list of values and optional shared unit
+    // Constructor from initializer list of values and optional shared unit in Unit format
+    Vector(const std::initializer_list<double>& values, const Unit& unit = Unit::dimensionless()) : data{} {
+        if (values.size() != N) {
+            throw std::invalid_argument("initializer_list size must match vector size");
+        }
+        std::size_t i = 0;
+        for (const double value : values) {
+            this->data[i++] = Quantity{value, unit};
+        }
+    }
+
+    // Constructor from initializer list of values and optional shared unit in string format
     Vector(const std::initializer_list<double>& values, const std::string& unit = "") : data{} {
         if (values.size() != N) {
             throw std::invalid_argument("initializer_list size must match vector size");
