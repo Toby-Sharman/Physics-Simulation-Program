@@ -43,6 +43,10 @@ struct ParticleDatabase final : BaseDatabase {
     [[nodiscard]] std::string getParticleType(const std::string& particle) const {
         return getStringProperty(particle, "particle type");
     }
+
+    [[nodiscard]] Quantity getLifetime(const std::string& particle) const {
+        return getQuantityProperty(particle, "lifetime");
+    }
 };
 
 // Create a reusable instance of the particle database

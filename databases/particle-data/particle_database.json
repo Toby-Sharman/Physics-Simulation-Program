@@ -4,91 +4,104 @@
     "rest mass": { "value": 0.0, "unit": "eV/c^2" },
     "charge": 0.0,
     "spin": 1.0,
-    "particle type": "boson"
+    "particle type": "boson",
+    "lifetime": { "value": 0.0, "unit": "s" }
   },
   "gluon": {
     "symbol": "g",
     "rest mass": { "value": 0.0, "unit": "eV/c^2" },
     "charge": 0.0,
     "spin": 1.0,
-    "particle type": "boson"
+    "particle type": "boson",
+    "lifetime": { "value": 0.0, "unit": "s" }
   },
   "W+": {
     "symbol": "W+",
     "rest mass": { "value": 80.3692e9, "unit": "eV/c^2" },
     "charge": 1.0,
     "spin": 1.0,
-    "particle type": "boson"
+    "particle type": "boson",
+    "lifetime": { "value": 3.0e-25, "unit": "s" }
   },
   "W-": {
     "symbol": "W-",
     "rest mass": { "value": 80.3692e9, "unit": "eV/c^2" },
     "charge": -1.0,
     "spin": 1.0,
-    "particle type": "boson"
+    "particle type": "boson",
+    "lifetime": { "value": 3.0e-25, "unit": "s" }
   },
   "Z": {
     "symbol": "Z0",
     "rest mass": { "value": 91.1880e9, "unit": "eV/c^2" },
     "charge": 0.0,
     "spin": 1.0,
-    "particle type": "boson"
+    "particle type": "boson",
+    "lifetime": { "value": 3.0e-25, "unit": "s" }
   },
   "electron": {
     "symbol": "e-",
     "rest mass": { "value": 548.579909065e-6, "unit": "u" },
     "charge": -1.0,
     "spin": 0.5,
-    "particle type": "lepton"
+    "particle type": "lepton",
+    "lifetime": { "value": 0.0, "unit": "s" }
   },
   "muon": {
     "symbol": "μ-",
     "rest mass": { "value": 0.1134289259 , "unit": "u" },
     "charge": -1.0,
     "spin": 0.5,
-    "particle type": "lepton"
+    "particle type": "lepton",
+    "lifetime": { "value": 2.1969811e-6, "unit": "s" }
   },
   "tau": {
     "symbol": "τ-",
     "rest mass": { "value": 1776.93e6, "unit": "eV/c^2" },
     "charge": -1.0,
     "spin": 0.5,
-    "particle type": "lepton"
+    "particle type": "lepton",
+    "lifetime": { "value": 2.903e-13, "unit": "s" }
   },
   "electron neutrino": {
     "symbol": "ν_e",
     "rest mass": { "value": 0.0, "unit": "eV/c^2" },
     "charge": 0.0,
     "spin": 0.5,
-    "particle type": "lepton"
+    "particle type": "lepton",
+    "lifetime": { "value": 0.0, "unit": "s" }
   },
   "muon neutrino": {
     "symbol": "ν_μ",
     "rest mass": { "value": 0.0, "unit": "eV/c^2" },
     "charge": 0.0,
     "spin": 0.5,
-    "particle type": "lepton"
+    "particle type": "lepton",
+    "lifetime": { "value": 0.0, "unit": "s" }
   },
   "tau neutrino": {
     "symbol": "ν_τ",
     "rest mass": { "value": 0.0, "unit": "eV/c^2" },
     "charge": 0.0,
     "spin": 0.5,
-    "particle type": "lepton"
+    "particle type": "lepton",
+    "lifetime": { "value": 0.0, "unit": "s" }
   },
   "proton": {
     "symbol": "p",
     "rest mass": { "value": 1.007276466621, "unit": "u" },
     "charge": 1.0,
     "spin": 0.5,
-    "particle type": "baryon"
+    "particle type": "baryon",
+    "lifetime": { "value": 0.0, "unit": "s" }
   },
   "neutron": {
     "symbol": "n",
     "rest mass": { "value": 1.00866491595, "unit": "u" },
     "charge": 0.0,
     "spin": 0.5,
-    "particle type": "baryon"
+    "particle type": "baryon",
+    "lifetime": { "value": 880.2, "unit": "s" }
   },
   "Rb85": {
     "nuclearSpin": 2.5,
@@ -135,6 +148,7 @@
     "rest mass": { "value": 1, "unit": "u" },
     "charge": 0.0,
     "spin": 0.5,
-    "particle type": "baryon"
+    "particle type": "baryon",
+    "lifetime": { "value": 27e-9, "unit": "s" }
   }
 }
