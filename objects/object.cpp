@@ -10,8 +10,6 @@
 // Licensed under a Non-Commercial License. See LICENSE file for details
 //
 
-// TODO: Add a cache for world and inverse world transforms to reduce computations
-
 #include "objects/object.h"
 
 #include "core/maths/matrix.h"
@@ -34,7 +32,7 @@ void Object::setPosition(const Vector<3> &position) {
     this->m_transformation.translation = position;
 }
 
-void Object::setRotation(const Matrix<3, 3> &rotation) {
+void Object::setRotation(const Matrix<3,3> &rotation) {
     for (std::size_t i = 0; i < 3; i++) {
         for (std::size_t j = 0; j < 3; j++) {
             if (rotation[i][j].unit != Unit(0,0,0,0,0,0,0)) {
@@ -63,12 +61,12 @@ void Object::setNumberDensity(const Quantity numberDensity) {
     return getWorldTransformation() * localPoint;
 }
 
-[[nodiscard]] Vector<3> Object::localToWorldDirection(const Vector<3> &localDirection) const noexcept {
-    return getWorldTransformation().rotation * localDirection;
-}
-
 [[nodiscard]] Vector<3> Object::worldToLocalPoint(const Vector<3>& worldPoint) const noexcept {
     return getWorldTransformation().inverse() * worldPoint;
+}
+
+[[nodiscard]] Vector<3> Object::localToWorldDirection(const Vector<3> &localDirection) const noexcept {
+    return getWorldTransformation().rotation * localDirection;
 }
 
 [[nodiscard]] Vector<3> Object::worldToLocalDirection(const Vector<3> &worldDirection) const noexcept {
@@ -85,6 +83,13 @@ void Object::setNumberDensity(const Quantity numberDensity) {
         return this;
     }
     return nullptr;
+}
+
+Vector<3> Object::worldIntersection(const Vector<3>& startWorldPoint, const Vector<3>& worldDisplacement) const {
+    const auto localStart = worldToLocalPoint(startWorldPoint);
+    const auto localDisplacement = worldToLocalDirection(worldDisplacement);
+    const auto intersectionLocal = localIntersection(localStart, localDisplacement);
+    return localToWorldPoint(intersectionLocal);
 }
 
 void Object::printHierarchy(const std::size_t indent) const {

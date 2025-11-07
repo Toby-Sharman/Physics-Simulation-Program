@@ -59,10 +59,13 @@
 //                                         WorldTransformation)
 //   - Setters:                set_____() (Parent, Name, Position, Rotation, Material, Temperature, NumberDensity,
 //                                         RelativePermeability)
-//   - To world transform:     localToWorld()
-//   - To local transform:     worldToLocal()
+//   - To world transform:     localToWorldPoint(), localToWorldDirection()
+//   - To local transform:     worldToLocalPoint(), worldToLocalDirection()
+//   - Volumeless check:       isVolumeless()
 //   - Containment check:      containsPoint()
 //   - Locate point:           findObjectContainingPoint()
+//   - Compute intersection:   localIntersection(), worldIntersection()
+//   - Compute normal:         localNormal()
 //   - Print:                  print()
 //   - Print hierarchy:        printHierarchy()
 //
@@ -95,6 +98,8 @@ class Object {
         Object() = default;
         virtual ~Object() = default;
 
+        // See below class for some constructors
+
         // Constructor for child objects
         template<typename T, typename... Args>
         [[nodiscard]] T* addChild(Args&&... args) {
@@ -123,8 +128,8 @@ class Object {
         [[nodiscard]] constexpr const std::vector<std::unique_ptr<Object>>& getChildren() const noexcept { return this->m_children; }
         [[nodiscard]] constexpr const std::string& getName() const noexcept { return this->m_name; }
         [[nodiscard]] constexpr const Vector<3>& getPosition() const noexcept { return this->m_transformation.translation; }
-        [[nodiscard]] constexpr const Matrix<3, 3>& getRotation() const noexcept { return this->m_transformation.rotation; }
-        // Must implement getSize() but hard to enforce with the variant input type
+        [[nodiscard]] constexpr const Matrix<3,3>& getRotation() const noexcept { return this->m_transformation.rotation; }
+        // Must implement getSize() but hard to enforce with the variant input type to the best of my ability
         [[nodiscard]] constexpr const std::string& getMaterial() const noexcept { return this->m_material; }
         [[nodiscard]] constexpr const Quantity& getTemperature() const noexcept { return this->m_temperature; }
         [[nodiscard]] constexpr const Quantity& getNumberDensity() const noexcept { return this->m_numberDensity; }
@@ -135,18 +140,23 @@ class Object {
         // Setters
         constexpr void setParent(Object* parent) noexcept { this->m_parent = parent; }
         constexpr void setName(std::string name) noexcept { this->m_name = std::move(name); }
-        void setPosition(const Vector<3>& position);
-        void setRotation(const Matrix<3,3>& rotation);
-        // Must implement setSize() but hard to enforce with the variant input type
+        void setPosition(const Vector<3>& position); // Dimension enforcement
+        void setRotation(const Matrix<3,3>& rotation); // Dimension enforcement
+        // Must implement setSize() but hard to enforce with the variant input type to the best of my ability
         constexpr void setMaterial(std::string material) noexcept { this->m_material = std::move(material); }
-        void setTemperature(Quantity temperature);
-        void setNumberDensity(Quantity numberDensity);
+        void setTemperature(Quantity temperature); // Dimension enforcement
+        void setNumberDensity(Quantity numberDensity); // Dimension enforcement
         constexpr void setRelativePermeability(const double relativePermeability) noexcept { this->m_relativePermeability = relativePermeability; }
 
         // To world transform method
         //
         // Transform Cartesian coordinates from local space to world space
         [[nodiscard]] Vector<3> localToWorldPoint(const Vector<3>& localPoint) const noexcept;
+
+        // To local transform method
+        //
+        // Transform Cartesian coordinates from world space to local space method
+        [[nodiscard]] Vector<3> worldToLocalPoint(const Vector<3>& worldPoint) const noexcept;
 
         // To world transform method
         //
@@ -155,13 +165,13 @@ class Object {
 
         // To local transform method
         //
-        // Transform Cartesian coordinates from world space to local space method
-        [[nodiscard]] Vector<3> worldToLocalPoint(const Vector<3>& worldPoint) const noexcept;
-
-        // To local transform method
-        //
         // Transform Cartesian direction from world space to local space method
         [[nodiscard]] Vector<3> worldToLocalDirection(const Vector<3>& worldDirection) const noexcept;
+
+        // No volume check method
+        //
+        // Check whether an object has no volume; used to short-circuit containment
+        [[nodiscard]] virtual bool isVolumeless() const noexcept = 0;
 
         // Containment check method
         //
@@ -172,6 +182,21 @@ class Object {
         //
         // Locates an object a point is in within the object tree
         [[nodiscard]] const Object* findObjectContaining(const Vector<3>& worldPoint) const noexcept;
+
+        // Local intersection method
+        //
+        // Compute an intersection in local coordinates given a start point and displacement
+        [[nodiscard]] virtual Vector<3> localIntersection(const Vector<3>& startLocalPoint, const Vector<3>& localDisplacement) const = 0;
+
+        // World intersection method
+        //
+        // Compute an intersection in world coordinates given a start point and displacement
+        [[nodiscard]] Vector<3> worldIntersection(const Vector<3>& startWorldPoint, const Vector<3>& worldDisplacement) const;
+
+        // Local normal method
+        //
+        // Compute a normal in local coordinates at a specified coordinate
+        [[nodiscard]] virtual Vector<3> localNormal(const Vector<3>& localPoint) const = 0;
 
         // Print method
         //
@@ -191,7 +216,7 @@ class Object {
         std::string m_name = "Unknown";
         TransformationMatrix m_transformation; // Has default values from definition of TransformationMatrix
         std::string m_material = "Unknown";
-        Quantity m_temperature = Quantity(293, "K"); // Room temperature
+        Quantity m_temperature = Quantity(293, Unit(0,0,0,0,1,0,0)); // Room temperature
         Quantity m_numberDensity;
         double m_relativePermeability = 1; // Will be set via construction; this is to supress linters or IDEs
 
