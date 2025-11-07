@@ -43,6 +43,7 @@
 
 #include <cstdint> // For std::uint_t types ignore warning
 #include <fstream>
+#include <format>
 #include <iostream>
 #include <map>
 #include <stdexcept>
@@ -77,7 +78,10 @@ using Json = nlohmann::json;
     if (value.is_string()) {
         return PropertyType::STRING;
     }
-    throw std::runtime_error("Unsupported property type");
+    throw std::runtime_error(std::format(
+        "Unsupported property type '{}'",
+        value.type_name()
+    ));
 }
 
 int main(int argc, char** argv) {

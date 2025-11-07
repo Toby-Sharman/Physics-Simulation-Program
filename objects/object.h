@@ -15,9 +15,11 @@
 
 #include <concepts>
 #include <cstddef> // For std::size_t ignore warning
+#include <format>
 #include <memory>
 #include <stdexcept>
 #include <string>
+#include <string_view>
 #include <type_traits>
 #include <utility>
 #include <vector>
@@ -240,7 +242,11 @@ class Object {
             // Check if a material was defined
             if constexpr ((std::same_as<std::decay_t<Args>, MaterialTag> || ...)) {
                 if (!materialDatabase.contains(m_material)) {
-                    throw std::runtime_error("Material \"" + m_material + "\" is not in the material database.");
+                    throw std::runtime_error(std::format(
+                        "Object '{}' references unknown material '{}' in the material database",
+                        m_name,
+                        m_material
+                    ));
                 }
 
                 // If number density wasn't given set from the material database
@@ -254,22 +260,29 @@ class Object {
                 }
             } else {
                 std::string missing;
+                const auto appendMissing = [&](const std::string_view field) {
+                    if (!missing.empty()) {
+                        missing += " and ";
+                    }
+                    missing += field;
+                };
 
                 // If number density didn't have a way to set
                 if constexpr (!((std::same_as<std::decay_t<Args>, NumberDensityTag> || ...))) {
-                    missing += "NumberDensity ";
+                    appendMissing("NumberDensity");
                 }
 
                 // If relative permeability didn't have a way to set
                 if constexpr (!((std::same_as<std::decay_t<Args>, RelativePermeabilityTag> || ...))) {
-                    if (!missing.empty()) {
-                        missing += "and ";
-                    }
-                    missing += "RelativePermeability";
+                    appendMissing("RelativePermeability");
                 }
 
                 if (!missing.empty()) {
-                    throw std::invalid_argument("Cannot initialize Object: Missing " + missing + " (no MaterialTag provided).");
+                    throw std::invalid_argument(std::format(
+                        "Cannot initialize object '{}' because required attributes ({}) were not provided and no MaterialTag overrides them",
+                        m_name,
+                        missing
+                    ));
                 }
             }
         }

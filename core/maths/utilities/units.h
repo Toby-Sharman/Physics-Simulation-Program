@@ -15,6 +15,7 @@
 
 #include <array>
 #include <cmath>
+#include <sstream>
 #include <string>
 #include <string_view>
 #include <unordered_map>
@@ -217,9 +218,13 @@ struct [[nodiscard]] Unit {
     // Raises a Unit to any real power and throws an error if the resultant exponent is non-integer
     [[nodiscard]] Unit raisedTo(const double power) const {
         Unit result = {0, 0, 0, 0, 0, 0, 0};
-        for (std::size_t i = 0; i < 7; ++i) { const double newExponent = static_cast<double>(exponents[i]) * power;
+        for (std::size_t i = 0; i < 7; ++i) {
+            const double newExponent = static_cast<double>(exponents[i]) * power;
             if (std::round(newExponent) != newExponent) {
-                throw std::domain_error("New exponent is non-integer");
+                std::ostringstream oss;
+                oss << "Cannot raise unit '" << toString() << "' to power " << power
+                    << " because exponent " << i << " becomes non-integer (" << newExponent << ")";
+                throw std::domain_error(oss.str());
             }
 
             result.exponents[i] = static_cast<std::int8_t>(std::round(newExponent));

@@ -14,6 +14,7 @@
 #define PHYSICS_SIMULATION_PROGRAM_VECTOR_H
 
 #include <array>
+#include <format>
 #include <initializer_list>
 #include <iostream>
 #include <stdexcept>
@@ -112,7 +113,12 @@ struct [[nodiscard]] Vector {
     // Constructor from initializer list of Quantities
     Vector(const std::initializer_list<Quantity> quantities) {
         if (quantities.size() != N) {
-            throw std::invalid_argument("Number of Quantity arguments must match vector dimension");
+            throw std::invalid_argument(std::format(
+                "Vector<{}> expects {} Quantity elements but received {}",
+                N,
+                N,
+                quantities.size()
+            ));
         }
 
         std::size_t i = 0;
@@ -145,7 +151,12 @@ struct [[nodiscard]] Vector {
     // Constructor from initializer list of values and optional shared unit in Unit format
     Vector(const std::initializer_list<double>& values, const Unit& unit = Unit::dimensionless()) : data{} {
         if (values.size() != N) {
-            throw std::invalid_argument("initializer_list size must match vector size");
+            throw std::invalid_argument(std::format(
+                "Vector<{}> expects {} values but received {} when constructing with Unit",
+                N,
+                N,
+                values.size()
+            ));
         }
         std::size_t i = 0;
         for (const double value : values) {
@@ -156,7 +167,13 @@ struct [[nodiscard]] Vector {
     // Constructor from initializer list of values and optional shared unit in string format
     Vector(const std::initializer_list<double>& values, const std::string& unit) : data{} {
         if (values.size() != N) {
-            throw std::invalid_argument("initializer_list size must match vector size");
+            throw std::invalid_argument(std::format(
+                "Vector<{}> expects {} values but received {} when constructing with unit string '{}'",
+                N,
+                N,
+                values.size(),
+                unit
+            ));
         }
         std::size_t i = 0;
         for (const double value : values) {
@@ -169,7 +186,11 @@ struct [[nodiscard]] Vector {
     // Mutable
     Quantity& operator[](std::size_t i) {
         if (i >= N) {
-            throw std::out_of_range("Vector index out of range");
+            throw std::out_of_range(std::format(
+                "Vector<{}> index {} is out of range",
+                N,
+                i
+            ));
         }
         return this->data[i];
     }
@@ -179,7 +200,11 @@ struct [[nodiscard]] Vector {
     // Read-only
     const Quantity& operator[](std::size_t i) const {
         if (i >= N) {
-            throw std::out_of_range("Vector index out of range");
+            throw std::out_of_range(std::format(
+                "Vector<{}> index {} is out of range",
+                N,
+                i
+            ));
         }
         return this->data[i];
     }
@@ -333,7 +358,10 @@ struct [[nodiscard]] Vector {
     // Dot product method
     [[nodiscard]] Quantity dot(const Vector& other) const {
         if (N == 0) {
-            throw std::invalid_argument("Cannot take dot product of empty vector");
+            throw std::invalid_argument(std::format(
+                "Cannot compute dot product for Vector<{}> because it has zero dimension",
+                N
+            ));
         }
 
         Quantity result = data[0] * other[0];
@@ -372,7 +400,11 @@ struct [[nodiscard]] Vector {
     [[nodiscard]] Vector unitVector() const {
         const auto len = length();
         if (len.value == 0) {
-            throw std::invalid_argument("Cannot create a unit vector for a 0 length vector");
+            throw std::invalid_argument(std::format(
+                "Cannot create a unit vector for Vector<{}> because its length is zero (length = {})",
+                N,
+                len
+            ));
         }
         return *this / len;
     }
@@ -423,7 +455,10 @@ template <std::size_t N>
 template <std::size_t N>
 [[nodiscard]] Quantity dot(const Vector<N>& vector1, const Vector<N>& vector2) {
     if (N == 0) {
-        throw std::invalid_argument("Cannot take dot product of empty vector");
+        throw std::invalid_argument(std::format(
+            "Cannot compute dot product for Vector<{}> because it has zero dimension",
+            N
+        ));
     }
 
     Quantity result = vector1[0] * vector2[0];

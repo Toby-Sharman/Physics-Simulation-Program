@@ -31,7 +31,10 @@ void BaseDatabase::loadFromBinary(const std::string& filepath) {
 
     std::uint16_t numberOfUnits; // uint8_t (255) would do, but 1 byte extra per file to futureproof is fine
     if (!BinaryIO::read(in, numberOfUnits)) {
-        throw std::runtime_error("Failed to read number of units");
+        throw std::runtime_error(std::format(
+            "Failed to read number of units from '{}'",
+            filepath
+        ));
     }
 
     std::vector<Unit> unitTable(numberOfUnits);
@@ -199,7 +202,13 @@ void BaseDatabase::saveToBinary(const std::string& filepath) {
                     BinaryIO::writeString(out, std::get<std::string>(propertyValue));
                     break;
                 default:
-                    throw std::runtime_error("Unknown property type during write");
+                    throw std::runtime_error(std::format(
+                        "Unknown property type code {} while writing '{}.{}' to '{}'",
+                        static_cast<std::uint8_t>(propertyType),
+                        entryName,
+                        propertyName,
+                        filepath
+                    ));
             }
         }
     }
@@ -219,7 +228,7 @@ void BaseDatabase::saveToBinary(const std::string& filepath) {
     const auto& entry = findEntry(entryName);
     const auto& property  = findProperty(entry, propertyName);
 
-    return std::visit([]<typename T0>(T0&& value) -> double {
+    return std::visit([&]<typename T0>(T0&& value) -> double {
         using T = std::decay_t<T0>;
         if constexpr (std::is_same_v<T, int64_t> || std::is_same_v<T, float> || std::is_same_v<T, double>) {
             return static_cast<double>(value);
@@ -228,7 +237,11 @@ void BaseDatabase::saveToBinary(const std::string& filepath) {
             return value.value;
         }
         else {
-            throw std::runtime_error("Property is not numeric");
+            throw std::runtime_error(std::format(
+                "Property '{}.{}' is not numeric",
+                entryName,
+                propertyName
+            ));
         }
     }, property.value);
 }
@@ -237,13 +250,17 @@ void BaseDatabase::saveToBinary(const std::string& filepath) {
     const auto& entry = findEntry(entryName);
     const auto& property  = findProperty(entry, propertyName);
 
-    return std::visit([]<typename T0>(T0&& value) -> Quantity {
+    return std::visit([&]<typename T0>(T0&& value) -> Quantity {
         using T = std::decay_t<T0>;
         if constexpr (std::is_same_v<T, Quantity>) {
             return value;
         }
         else {
-            throw std::runtime_error("Property is not a Quantity");
+            throw std::runtime_error(std::format(
+                "Property '{}.{}' is not stored as a Quantity",
+                entryName,
+                propertyName
+            ));
         }
     }, property.value);
 }

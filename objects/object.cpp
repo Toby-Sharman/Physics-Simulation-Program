@@ -12,6 +12,8 @@
 
 #include "objects/object.h"
 
+#include <format>
+
 #include "core/maths/matrix.h"
 #include "core/maths/vector.h"
 #include "core/maths/utilities/units.h"
@@ -24,10 +26,17 @@
 }
 
 void Object::setPosition(const Vector<3> &position) {
-    for (auto positionComponent : position) {
+    std::size_t componentIndex = 0;
+    for (const auto& positionComponent : position) {
         if (positionComponent.unit != Unit(1,0,0,0,0,0,0)) {
-            throw std::invalid_argument("Position component must be of length dimensions");
+            throw std::invalid_argument(std::format(
+                "Object '{}' position[{}] must have length dimensions but got {}",
+                m_name,
+                componentIndex,
+                positionComponent
+            ));
         }
+        ++componentIndex;
     }
     this->m_transformation.translation = position;
 }
@@ -35,8 +44,14 @@ void Object::setPosition(const Vector<3> &position) {
 void Object::setRotation(const Matrix<3,3> &rotation) {
     for (std::size_t i = 0; i < 3; i++) {
         for (std::size_t j = 0; j < 3; j++) {
-            if (rotation[i][j].unit != Unit(0,0,0,0,0,0,0)) {
-                throw std::invalid_argument("Rotation components must be dimensionless");
+            if (const auto& component = rotation[i][j]; component.unit != Unit(0,0,0,0,0,0,0)) {
+                throw std::invalid_argument(std::format(
+                    "Object '{}' rotation[{}][{}] must be dimensionless but got {}",
+                    m_name,
+                    i,
+                    j,
+                    component
+                ));
             }
         }
     }
@@ -45,14 +60,22 @@ void Object::setRotation(const Matrix<3,3> &rotation) {
 
 void Object::setTemperature(const Quantity temperature) {
     if (temperature.unit != Unit(0,0,0,0,1,0,0)) {
-        throw std::invalid_argument("Temperature must be of temperature dimensions");
+        throw std::invalid_argument(std::format(
+            "Object '{}' temperature must have thermodynamic temperature dimensions but got {}",
+            m_name,
+            temperature
+        ));
     }
     this->m_temperature = temperature;
 }
 
 void Object::setNumberDensity(const Quantity numberDensity) {
     if (numberDensity.unit != Unit(-3,0,0,0,0,0,0)) {
-        throw std::invalid_argument("Number Density must be of length^-3 dimensions");
+        throw std::invalid_argument(std::format(
+            "Object '{}' numberDensity must have length^-3 dimensions but got {}",
+            m_name,
+            numberDensity
+        ));
     }
     this->m_numberDensity = numberDensity;
 }

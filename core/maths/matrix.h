@@ -20,10 +20,10 @@
 #include <array>
 #include <cmath> // For std::abs ignore warning
 #include <cstddef> // For std::size_t ignore warning
+#include <format>
 #include <initializer_list>
 #include <iostream>
 #include <limits>
-#include <ostream>
 #include <stdexcept>
 #include <utility> // For std::swap ignore warning
 
@@ -190,7 +190,12 @@ struct [[nodiscard]] Matrix {
             }
 
             if (maxValue <= eps) {
-                throw std::runtime_error("Matrix is singular or nearly singular");
+                throw std::runtime_error(std::format(
+                    "Matrix inversion failed: pivot column {} has max absolute value {} <= epsilon {}",
+                    pivot,
+                    maxValue,
+                    eps
+                ));
             }
 
             // Swap rows if needed

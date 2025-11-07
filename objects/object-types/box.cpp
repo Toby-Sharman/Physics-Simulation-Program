@@ -13,6 +13,7 @@
 #include "objects/object-types/box.h"
 
 #include <algorithm>
+#include <format>
 #include <iostream>
 #include <ranges>
 #include <stdexcept>
@@ -22,10 +23,17 @@
 #include "core/maths/utilities/quantity.h"
 
 void Box::setSize(const Vector<3> &size) {
-    for (auto dimension : size) {
+    std::size_t axis = 0;
+    for (const auto& dimension : size) {
         if (dimension.unit != Unit(1,0,0,0,0,0,0)) {
-            throw std::invalid_argument("Size components must be of length dimensions");
+            throw std::invalid_argument(std::format(
+                "Box '{}' size[{}] must have length dimensions but got {}",
+                m_name,
+                axis,
+                dimension
+            ));
         }
+        ++axis;
     }
     this->m_size = size;
 }
@@ -58,7 +66,12 @@ bool Box::contains(const Vector<3>& worldPoint) const {
 Vector<3> Box::localIntersection(const Vector<3>& startLocalPoint, const Vector<3>& localDisplacement) const {
     const auto displacementLength = localDisplacement.length();
     if (displacementLength.value == 0.0) {
-        throw std::runtime_error("No intersection: displacement has zero length");
+        throw std::runtime_error(std::format(
+            "Box '{}' cannot compute intersection because displacement length is zero (start = {}, displacement = {})",
+            m_name,
+            startLocalPoint,
+            localDisplacement
+        ));
     }
     const Vector<3> halfSize = this->m_size * 0.5;
     constexpr auto relativeTolerance = Globals::Constant::Program::geometryTolerance;
@@ -79,7 +92,14 @@ Vector<3> Box::localIntersection(const Vector<3>& startLocalPoint, const Vector<
 
         if (nearlyParallel) {
             if (axisStart < -axisHalfExtent - absoluteTolerance || axisStart > axisHalfExtent + absoluteTolerance) {
-                throw std::runtime_error("No intersection: segment lies outside box slab on axis " + std::to_string(i));
+                throw std::runtime_error(std::format(
+                    "Box '{}' segment lies outside slab on axis {} (start = {}, displacement = {}, slab half extent = {})",
+                    m_name,
+                    i,
+                    startLocalPoint,
+                    localDisplacement,
+                    axisHalfExtent
+                ));
             }
             continue;
         }
@@ -96,7 +116,15 @@ Vector<3> Box::localIntersection(const Vector<3>& startLocalPoint, const Vector<
         segmentExit = std::min(segmentExit, axisExit);
 
         if (segmentEntry > segmentExit) {
-            throw std::runtime_error("No intersection: segment does not enter box in any axis");
+            throw std::runtime_error(std::format(
+                "Box '{}' segment does not enter the volume (axis {} entry = {}, exit = {}, start = {}, displacement = {})",
+                m_name,
+                i,
+                axisEntry,
+                axisExit,
+                startLocalPoint,
+                localDisplacement
+            ));
         }
     }
 

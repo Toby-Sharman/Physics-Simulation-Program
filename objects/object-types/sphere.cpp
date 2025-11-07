@@ -14,6 +14,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <format>
 #include <iostream>
 #include <stdexcept>
 #include <string>
@@ -23,7 +24,11 @@
 
 void Sphere::setRadius(const Quantity& radius) {
     if (radius.unit != Unit(1,0,0,0,0,0,0)) {
-        throw std::invalid_argument("Size components must be of length dimensions");
+        throw std::invalid_argument(std::format(
+            "Sphere '{}' radius must have length dimensions but got {}",
+            m_name,
+            radius
+        ));
     }
     this->m_radius = radius;
 }
@@ -47,7 +52,12 @@ bool Sphere::contains(const Vector<3>& worldPoint) const {
 Vector<3> Sphere::localIntersection(const Vector<3> &startLocalPoint, const Vector<3> &localDisplacement) const {
     const auto stepLength = localDisplacement.length();
     if (stepLength.value == 0.0) {
-        throw std::runtime_error("No intersection: displacement has zero length");
+        throw std::runtime_error(std::format(
+            "Sphere '{}' cannot compute intersection because displacement length is zero (start = {}, displacement = {})",
+            m_name,
+            startLocalPoint,
+            localDisplacement
+        ));
     }
 
     constexpr auto tolerance = Globals::Constant::Program::geometryTolerance;
@@ -61,7 +71,13 @@ Vector<3> Sphere::localIntersection(const Vector<3> &startLocalPoint, const Vect
 
     auto discriminant = bRatio.value * bRatio.value - 4.0 * cRatio.value;
     if (discriminant < -std::max(std::abs(discriminant), 1.0) * tolerance) {
-        throw std::runtime_error("No intersection: negative discriminant");
+        throw std::runtime_error(std::format(
+            "Sphere '{}' intersection discriminant is negative (value = {}, start = {}, displacement = {})",
+            m_name,
+            discriminant,
+            startLocalPoint,
+            localDisplacement
+        ));
     }
     discriminant = std::max(discriminant, 0.0);
 
@@ -84,7 +100,14 @@ Vector<3> Sphere::localIntersection(const Vector<3> &startLocalPoint, const Vect
     } else if (withinSegment(tExit)) {
         t = clamp01(tExit);
     } else {
-        throw std::runtime_error("No intersection: valid t not in [0,1]");
+        throw std::runtime_error(std::format(
+            "Sphere '{}' intersection parameter not in [0,1]: tEntry = {}, tExit = {} (start = {}, displacement = {})",
+            m_name,
+            tEntry,
+            tExit,
+            startLocalPoint,
+            localDisplacement
+        ));
     }
 
     return startLocalPoint + localDisplacement * t;

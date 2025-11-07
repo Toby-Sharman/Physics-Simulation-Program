@@ -16,6 +16,7 @@
 #include <cmath>
 #include <format>
 #include <iostream>
+#include <sstream>
 #include <stdexcept>
 #include <string>
 #include <string_view>
@@ -91,6 +92,8 @@ struct [[nodiscard]] Quantity {
     double value;
     Unit unit; // Dimensions represented by Unit struct
 
+    friend std::ostream& operator<<(std::ostream& outputStream, const Quantity& quantity);
+
     // Default constructor
     constexpr Quantity() noexcept : value(0.0), unit(Unit::dimensionless()) {}
 
@@ -130,7 +133,9 @@ struct [[nodiscard]] Quantity {
     // Requires same Unit
     [[nodiscard]] Quantity operator+(const Quantity& other) const {
         if (this->unit != other.unit) {
-            throw std::invalid_argument("Cannot add quantities with different units");
+            std::ostringstream oss;
+            oss << "Cannot add quantities with different units: lhs=" << *this << ", rhs=" << other;
+            throw std::invalid_argument(oss.str());
         }
         return {this->value + other.value, this->unit};
     }
@@ -140,7 +145,9 @@ struct [[nodiscard]] Quantity {
     // Requires same Unit
     Quantity& operator+=(const Quantity& other) {
         if (this->unit != other.unit) {
-            throw std::invalid_argument("Cannot add quantities with different units");
+            std::ostringstream oss;
+            oss << "Cannot add quantities with different units: lhs=" << *this << ", rhs=" << other;
+            throw std::invalid_argument(oss.str());
         }
         this->value += other.value;
         return *this;
@@ -151,7 +158,9 @@ struct [[nodiscard]] Quantity {
     // Requires same Unit
     [[nodiscard]] Quantity operator-(const Quantity& other) const {
         if (this->unit != other.unit) {
-            throw std::invalid_argument("Cannot subtract quantities with different units");
+            std::ostringstream oss;
+            oss << "Cannot subtract quantities with different units: lhs=" << *this << ", rhs=" << other;
+            throw std::invalid_argument(oss.str());
         }
         return {this->value - other.value, this->unit};
     }
@@ -161,7 +170,9 @@ struct [[nodiscard]] Quantity {
     // Requires same Unit
     Quantity& operator-=(const Quantity& other) {
         if (this->unit != other.unit) {
-            throw std::invalid_argument("Cannot subtract quantities with different units");
+            std::ostringstream oss;
+            oss << "Cannot subtract quantities with different units: lhs=" << *this << ", rhs=" << other;
+            throw std::invalid_argument(oss.str());
         }
         this->value -= other.value;
         return *this;
@@ -232,7 +243,9 @@ struct [[nodiscard]] Quantity {
     // Less than operator
     bool operator<(const Quantity& other) const {
         if (this->unit != other.unit) {
-            throw std::invalid_argument("Cannot evaluate less than for quantities of different units");
+            std::ostringstream oss;
+            oss << "Cannot compare (<) quantities with different units: lhs=" << *this << ", rhs=" << other;
+            throw std::invalid_argument(oss.str());
         }
         return this->value < other.value;
     }
@@ -240,7 +253,9 @@ struct [[nodiscard]] Quantity {
     // Less than or equal to operator
     bool operator<=(const Quantity& other) const {
         if (this->unit != other.unit) {
-            throw std::invalid_argument("Cannot evaluate less than or equal to for quantities of different units");
+            std::ostringstream oss;
+            oss << "Cannot compare (<=) quantities with different units: lhs=" << *this << ", rhs=" << other;
+            throw std::invalid_argument(oss.str());
         }
         return this->value <= other.value;
     }
@@ -248,7 +263,9 @@ struct [[nodiscard]] Quantity {
     // Greater than operator
     bool operator>(const Quantity& other) const {
         if (this->unit != other.unit) {
-            throw std::invalid_argument("Cannot evaluate greater than for quantities of different units");
+            std::ostringstream oss;
+            oss << "Cannot compare (>) quantities with different units: lhs=" << *this << ", rhs=" << other;
+            throw std::invalid_argument(oss.str());
         }
         return this->value > other.value;
     }
@@ -256,7 +273,9 @@ struct [[nodiscard]] Quantity {
     // Greater than or equal to operator
     bool operator>=(const Quantity& other) const {
         if (this->unit != other.unit) {
-            throw std::invalid_argument("Cannot evaluate greater than or equal to for quantities of different units");
+            std::ostringstream oss;
+            oss << "Cannot compare (>=) quantities with different units: lhs=" << *this << ", rhs=" << other;
+            throw std::invalid_argument(oss.str());
         }
         return this->value >= other.value;
     }
