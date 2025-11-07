@@ -264,7 +264,7 @@ std::ostream& operator<<(std::ostream& os, const Matrix<Rows, Columns>& matrix) 
 // Example usage: TODO
 struct TransformationMatrix {
     Matrix<3,3> rotation = Matrix<3,3>::identity();
-    Vector<3> translation = Vector<3>({0, 0, 0}, "m");;
+    Vector<3> translation = Vector<3>({0, 0, 0}, Unit(1,0,0,0,0,0,0));;
 
     // Multiplication operator
     //
