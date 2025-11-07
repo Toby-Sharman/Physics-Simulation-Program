@@ -51,6 +51,8 @@
 //   - Multiplication:         operator*, operator*= (Quantity * Quantity, Quantity * scalar, scalar * Quantity)
 //   - Division:               operator/, operator/= (Quantity / Quantity, Quantity / scalar, scalar / Quantity)
 //   - Comparison:             operator<, operator<=, operator>, operator>=
+//   - Minimum:                min()
+//   - Maximum:                max()
 //   - Absolute value:         abs()
 //   - Exponentiation:         raisedTo(n)
 //   - Printing:               print()
@@ -72,6 +74,8 @@
 //   Quantity smallLength = length - Quantity{3.0, meter};   // 2 L^1
 //
 //   bool double > speed;                                    // true
+//
+//   Quantity smallest = Quantity::min(speed, double)        // speed
 //
 //   Quantity absolute = speed.abs();                        // 2.5 L^1 T^-1
 //
@@ -253,6 +257,16 @@ struct [[nodiscard]] Quantity {
             throw std::invalid_argument("Cannot evaluate greater than or equal to for quantities of different units");
         }
         return this->value >= other.value;
+    }
+
+    // Minimum method
+    [[nodiscard]] static constexpr const Quantity& min(const Quantity& a, const Quantity& b) {
+        return a <= b ? a : b;
+    }
+
+    // Maximum method
+    [[nodiscard]] static constexpr const Quantity& max(const Quantity& a, const Quantity& b) {
+        return a >= b ? a : b;
     }
 
     // Absolute value method
