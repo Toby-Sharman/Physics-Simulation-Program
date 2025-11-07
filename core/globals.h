@@ -43,6 +43,7 @@ class Globals {
 
                 static constexpr double timeStep = 1e-15;                             // Increment of time in each step of the program (in seconds)
                 static constexpr double masslessTolerance = 0;                        // Tolerance for treating particles as massless (in kg)
+                static constexpr double geometryTolerance = 1e-12;                    // Relative/absolute scale for geometry comparisons
             };
             // Common maths constants to ensure same value is used program wide
             struct Maths {
