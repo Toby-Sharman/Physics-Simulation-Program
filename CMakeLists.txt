@@ -48,6 +48,7 @@ add_executable(Simulation_program)
 target_sources(Simulation_program PRIVATE
         app/main.cpp
         core/maths/utilities/unit_utilities.cpp
+        core/quantities/utilities/unit_utilities.cpp
         databases/base_database.cpp
         objects/object.cpp
         objects/object-types/box.cpp
@@ -71,6 +72,8 @@ target_include_directories(Simulation_program PRIVATE
         core
         core/maths
         core/maths/utilities
+        core/linear-algebra
+        core/quantities/utilities
         databases
         databases/material-data
         databases/particle-data
@@ -110,7 +113,7 @@ set(CONFIG_INCLUDE_GUARD "PHYSICS_SIMULATION_PROGRAM_CONFIG_H")
 add_executable(json_to_bin EXCLUDE_FROM_ALL databases/json_to_bin.cpp)
 
 target_sources(json_to_bin PRIVATE
-        core/maths/utilities/unit_utilities.cpp
+        core/quantities/utilities/unit_utilities.cpp
         databases/base_database.cpp
 )
 
@@ -119,8 +122,8 @@ target_include_directories(json_to_bin PRIVATE
         databases
         databases/utilities
         core
-        core/maths
-        core/maths/utilities
+        core/linear-algebra
+        core/quantities/utilities
 )
 
 target_link_libraries(json_to_bin PRIVATE nlohmann_json::nlohmann_json)

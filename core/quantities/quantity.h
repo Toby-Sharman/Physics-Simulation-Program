@@ -22,8 +22,8 @@
 #include <string_view>
 #include <unordered_map>
 
-#include "core/maths/utilities/units.h"
-#include "core/maths/utilities/unit_utilities.h"
+#include "units.h"
+#include "core/quantities//utilities/unit_utilities.h"
 
 // Quantity
 //

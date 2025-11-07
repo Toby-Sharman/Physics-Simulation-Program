@@ -18,9 +18,9 @@
 #include <string>
 #include <type_traits>
 
-#include "core/maths/matrix.h"
-#include "core/maths/vector.h"
-#include "core/maths/utilities/quantity.h"
+#include "core/linear-algebra/matrix.h"
+#include "core/linear-algebra/vector.h"
+#include "core/quantities/quantity.h"
 
 // Parent tag
 //

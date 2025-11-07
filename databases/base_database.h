@@ -19,7 +19,7 @@
 #include <variant>
 #include <vector>
 
-#include "core/maths/utilities/quantity.h"
+#include "core/quantities/quantity.h"
 
 // PropertyType
 //

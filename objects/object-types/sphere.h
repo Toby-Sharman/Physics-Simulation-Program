@@ -12,7 +12,7 @@
 #ifndef PHYSICS_SIMULATION_PROGRAM_SPHERE_H
 #define PHYSICS_SIMULATION_PROGRAM_SPHERE_H
 
-#include "core/maths/vector.h"
+#include "core/linear-algebra/vector.h"
 #include "objects/object.h"
 
 // Sphere

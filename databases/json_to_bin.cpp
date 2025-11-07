@@ -52,8 +52,8 @@
 
 #include <nlohmann/json.hpp>
 
-#include "core/maths/utilities/quantity.h"
-#include "core/maths/utilities/unit_utilities.h"
+#include "core/quantities/quantity.h"
+#include "core/quantities//utilities/unit_utilities.h"
 #include "databases/base_database.h"
 #include "databases/utilities/binary_file_IO.h"
 

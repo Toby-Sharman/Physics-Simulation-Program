@@ -10,7 +10,7 @@
 // Licensed under a Non-Commercial License. See LICENSE file for details
 //
 
-#include "core/maths/utilities/unit_utilities.h"
+#include "core/quantities/utilities/unit_utilities.h"
 
 #include <cctype> // For std::isalpha and std::isspace ignore warning
 #include <charconv>
@@ -19,7 +19,7 @@
 #include <stdexcept>
 #include <string>
 
-#include "core/maths/utilities/quantity.h"
+#include "core/quantities/quantity.h"
 
 [[nodiscard]] std::pair<std::string_view, int> extractSuperscript(const std::string_view unit) noexcept {
     if (unit.empty()) { return {unit, 0}; } // If empty return input with exponent = 0

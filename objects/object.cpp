@@ -14,9 +14,9 @@
 
 #include <format>
 
-#include "core/maths/matrix.h"
-#include "core/maths/vector.h"
-#include "core/maths/utilities/units.h"
+#include "core/linear-algebra/matrix.h"
+#include "core/linear-algebra/vector.h"
+#include "core/quantities/units.h"
 
 [[nodiscard]] TransformationMatrix Object::getWorldTransformation() const noexcept{
     if (this->m_parent) {

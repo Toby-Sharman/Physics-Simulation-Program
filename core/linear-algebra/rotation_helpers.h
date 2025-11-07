@@ -6,8 +6,8 @@
 #ifndef PHYSICS_SIMULATION_PROGRAM_ROTATION_HELPERS_H
 #define PHYSICS_SIMULATION_PROGRAM_ROTATION_HELPERS_H
 
-#include "../matrix.h"
-#include "../vector.h"
+#include "matrix.h"
+#include "vector.h"
 
 #include "globals.h"
 

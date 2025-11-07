@@ -20,7 +20,7 @@
 #include <string>
 
 #include "core/globals.h"
-#include "core/maths/utilities/quantity.h"
+#include "core/quantities/quantity.h"
 
 void Box::setSize(const Vector<3> &size) {
     std::size_t axis = 0;

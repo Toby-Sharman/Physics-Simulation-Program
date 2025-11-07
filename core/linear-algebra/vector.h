@@ -22,7 +22,7 @@
 #include <type_traits>
 #include <utility>
 
-#include "core/maths/utilities/quantity.h"
+#include "core/quantities/quantity.h"
 
 // Vector<N>
 //

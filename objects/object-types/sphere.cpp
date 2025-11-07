@@ -20,7 +20,7 @@
 #include <string>
 
 #include "core/globals.h"
-#include "core/maths/utilities/quantity.h"
+#include "core/quantities/quantity.h"
 
 void Sphere::setRadius(const Quantity& radius) {
     if (radius.unit != Unit(1,0,0,0,0,0,0)) {

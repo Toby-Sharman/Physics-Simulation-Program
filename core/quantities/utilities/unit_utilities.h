@@ -18,7 +18,7 @@
 #include <string_view>
 #include <utility>
 
-#include "core/maths/utilities/units.h"
+#include "core/quantities/units.h"
 
 // Superscript extractor
 //

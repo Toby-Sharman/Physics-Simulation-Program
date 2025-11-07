@@ -19,7 +19,7 @@
 #include <string>
 #include <type_traits>
 
-#include "core/maths/utilities/quantity.h"
+#include "core/quantities/quantity.h"
 
 // BinaryIO
 //

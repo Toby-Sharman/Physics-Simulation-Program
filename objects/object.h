@@ -24,9 +24,9 @@
 #include <utility>
 #include <vector>
 
-#include "core/maths/matrix.h"
-#include "core/maths/vector.h"
-#include "core/maths/utilities/quantity.h"
+#include "core/linear-algebra/matrix.h"
+#include "core/linear-algebra/vector.h"
+#include "core/quantities/quantity.h"
 #include "databases/material-data/material_database.h"
 #include "objects/utilities/object_initialisation_tags.h"
 

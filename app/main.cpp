@@ -10,16 +10,18 @@
 // Licensed under a Non-Commercial License. See LICENSE file for details
 //
 
-// Reminder: what includes am I missing? Can I mark any functions nodiscard, noexcept, constexpr, or static?
+// Reminder: what includes am I missing? Can I mark any functions nodiscard, noexcept, constexpr?
 
 #include <chrono>
 #include <iomanip>
 #include <iostream>
 #include <memory>
 
-#include "core/maths/vector.h"
+#include "core/linear-algebra/matrix.h"
+#include "core/linear-algebra/vector.h"
 #include "objects/object.h"
 #include "objects/object-types/box.h"
+#include "objects/object-types/sphere.h"
 #include "particles/particle.h"
 #include "particles/particle_source.h"
 #include "simulation/step.h"
@@ -79,19 +81,18 @@ int main() {
 
     source.generateParticles(
         "photon",
-        1e3,
+        1000,
         Vector<4>({0,-(25.0/2 + 10),0,0}, "mm"),
         Vector<4>({1,1,0,0}, "kg m s^-1"),
-        Vector<4>({1,0,0, 1}) // Right hand circular polarised TODO: Think on units
+        Vector<4>({1.0, 0.0, 0.0, 1.0}) // Right hand circular polarised TODO: Think on units
         );
-
 
     const auto start = std::chrono::steady_clock::now();
 
     // Simulation loop
     while (!particleManager.empty()) {
-        stepAll(particleManager.getParticles(), world.get(), collection); // all particles automatically stepped
-    }
+        stepAll(particleManager.getParticles(), world, collection, Quantity(1e-13, "s")); // all particles automatically stepped
+    } // Need to template so world need not be a box type
 
     const auto end = std::chrono::steady_clock::now();
 

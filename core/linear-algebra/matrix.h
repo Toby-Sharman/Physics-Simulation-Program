@@ -14,8 +14,8 @@
 #ifndef PHYSICS_SIMULATION_PROGRAM_MATRIX_H
 #define PHYSICS_SIMULATION_PROGRAM_MATRIX_H
 
-#include "core/maths/vector.h"
-#include "core/maths/utilities/quantity.h"
+#include "core/linear-algebra/vector.h"
+#include "core/quantities/quantity.h"
 
 #include <array>
 #include <cmath> // For std::abs ignore warning
