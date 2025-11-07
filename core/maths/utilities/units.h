@@ -14,6 +14,7 @@
 #define PHYSICS_SIMULATION_PROGRAM_UNITS_H
 
 #include <array>
+#include <cmath>
 #include <string>
 #include <string_view>
 #include <unordered_map>
