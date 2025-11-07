@@ -14,6 +14,7 @@
 #define PHYSICS_SIMULATION_PROGRAM_QUANTITY_H
 
 #include <cmath>
+#include <format>
 #include <iostream>
 #include <stdexcept>
 #include <string>
@@ -58,6 +59,7 @@
 //   - Printing:               print()
 //   - Stream output:          operator<<
 //   - Unary negation:         operator-
+//   - std::format support:    std::format
 //
 // Example usage:
 //   Unit meter(1, 0, 0, 0, 0, 0, 0);
@@ -311,6 +313,25 @@ inline Quantity operator-(const Quantity& q) {
 [[nodiscard]] constexpr inline Quantity operator/(const double scalar, const Quantity& quantity) noexcept {
     return {scalar / quantity.value, quantity.unit.inverse()};
 }
+
+template <typename CharT>
+struct std::formatter<Quantity, CharT> : formatter<double, CharT> {
+    template <class ParseContext>
+    constexpr auto parse(ParseContext& ctx) {
+        return formatter<double, CharT>::parse(ctx);
+    }
+
+    template <class FormatContext>
+    auto format(const Quantity& quantity, FormatContext& ctx) const {
+        auto out = formatter<double, CharT>::format(quantity.value, ctx);
+        const auto unit = quantity.unit.toString();
+        *out++ = CharT(' ');
+        for (char ch : unit) {
+            *out++ = static_cast<CharT>(ch);
+        }
+        return out;
+    }
+};
 
 // Table of some common physical constants
 [[nodiscard]] inline const std::unordered_map<std::string_view, Quantity>& quantityTable() {
