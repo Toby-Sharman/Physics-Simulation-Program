@@ -47,8 +47,8 @@ add_executable(Simulation_program)
 
 target_sources(Simulation_program PRIVATE
         app/main.cpp
-        core/maths/utilities/unit_utilities.cpp
         core/quantities/utilities/unit_utilities.cpp
+        core/random/random_manager.cpp
         databases/base_database.cpp
         objects/object.cpp
         objects/object-types/box.cpp
@@ -70,10 +70,9 @@ target_include_directories(Simulation_program PRIVATE
         app
         config
         core
-        core/maths
-        core/maths/utilities
         core/linear-algebra
         core/quantities/utilities
+        core/random
         databases
         databases/material-data
         databases/particle-data
