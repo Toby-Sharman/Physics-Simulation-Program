@@ -12,10 +12,6 @@
 
 #include "objects/object.h"
 
-#include <format>
-
-#include "core/linear-algebra/matrix.h"
-#include "core/linear-algebra/vector.h"
 #include "core/quantities/units.h"
 
 [[nodiscard]] TransformationMatrix Object::getWorldTransformation() const noexcept{

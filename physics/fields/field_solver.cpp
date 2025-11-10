@@ -5,7 +5,6 @@
 #include "field_solver.h"
 #include "globals.h"
 #include "material_database.h"
-#include "vector.h"
 
 auto globalB = Vector<3>{{0.0, 0.0, 1.0},"T"};
 auto globalH = globalB / Globals::Constant::Physics::mu0;
