@@ -79,12 +79,17 @@ Vector<3> Box::localIntersection(const Vector<3>& startLocalPoint, const Vector<
 
     auto segmentEntry = 0.0; // Earliest parameter in [0, 1] where the ray enters every slab
     auto segmentExit = 1.0;  // Latest parameter before the ray exits the box
+    bool startInside = true;
 
     for (std::size_t i = 0; i < 3; ++i) {
         const auto axisHalfExtent = halfSize[i];
         const Quantity axisDirection = localDisplacement[i]; // Displacement component along this axis
         const Quantity axisStart = startLocalPoint[i];       // Ray start along this axis
         const auto axisDirectionMagnitude = axisDirection.abs();
+        if (const auto axisSlack = axisHalfExtent.abs() * relativeTolerance;
+            axisStart < -axisHalfExtent - axisSlack || axisStart > axisHalfExtent + axisSlack) {
+            startInside = false;
+        }
 
         const bool nearlyParallel =
             axisDirectionMagnitude <= absoluteTolerance ||
@@ -128,8 +133,19 @@ Vector<3> Box::localIntersection(const Vector<3>& startLocalPoint, const Vector<
         }
     }
 
-    // Convert the earliest entry parameter back into a point in local coordinates
-    return startLocalPoint + localDisplacement * segmentEntry;
+    const double parameter = startInside ? segmentExit : segmentEntry;
+    if (parameter < -relativeTolerance || parameter > 1.0 + relativeTolerance) {
+        throw std::runtime_error(std::format(
+            "Box '{}' intersection parameter {} outside [0,1] (start = {}, displacement = {}, startInside = {})",
+            m_name,
+            parameter,
+            startLocalPoint,
+            localDisplacement,
+            startInside
+        ));
+    }
+
+    return startLocalPoint + localDisplacement * parameter;
 }
 
 Vector<3> Box::localNormal(const Vector<3> &localPoint) const {
