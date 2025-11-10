@@ -26,11 +26,11 @@
 // Enumeration of supported property types for binary files
 // The enum value corresponds to a unique type identifier in binary
 enum class PropertyType : std::uint8_t {
-    BOOL = 0,
-    INT = 1,
-    DOUBLE = 2,
-    QUANTITY = 3,
-    STRING = 4
+    Bool = 0,
+    Int = 1,
+    Double = 2,
+    Quantity = 3,
+    String = 4
 };
 
 // DatabaseProperty

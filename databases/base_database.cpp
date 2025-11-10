@@ -75,7 +75,7 @@ void BaseDatabase::loadFromBinary(const std::string& filepath) {
             }
 
             switch (property.type) {
-                case PropertyType::BOOL: {
+                case PropertyType::Bool: {
                     std::uint8_t boolean;
                     if (!BinaryIO::read(in, boolean)) {
                         throw std::runtime_error(
@@ -85,7 +85,7 @@ void BaseDatabase::loadFromBinary(const std::string& filepath) {
                     property.value = (boolean != 0);
                     break;
                 }
-                case PropertyType::INT: {
+                case PropertyType::Int: {
                     int64_t integer;
                     if (!BinaryIO::read(in, integer)) {
                         throw std::runtime_error(
@@ -95,7 +95,7 @@ void BaseDatabase::loadFromBinary(const std::string& filepath) {
                     property.value = integer;
                     break;
                 }
-                case PropertyType::DOUBLE: {
+                case PropertyType::Double: {
                     double floating;
                     if (!BinaryIO::read(in, floating)) {
                         throw std::runtime_error(
@@ -105,7 +105,7 @@ void BaseDatabase::loadFromBinary(const std::string& filepath) {
                     property.value = floating;
                     break;
                 }
-                case PropertyType::QUANTITY: {
+                case PropertyType::Quantity: {
                     Quantity quantity;
                     if (!BinaryIO::read(in, quantity.value)) {
                         throw std::runtime_error(
@@ -122,7 +122,7 @@ void BaseDatabase::loadFromBinary(const std::string& filepath) {
                     property.value = quantity;
                     break;
                 }
-                case PropertyType::STRING: {
+                case PropertyType::String: {
                     std::string string;
                     if (!BinaryIO::readString(in, string)) {
                         throw std::runtime_error(
@@ -156,7 +156,7 @@ void BaseDatabase::saveToBinary(const std::string& filepath) {
 
     for (const auto& [entryName, entryProperties] : this->m_db) {
         for (const auto& property : entryProperties) {
-            if (property.type == PropertyType::QUANTITY) {
+            if (property.type == PropertyType::Quantity) {
                 if (const auto& u = std::get<Quantity>(property.value).unit; !unitIndexMap.contains(u)) {
                     const auto idx = static_cast<std::uint16_t>(unitTable.size());
                     unitIndexMap[u] = idx;
@@ -183,22 +183,22 @@ void BaseDatabase::saveToBinary(const std::string& filepath) {
             BinaryIO::writeEnum(out, propertyType);
 
             switch (propertyType) {
-                case PropertyType::BOOL:
+                case PropertyType::Bool:
                     BinaryIO::write(out, static_cast<std::uint8_t>(std::get<bool>(propertyValue)));
                     break;
-                case PropertyType::INT:
+                case PropertyType::Int:
                     BinaryIO::write(out, std::get<int64_t>(propertyValue));
                     break;
-                case PropertyType::DOUBLE:
+                case PropertyType::Double:
                     BinaryIO::write(out, std::get<double>(propertyValue));
                     break;
-                case PropertyType::QUANTITY: {
+                case PropertyType::Quantity: {
                     const auto& quantity = std::get<Quantity>(propertyValue);
                     BinaryIO::write(out, quantity.value);
                     BinaryIO::write(out, unitIndexMap[quantity.unit]);
                     break;
                 }
-                case PropertyType::STRING:
+                case PropertyType::String:
                     BinaryIO::writeString(out, std::get<std::string>(propertyValue));
                     break;
                 default:
