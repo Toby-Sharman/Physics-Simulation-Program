@@ -60,6 +60,7 @@
 //   - End:                    end()
 //   - Addition:               operator+, operator+=
 //   - Subtraction:            operator-, operator-=
+//   - Unary negation:         operator-
 //   - Multiplication:         operator*, operator*=
 //   - Division:               operator/, operator/=
 //   - Dot product:            dot(vector)
@@ -269,6 +270,15 @@ struct [[nodiscard]] Vector {
             data[i] = data[i] - other[i];
         }
         return *this;
+    }
+
+    // Unary negation operator
+    [[nodiscard]] Vector operator-() const {
+        Vector result;
+        for (std::size_t i = 0; i < N; ++i) {
+            result[i] = -data[i];
+        }
+        return result;
     }
 
     // Multiplication operator

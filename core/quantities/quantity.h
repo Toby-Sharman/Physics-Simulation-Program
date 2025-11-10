@@ -50,6 +50,7 @@
 //   - Dimensionless factory:  Quantity::dimensionless()
 //   - Addition:               operator+, operator+=
 //   - Subtraction:            operator-, operator-=
+//   - Unary negation:         operator-
 //   - Multiplication:         operator*, operator*= (Quantity * Quantity, Quantity * scalar, scalar * Quantity)
 //   - Division:               operator/, operator/= (Quantity / Quantity, Quantity / scalar, scalar / Quantity)
 //   - Comparison:             operator<, operator<=, operator>, operator>=
@@ -59,7 +60,6 @@
 //   - Exponentiation:         raisedTo(n)
 //   - Printing:               print()
 //   - Stream output:          operator<<
-//   - Unary negation:         operator-
 //   - std::format support:    std::format
 //
 // Example usage:
@@ -176,6 +176,11 @@ struct [[nodiscard]] Quantity {
         }
         this->value -= other.value;
         return *this;
+    }
+
+    // Unary negation operator
+    [[nodiscard]] Quantity operator-() const {
+        return {this->value * -1.0, this->unit};
     }
 
     // Multiplication operator
@@ -312,11 +317,6 @@ struct [[nodiscard]] Quantity {
 inline std::ostream& operator<<(std::ostream& outputStream, const Quantity& quantity) {
     outputStream << quantity.value << " " << quantity.unit.toString();
     return outputStream;
-}
-
-// Unitary negation operator
-inline Quantity operator-(const Quantity& q) {
-    return {-q.value, q.unit};
 }
 
 // Multiplication operator
