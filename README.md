@@ -95,8 +95,12 @@ updating table of values that are keyed by the velocity
 - Bounding radius for quicker computations for contains function
 - Review file opening for writing data
 - Unit printing not be the dimension representation
+- Have a smaller database of values kept in memory that has the often used particles (maybe materials too but *much* 
+less significant) so reading the entire database is not required (for instance for creating photons during spontaneous 
+emission)
 - Multithreading
   - In particular for the stepping of multiple particles
+- Have Quantity operations that return dimensionless return a double not a Quantity
 
 ---
 
