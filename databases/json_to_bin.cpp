@@ -64,19 +64,19 @@ using Json = nlohmann::json;
 // Helper function to determine the property type in the json file
 [[nodiscard]] static PropertyType getPropertyType(const Json& value) {
     if (value.is_boolean()) {
-        return PropertyType::BOOL;
+        return PropertyType::Bool;
     }
     if (value.is_number_integer()) {
-        return PropertyType::INT;
+        return PropertyType::Int;
     }
     if (value.is_number_float()) {
-        return PropertyType::DOUBLE;
+        return PropertyType::Double;
     }
     if (value.is_object() && value.contains("value") && value.contains("unit")) {
-        return PropertyType::QUANTITY;
+        return PropertyType::Quantity;
     }
     if (value.is_string()) {
-        return PropertyType::STRING;
+        return PropertyType::String;
     }
     throw std::runtime_error(std::format(
         "Unsupported property type '{}'",
@@ -169,23 +169,23 @@ int main(int argc, char** argv) {
             BinaryIO::writeString(out, propertyName);
 
             switch (getPropertyType(value)) {
-                case PropertyType::BOOL : {
-                    BinaryIO::writeEnum(out, PropertyType::BOOL);
+                case PropertyType::Bool : {
+                    BinaryIO::writeEnum(out, PropertyType::Bool);
                     BinaryIO::write(out, static_cast<std::uint8_t>(value.get<bool>()));
                     break;
                 }
-                case PropertyType::INT : {
-                    BinaryIO::writeEnum(out, PropertyType::INT);
+                case PropertyType::Int : {
+                    BinaryIO::writeEnum(out, PropertyType::Int);
                     BinaryIO::write(out, value.get<int64_t>());
                     break;
                 }
-                case PropertyType::DOUBLE : {
-                    BinaryIO::writeEnum(out, PropertyType::DOUBLE);
+                case PropertyType::Double : {
+                    BinaryIO::writeEnum(out, PropertyType::Double);
                     BinaryIO::write(out, value.get<double>());
                     break;
                 }
-                case PropertyType::QUANTITY : {
-                    BinaryIO::writeEnum(out, PropertyType::QUANTITY);
+                case PropertyType::Quantity : {
+                    BinaryIO::writeEnum(out, PropertyType::Quantity);
                     double val = value["value"].get<double>();
                     auto unitString = value["unit"].get<std::string>();
                     auto [factor, unit] = parseUnits(unitString);
@@ -200,8 +200,8 @@ int main(int argc, char** argv) {
                     BinaryIO::write(out, idx);
                     break;
                 }
-                case PropertyType::STRING : {
-                    BinaryIO::writeEnum(out, PropertyType::STRING);
+                case PropertyType::String : {
+                    BinaryIO::writeEnum(out, PropertyType::String);
                     BinaryIO::writeString(out, value.get<std::string>());
                     break;
                 }
