@@ -32,6 +32,6 @@ struct MaterialDatabase final : BaseDatabase {
 };
 
 // Create a reusable instance of the material database
-inline MaterialDatabase materialDatabase{MATERIAL_DATABASE_PATH};
+inline MaterialDatabase g_materialDatabase{MATERIAL_DATABASE_PATH};
 
 #endif //PHYSICS_SIMULATION_PROGRAM_MATERIAL_DATABASE_H

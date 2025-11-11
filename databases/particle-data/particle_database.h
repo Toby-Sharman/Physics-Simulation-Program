@@ -50,6 +50,6 @@ struct ParticleDatabase final : BaseDatabase {
 };
 
 // Create a reusable instance of the particle database
-inline ParticleDatabase particleDatabase{PARTICLE_DATABASE_PATH};
+inline ParticleDatabase g_particleDatabase{PARTICLE_DATABASE_PATH};
 
 #endif //PHYSICS_SIMULATION_PROGRAM_PARTICLE_DATABASE_H

@@ -241,7 +241,7 @@ class Object {
         void attributeAssignmentCheck() {
             // Check if a material was defined
             if constexpr ((std::same_as<std::decay_t<Args>, MaterialTag> || ...)) {
-                if (!materialDatabase.contains(m_material)) {
+                if (!g_materialDatabase.contains(m_material)) {
                     throw std::runtime_error(std::format(
                         "Object '{}' references unknown material '{}' in the material database",
                         m_name,
@@ -251,12 +251,12 @@ class Object {
 
                 // If number density wasn't given set from the material database
                 if constexpr (!((std::same_as<std::decay_t<Args>, NumberDensityTag> || ...))) {
-                    setNumberDensity(materialDatabase.getNumberDensity(m_material));
+                    setNumberDensity(g_materialDatabase.getNumberDensity(m_material));
                 }
 
                 // If relative permeability wasn't given set from the material database
                 if constexpr (!((std::same_as<std::decay_t<Args>, RelativePermeabilityTag> || ...))) {
-                    setRelativePermeability(materialDatabase.getRelativePermeability(m_material));
+                    setRelativePermeability(g_materialDatabase.getRelativePermeability(m_material));
                 }
             } else {
                 std::string missing;
