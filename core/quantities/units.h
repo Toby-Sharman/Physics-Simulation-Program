@@ -68,7 +68,6 @@ inline constexpr std::array<Prefix, 24> prefixes = {{
 //     debug modes
 //         -> Compiler would normally unpack small for loops that may be used for the operator overloads
 //         -> For assignment operators there is repeat to avoid temporaries
-//   - Equality and inequality are branchless since short-circuiting should not be faster for Quantity use cases
 //   - The casting warning from Clang-Tidy or otherwise is not a problem for this use case and the value will not
 //     propagate in a way that would cause issues in other places
 //         -> If wanting to get rid of warning static_cast<int16_t> or static_cast<short> will work
@@ -83,6 +82,8 @@ inline constexpr std::array<Prefix, 24> prefixes = {{
 // Supported overloads / operations and functions / methods:
 //   - Constructor:            Unit()
 //   - Dimensionless factory:  Unit::dimensionless()
+//   - Dimension factories:    Unit::_____Dimension() (See all options below; too much to include here)
+//   - Dimension chacks:       Unit::has_____Dimension(unit) (See all options below; too much to include here)
 //   - Multiplication:         operator*, operator*=
 //   - Division:               operator/, operator/=
 //   - Equality/Inequality:    operator==, operator!=
@@ -92,8 +93,8 @@ inline constexpr std::array<Prefix, 24> prefixes = {{
 //   - String conversion:      toString()
 //
 // Example usage:
-//   Unit meter = Unit(1, 0, 0, 0, 0, 0, 0);
-//   Unit second = Unit(0, 0, 1, 0, 0, 0, 0);
+//   Unit meter = Unit::lengthDimension();
+//   Unit second = Unit::timeDimension();
 //
 //   Unit speed = meter / second;           // {1,0,-1,0,0,0,0}
 //   Unit area  = meter * meter;            // {2,0,0,0,0,0,0}
@@ -117,6 +118,86 @@ struct [[nodiscard]] Unit {
     // Used to make it clearer when there is dimensionless Unit initialisation
     [[nodiscard]] static constexpr Unit dimensionless() noexcept {
         return Unit{0,0,0,0,0,0,0};
+    }
+
+    // Length Unit dimension factory
+    [[nodiscard]] static constexpr Unit lengthDimension() noexcept {
+        return Unit{1, 0, 0, 0, 0, 0, 0};
+    }
+
+    // Mass Unit dimension factory
+    [[nodiscard]] static constexpr Unit massDimension() noexcept {
+        return Unit{0, 1, 0, 0, 0, 0, 0};
+    }
+
+    // Time Unit dimension factory
+    [[nodiscard]] static constexpr Unit timeDimension() noexcept {
+        return Unit{0, 0, 1, 0, 0, 0, 0};
+    }
+
+    // Electric Unit current dimension factory
+    [[nodiscard]] static constexpr Unit currentDimension() noexcept {
+        return Unit{0, 0, 0, 1, 0, 0, 0};
+    }
+
+    // Thermodynamic temperature Unit dimension factory
+    [[nodiscard]] static constexpr Unit temperatureDimension() noexcept {
+        return Unit{0, 0, 0, 0, 1, 0, 0};
+    }
+
+    // Amount of substance in moles Unit dimension factory
+    [[nodiscard]] static constexpr Unit chemicalAmountDimension() noexcept {
+        return Unit{0, 0, 0, 0, 0, 1, 0};
+    }
+
+    // Luminous intensity Unit dimension factory
+    [[nodiscard]] static constexpr Unit luminousIntensityDimension() noexcept {
+        return Unit{0, 0, 0, 0, 0, 0, 1};
+    }
+
+    // Inverse volume Unit dimension factory
+    [[nodiscard]] static constexpr Unit inverseVolumeDimension() noexcept {
+        return Unit{-3, 0, 0, 0, 0, 0, 0};
+    }
+
+    // Length Unit dimension check
+    [[nodiscard]] static constexpr bool hasLengthDimension(const Unit& unit) noexcept {
+        return unit == lengthDimension();
+    }
+
+    // Mass Unit dimension check
+    [[nodiscard]] static constexpr bool hasMassDimension(const Unit& unit) noexcept {
+        return unit == massDimension();
+    }
+
+    // Time Unit dimension check
+    [[nodiscard]] static constexpr bool hasTimeDimension(const Unit& unit) noexcept {
+        return unit == timeDimension();
+    }
+
+    // Electric current Unit dimension check
+    [[nodiscard]] static constexpr bool hasCurrentDimension(const Unit& unit) noexcept {
+        return unit == currentDimension();
+    }
+
+    // Thermodynamic temperature Unit dimension check
+    [[nodiscard]] static constexpr bool hasTemperatureDimension(const Unit& unit) noexcept {
+        return unit == temperatureDimension();
+    }
+
+    // Amount of substance in moles Unit dimension check
+    [[nodiscard]] static constexpr bool hasChemicalAmountDimension(const Unit& unit) noexcept {
+        return unit == chemicalAmountDimension();
+    }
+
+    // Luminous intensity Unit dimension check
+    [[nodiscard]] static constexpr bool hasLuminousIntensityDimension(const Unit& unit) noexcept {
+        return unit == luminousIntensityDimension();
+    }
+
+    // Inverse volume Unit dimension check
+    [[nodiscard]] static constexpr bool hasInverseVolumeDimension(const Unit& unit) noexcept {
+        return unit == inverseVolumeDimension();
     }
 
     // Constructor method from array
@@ -195,16 +276,12 @@ struct [[nodiscard]] Unit {
     // Equality operator
     //
     // Compares all exponents for exact equality
-    [[nodiscard]] constexpr bool operator==(const Unit& other) const noexcept {
-        return this->exponents == other.exponents;
-    }
+    [[nodiscard]] constexpr bool operator==(const Unit& other) const noexcept = default;
 
     // Inequality operator
     //
-    // Compares all exponents for inequality
-    [[nodiscard]] constexpr bool operator!=(const Unit& other) const noexcept {
-        return this->exponents != other.exponents;
-    }
+    // Delegates to operator== to keep comparison logic centralised
+    [[nodiscard]] constexpr bool operator!=(const Unit& other) const noexcept = default;
 
     // Less-than operator
     //
@@ -297,13 +374,13 @@ struct UnitInfo {
     using PhysConst = Globals::Constant::Physics;
     static const std::unordered_map<std::string_view, UnitInfo> table = {
         // Base SI units (except kg -> g)
-        {"m",   {1.0,  Unit(1,  0,  0,  0,  0, 0, 0)}}, // Metre
-        {"g",   {1e-3, Unit(0,  1,  0,  0,  0, 0, 0)}}, // Gram
-        {"s",   {1.0,  Unit(0,  0,  1,  0,  0, 0, 0)}}, // Second
-        {"A",   {1.0,  Unit(0,  0,  0,  1,  0, 0, 0)}}, // Ampere
-        {"K",   {1.0,  Unit(0,  0,  0,  0,  1, 0, 0)}}, // Kelvin
-        {"mol", {1.0,  Unit(0,  0,  0,  0,  0, 1, 0)}}, // Mole
-        {"cd",  {1.0,  Unit(0,  0,  0,  0,  0, 0, 1)}}, // Candela
+        {"m",   {1.0,  Unit::lengthDimension()}},              // Metre
+        {"g",   {1e-3, Unit::massDimension()}},                // Gram
+        {"s",   {1.0,  Unit::timeDimension()}},                // Second
+        {"A",   {1.0,  Unit::currentDimension()}},             // Ampere
+        {"K",   {1.0,  Unit::temperatureDimension()}},         // Kelvin
+        {"mol", {1.0,  Unit::chemicalAmountDimension()}},      // Mole
+        {"cd",  {1.0,  Unit::luminousIntensityDimension()}},   // Candela
 
         // Derived SI units
         {"Hz",  {1.0,  Unit(0,  0,  -1, 0,  0, 0, 0)}}, // Hertz
@@ -319,7 +396,7 @@ struct UnitInfo {
         {"Wb",  {1.0,  Unit(2,  1,  -2, -1, 0, 0, 0)}}, // Weber
         {"T",   {1.0,  Unit(0,  1,  -2, -1, 0, 0, 0)}}, // Tesla
         {"H",   {1.0,  Unit(2,  1,  -2, -2, 0, 0, 0)}}, // Henry
-        {"lm",  {1.0,  Unit(0,  0,  0,  0,  0, 0, 1)}}, // Lumen
+        {"lm",  {1.0,  Unit::luminousIntensityDimension()}},              // Lumen
         {"lx",  {1.0,  Unit(-2, 0,  0,  0,  0, 0, 1)}}, // Lux
         {"Bq",  {1.0,  Unit(0,  0,  -1, 0,  0, 0, 0)}}, // Becquerel
         {"Gy",  {1.0,  Unit(2,  0,  -2, 0,  0, 0, 0)}}, // Gray
@@ -327,12 +404,12 @@ struct UnitInfo {
         {"kat", {1.0,  Unit(0,  0,  -1, 0,  0, 1, 0)}}, // Katal
 
         // Non-SI units
-        {"eV",   {PhysConst::e,    Unit(2, 1, -2, 0,  0, 0, 0)}}, // ElectronVolt
-        {"u",    {PhysConst::u,    Unit(0, 1, 0,  0,  0, 0, 0)}}, // Atomic mass unit
-        {"Da",   {PhysConst::Da,   Unit(0, 1, 0,  0,  0, 0, 0)}}, // Dalton
+        {"eV",  {PhysConst::e,  Unit(2, 1, -2, 0, 0, 0, 0)}}, // ElectronVolt
+        {"u",   {PhysConst::u,  Unit::massDimension()}},                        // Atomic mass unit
+        {"Da",  {PhysConst::Da, Unit::massDimension()}},                        // Dalton
 
-        {"min", {60.0,   Unit(0, 0, 1, 0, 0, 0, 0)}}, // Minute
-        {"hr",  {3600.0, Unit(0, 0, 1, 0, 0, 0, 0)}}, // Hour
+        {"min", {60.0,          Unit::timeDimension()}},                        // Minute
+        {"hr",  {3600.0,        Unit::timeDimension()}},                        // Hour
     };
     return table;
 }

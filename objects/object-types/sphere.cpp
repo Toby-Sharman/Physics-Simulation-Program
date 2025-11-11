@@ -23,7 +23,7 @@
 #include "core/quantities/quantity.h"
 
 void Sphere::setRadius(const Quantity& radius) {
-    if (radius.unit != Unit(1,0,0,0,0,0,0)) {
+    if (!Unit::hasLengthDimension(radius.unit)) {
         throw std::invalid_argument(std::format(
             "Sphere '{}' radius must have length dimensions but got {}",
             m_name,
@@ -123,7 +123,7 @@ Vector<3> Sphere::localNormal(const Vector<3> &localPoint) const {
 void Sphere::print(const std::size_t indent) const {
     const std::string pad(indent, ' ');
     const auto localPosition = m_transformation.translation;
-    const auto worldPosition = getWorldTransformation() * Vector<3>({0.0, 0.0, 0.0}, Unit(1,0,0,0,0,0,0));
+    const auto worldPosition = getWorldTransformation() * Vector<3>({0.0, 0.0, 0.0}, Unit::lengthDimension());
 
     std::cout << pad << "Sphere: " << m_name << " | Material: " << m_material << " | Local Position: " << localPosition << " | World Position: " << worldPosition << " | Radius: " << m_radius << std::endl;
 }

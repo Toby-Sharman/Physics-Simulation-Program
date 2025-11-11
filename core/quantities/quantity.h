@@ -357,8 +357,8 @@ struct std::formatter<Quantity, CharT> : formatter<double, CharT> {
     using PhysConst = Globals::Constant::Physics;
     using ProgramConst = Globals::Constant::Program;
     static const std::unordered_map<std::string_view, Quantity> table = {
-        {"time step",          {ProgramConst::timeStep,          Unit(0, 0, 1, 0, 0, 0, 0)}}, // Time step for simulation in seconds
-        {"massless tolerance", {ProgramConst::masslessTolerance, Unit(0, 1, 0, 0, 0, 0, 0)}}, // Massless tolerance in kg
+        {"time step",          {ProgramConst::timeStep,          Unit::timeDimension()}}, // Time step for simulation in seconds
+        {"massless tolerance", {ProgramConst::masslessTolerance, Unit::massDimension()}}, // Massless tolerance in kg
 
         {"c",    {PhysConst::c,    Unit(1, 0, -1, 0,  0,  0, 0)}}, // Speed of light in vacuum
         {"e",    {PhysConst::e,    Unit(0, 0, 1,  1,  0,  0, 0)}}, // Elementary electric charge

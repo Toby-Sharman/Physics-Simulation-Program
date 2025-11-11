@@ -65,7 +65,7 @@ class Sphere final : public Object {
         void print(std::size_t indent) const override;
 
     private:
-        Quantity m_radius = Quantity(0, Unit(1,0,0,0,0,0,0)); // Default is point-like
+        Quantity m_radius = Quantity(0, Unit::lengthDimension()); // Default is point-like
         void setTag(SizeTag<Quantity>&& tag) { setRadius(tag.value); }
 
         // Doesn't automatically use inherited tag setters so use this

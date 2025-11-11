@@ -64,7 +64,7 @@ class Box final : public Object {
         void print(std::size_t indent) const override;
 
     private:
-        Vector<3> m_size = Vector<3>({0, 0, 0}, Unit(1,0,0,0,0,0,0)); // Default is point-like
+        Vector<3> m_size = Vector<3>({0, 0, 0}, Unit::lengthDimension()); // Default is point-like
         void setTag(SizeTag<Vector<3>>&& tag) { setSize(tag.value); }
 
         // Doesn't automatically use inherited tag setters so use this

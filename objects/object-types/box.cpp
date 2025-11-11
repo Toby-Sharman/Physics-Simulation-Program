@@ -25,7 +25,7 @@
 void Box::setSize(const Vector<3> &size) {
     std::size_t axis = 0;
     for (const auto& dimension : size) {
-        if (dimension.unit != Unit(1,0,0,0,0,0,0)) {
+        if (!Unit::hasLengthDimension(dimension.unit)) {
             throw std::invalid_argument(std::format(
                 "Box '{}' size[{}] must have length dimensions but got {}",
                 m_name,
@@ -174,7 +174,7 @@ Vector<3> Box::localNormal(const Vector<3> &localPoint) const {
 void Box::print(const std::size_t indent) const {
     const std::string pad(indent, ' ');
     const auto localPosition = m_transformation.translation;
-    const auto worldPosition = getWorldTransformation() * Vector<3>({0.0, 0.0, 0.0}, Unit(1,0,0,0,0,0,0));
+    const auto worldPosition = getWorldTransformation() * Vector<3>({0.0, 0.0, 0.0}, Unit::lengthDimension());
 
     std::cout << pad << "Box: " << m_name << " | Material: " << m_material << " | Local Position: " << localPosition << " | World Position: " << worldPosition << " | Size: " << m_size << std::endl;
 }

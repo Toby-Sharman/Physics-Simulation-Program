@@ -218,7 +218,7 @@ class Object {
         std::string m_name = "Unknown";
         TransformationMatrix m_transformation; // Has default values from definition of TransformationMatrix
         std::string m_material = "Unknown";
-        Quantity m_temperature = Quantity(293, Unit(0,0,0,0,1,0,0)); // Room temperature
+        Quantity m_temperature = Quantity(293, Unit::temperatureDimension()); // Room temperature
         Quantity m_numberDensity;
         double m_relativePermeability = 1; // Will be set via construction; this is to supress linters or IDEs
 
