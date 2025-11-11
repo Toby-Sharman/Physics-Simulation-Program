@@ -57,7 +57,7 @@ class Globals {
             struct Physics {
                 static constexpr double c = 299792458;                                // Speed of light in m s^-1
                 static constexpr double h = 6.62607015e-34;                           // Planck constant
-                static constexpr double hbar = h/Maths::pi;                           // Reduced Planck constant
+                static constexpr double hbar = h/(2*Maths::pi);                       // Reduced Planck constant
                 static constexpr double e = 1.602176634e-19;                          // Elementary charge
                 static constexpr double mu0 = 1.25663706127e-6;                       // Vacuum permeability
                 static constexpr double u = 1.66053906892e-27;                        // Atomic mass unit in kg
