@@ -51,6 +51,7 @@ target_sources(Simulation_program PRIVATE
         core/random/random_manager.cpp
         databases/base_database.cpp
         objects/object.cpp
+        objects/object_manager.cpp
         objects/object-types/box.cpp
         objects/object-types/sphere.cpp
         particles/particle.cpp
