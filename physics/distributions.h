@@ -13,8 +13,8 @@
 #ifndef PHYSICS_SIMULATION_PROGRAM_DISTRIBUTIONS_H
 #define PHYSICS_SIMULATION_PROGRAM_DISTRIBUTIONS_H
 
-#include "core/maths/vector.h"
-#include "core/maths/utilities/quantity.h"
+#include "core/linear-algebra/vector.h"
+#include "core/quantities/quantity.h"
 
 // Velocity sampler from temperature
 //
@@ -26,10 +26,6 @@
 //   - particleMass should be taken from the particle properties not the particle table for consistency with custom
 //     units
 //
-// Notes on algorithms:
-//   - There is no check here for if the temperature and particle mass are of incorrect units beyond that raisedTo()
-//     doesn't throw an error for fractional units
-//
 // Notes on output:
 //   - Generate velocity not a 4-momentum so it is more general
 //
@@ -40,7 +36,27 @@
 // Returns:
 //   - Vector<3> - A 3-velocity vector
 //
-// Example usage:
+// Example usage: TODO
 [[nodiscard]] Vector<3> sampleThermalVelocity(const Quantity& temperature, const Quantity& particleMass);
+
+
+// Isotropic direction sampler
+//
+// Generates a random unit vector uniformly distributed over the surface of a sphere
+//
+// Notes on algorithms:
+//   - Draws cos(Θ) uniformly in [-1, 1] and φ uniformly in [Θ, 2π) to avoid pole clustering
+//   - Theta is measured from +z and φ from +x in the x-y plane; sampling cos(Θ) directly ensures the polar angle
+//     density matches the surface area element (sin(Θ) dΘ dφ)
+//   - Phi (azimuth) is sampled uniformly over a full revolution [0, 2π) so every rotation around +z is equally likely
+//
+// Notes on output:
+//   - Returns a Vector<3> whose components are all dimensionless and whose magnitude is 1 (within floating precision)
+//
+// Returns:
+//   - Vector<3> - A unit direction vector
+//
+// Example usage: TODO
+[[nodiscard]] Vector<3> sampleIsotropicDirection();
 
 #endif //PHYSICS_SIMULATION_PROGRAM_DISTRIBUTIONS_H
