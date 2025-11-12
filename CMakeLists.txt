@@ -59,9 +59,9 @@ target_sources(Simulation_program PRIVATE
         physics/distributions.cpp
         physics/fields/field_solver.cpp
         physics/fields/field_boundary_handling.cpp
+        physics/particle-movement/particle_continuous_interactions.cpp
         simulation/step.cpp
         simulation/data-collection/particle_collection.cpp
-        simulation/particle-movement/particle_movement.cpp
         simulation/particle-movement/particle_interaction.cpp
 )
 
@@ -84,9 +84,9 @@ target_include_directories(Simulation_program PRIVATE
         particles
         physics
         physics/fields
+        physics/particle-movement
         simulation
         simulation/data-collection
-        simulation/particle-movement
 )
 
 target_link_libraries(Simulation_program PRIVATE nlohmann_json::nlohmann_json)
