@@ -72,6 +72,7 @@ target_include_directories(Simulation_program PRIVATE
         config
         core
         core/linear-algebra
+        core/physics
         core/quantities/utilities
         core/random
         databases
