@@ -60,6 +60,7 @@ target_sources(Simulation_program PRIVATE
         physics/fields/field_solver.cpp
         physics/fields/field_boundary_handling.cpp
         physics/interactions/continuous/particle_continuous_interactions.cpp
+        physics/interactions/discrete/boundary_interactions.cpp
         physics/interactions/interaction_utilities.cpp
         simulation/step.cpp
         simulation/data-collection/particle_collection.cpp
