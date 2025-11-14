@@ -10,15 +10,9 @@
 // Licensed under a Non-Commercial License. See LICENSE file for details
 //
 
-#include "particle_continuous_interactions.h"
+#include "physics/interactions/continuous/particle_continuous_interactions.h"
 
-namespace {
-    // Access speed of light once to avoid repeated quantity table lookups
-    const Quantity& speedOfLight() {
-        static const Quantity c = quantityTable().at("c");
-        return c;
-    }
-}
+#include "physics/interactions/interaction_utilities.h"
 
 Vector<3> displacement(const Particle& particle, const Quantity& dt) {
     const auto& momentum = particle.getMomentum();

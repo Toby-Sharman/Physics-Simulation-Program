@@ -59,10 +59,10 @@ target_sources(Simulation_program PRIVATE
         physics/distributions.cpp
         physics/fields/field_solver.cpp
         physics/fields/field_boundary_handling.cpp
-        physics/particle-movement/particle_continuous_interactions.cpp
+        physics/interactions/continuous/particle_continuous_interactions.cpp
+        physics/interactions/interaction_utilities.cpp
         simulation/step.cpp
         simulation/data-collection/particle_collection.cpp
-        simulation/particle-movement/particle_interaction.cpp
 )
 
 # Include directories
@@ -83,8 +83,10 @@ target_include_directories(Simulation_program PRIVATE
         objects/utilities
         particles
         physics
+        physics/interactions
+        physics/interactions/continuous
+        physics/interactions/discrete
         physics/fields
-        physics/particle-movement
         simulation
         simulation/data-collection
 )
