@@ -10,14 +10,14 @@
 // Licensed under a Non-Commercial License. See LICENSE file for details
 //
 
-#include "physics/interactions/discrete/boundary_interactions.h"
+#include "simulation/geometry/boundary/boundary_interactions.h"
 
 #include <algorithm>
 #include <cmath> // For std::abs and std::clamp ignore warning
 #include <limits>
 
 #include "core/globals.h"
-#include "physics/interactions/interaction_utilities.h"
+#include "physics/processes/interaction_utilities.h"
 
 bool particleBoundaryConditions(
     const Object* world,
@@ -93,6 +93,7 @@ bool particleBoundaryConditions(
 
     event.surface = best.surface;
     event.intersection = startPosition + displacement;
+    event.mediumAfter = nextObject;
     return true;
 }
 

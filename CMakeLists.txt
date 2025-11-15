@@ -63,6 +63,7 @@ target_sources(Simulation_program PRIVATE
         physics/interactions/discrete/boundary_interactions.cpp
         physics/interactions/interaction_utilities.cpp
         simulation/step.cpp
+        simulation/geometry/boundary/boundary_interactions.cpp
         simulation/data-collection/particle_collection.cpp
 )
 
@@ -90,6 +91,7 @@ target_include_directories(Simulation_program PRIVATE
         physics/interactions/discrete
         physics/fields
         simulation
+        simulation/geometry
         simulation/data-collection
 )
 

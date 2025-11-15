@@ -21,6 +21,7 @@
 struct BoundaryEvent {
     const Object* surface = nullptr;
     Vector<3> intersection;
+    const Object* mediumAfter = nullptr;
 };
 
 bool particleBoundaryConditions(const Object* world,
