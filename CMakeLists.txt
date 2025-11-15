@@ -59,10 +59,9 @@ target_sources(Simulation_program PRIVATE
         physics/distributions.cpp
         physics/fields/field_solver.cpp
         physics/fields/field_boundary_handling.cpp
-        physics/interactions/continuous/particle_continuous_interactions.cpp
-        physics/interactions/discrete/boundary_interactions.cpp
-        physics/interactions/interaction_utilities.cpp
         simulation/step.cpp
+        physics/processes/continuous/particle_continuous_interactions.cpp
+        physics/processes/interaction_utilities.cpp
         simulation/geometry/boundary/boundary_interactions.cpp
         simulation/data-collection/particle_collection.cpp
 )
@@ -86,12 +85,17 @@ target_include_directories(Simulation_program PRIVATE
         objects/utilities
         particles
         physics
-        physics/interactions
-        physics/interactions/continuous
-        physics/interactions/discrete
+        physics/processes
+        physics/processes/continuous
+        physics/processes/discrete
+        physics/processes/discrete/core
+        physics/processes/discrete/interactions
         physics/fields
         simulation
         simulation/geometry
+        simulation/geometry/boundary
+        simulation/motion
+        simulation/stepping
         simulation/data-collection
 )
 

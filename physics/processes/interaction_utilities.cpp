@@ -10,7 +10,7 @@
 // Licensed under a Non-Commercial License. See LICENSE file for details
 //
 
-#include "physics/interactions/interaction_utilities.h"
+#include "physics/processes/interaction_utilities.h"
 
 #include <iostream>
 

@@ -4,7 +4,7 @@
 // Created by Tobias Sharman on 21/10/2025
 //
 // Description:
-//   - Helpers for propagating particles under continuous/integral motion
+//   - Functions for types of continuous/integral motion
 //
 // Copyright (c) 2025, Tobias Sharman
 // Licensed under a Non-Commercial License. See LICENSE file for details
@@ -29,15 +29,5 @@
 //
 // Example usage: TODO
 Vector<3> displacement(const Particle& particle, const Quantity& dt);
-
-// Particle position advancement
-//
-// "Integrates" a particle over a time dt; with simple relativistic considerations
-//
-// Notes on algorithms:
-//   - Advances spatial and time components of particle
-//
-// Example usage: TODO
-void moveParticle(Particle& particle, const Quantity& dt);
 
 #endif //PHYSICS_SIMULATION_PROGRAM_PARTICLE_CONTINUOUS_INTERACTIONS_H

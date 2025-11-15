@@ -10,9 +10,9 @@
 // Licensed under a Non-Commercial License. See LICENSE file for details
 //
 
-#include "physics/interactions/continuous/particle_continuous_interactions.h"
+#include "physics/processes/continuous/particle_continuous_interactions.h"
 
-#include "physics/interactions/interaction_utilities.h"
+#include "physics/processes/interaction_utilities.h"
 
 Vector<3> displacement(const Particle& particle, const Quantity& dt) {
     const auto& momentum = particle.getMomentum();
@@ -24,11 +24,4 @@ Vector<3> displacement(const Particle& particle, const Quantity& dt) {
 
     const auto& energy = particle.getEnergy();
     return momentum / energy * scaledTime;
-}
-
-void moveParticle(Particle& particle, const Quantity& dt) {
-    const auto spatialDisplacement = displacement(particle, dt);
-    const auto updatedPosition = particle.getPosition() + spatialDisplacement;
-    const auto updatedTime = particle.getTime() + dt * speedOfLight();
-    particle.setPosition(updatedTime, updatedPosition);
 }
