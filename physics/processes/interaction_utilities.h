@@ -38,4 +38,9 @@ void clampVelocityToSubLuminal(Vector<3>& velocity,
     std::string_view contextLabel,
     const Quantity& c = speedOfLight());
 
+// Lorentz factor helper
+//
+// Compute γ = 1 / sqrt(1 - (v/c)^2) for a supplied speed magnitude, guarding against superluminal inputs
+Quantity lorentzGammaFromSpeed(const Quantity& speed, const Quantity& c = speedOfLight());
+
 #endif //PHYSICS_SIMULATION_PROGRAM_INTERACTION_UTILITIES_H

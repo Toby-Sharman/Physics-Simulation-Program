@@ -15,13 +15,26 @@
 #include "physics/processes/interaction_utilities.h"
 
 Vector<3> displacement(const Particle& particle, const Quantity& dt) {
-    const auto& momentum = particle.getMomentum();
-    const auto scaledTime = dt * speedOfLight();
-
-    if (particle.isMassless()) {
-        return momentum.unitVector() * scaledTime;
+    if (!std::isfinite(dt.value) || dt.value == 0.0) {
+        return {};
     }
 
-    const auto& energy = particle.getEnergy();
-    return momentum / energy * scaledTime;
+    const auto& momentum = particle.getMomentum();
+    const auto momentumMagnitude = momentum.length();
+    if (momentumMagnitude.value <= 0.0) {
+        return {};
+    }
+
+    const auto c = speedOfLight();
+    if (particle.isMassless()) {
+        return momentum / momentumMagnitude * (c * dt);
+    }
+
+    const auto energy = particle.getEnergy();
+    if (energy.value == 0.0) {
+        return {};
+    }
+
+    const auto velocity = momentum / energy * (c * c);
+    return velocity * dt;
 }

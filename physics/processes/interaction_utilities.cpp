@@ -12,8 +12,12 @@
 
 #include "physics/processes/interaction_utilities.h"
 
+#include <algorithm>
+#include <cmath>
 #include <iostream>
+#include <stdexcept>
 
+#include "core/globals.h"
 #include "core/quantities/units.h"
 
 const Quantity& speedOfLight() {
@@ -47,4 +51,21 @@ void clampVelocityToSubLuminal(Vector<3>& velocity,
     }
 
     logInteractionWarning(contextLabel, "Sampled velocity exceeded c; clamped to subluminal speed");
+}
+
+Quantity lorentzGammaFromSpeed(const Quantity& speed, const Quantity& c) {
+    if (c.value <= 0.0) {
+        throw std::invalid_argument("lorentzGammaFromSpeed: speed of light must be positive");
+    }
+
+    if (speed.value < 0.0) {
+        throw std::invalid_argument("lorentzGammaFromSpeed: speed must be non-negative");
+    }
+
+    const double beta = (speed / c).value;
+    const double clampedBeta = std::clamp(beta, 0.0, 1.0);
+    const double oneMinusBetaSq = std::max(1e-12, 1.0 - clampedBeta * clampedBeta);
+    const double gammaValue = 1.0 / std::sqrt(oneMinusBetaSq);
+    constexpr double gammaLimit = Globals::Constant::Program::lorentzGammaLimit;
+    return Quantity::dimensionless(std::min(gammaValue, gammaLimit));
 }

@@ -59,10 +59,16 @@ target_sources(Simulation_program PRIVATE
         physics/distributions.cpp
         physics/fields/field_solver.cpp
         physics/fields/field_boundary_handling.cpp
-        simulation/step.cpp
         physics/processes/continuous/particle_continuous_interactions.cpp
+        physics/processes/discrete/core/decay_utilities.cpp
+        physics/processes/discrete/core/interaction_channels.cpp
+        physics/processes/discrete/core/interaction_process_registry.cpp
+        physics/processes/discrete/core/interaction_sampling.cpp
+        physics/processes/discrete/interactions/photon_absorption.cpp
+        physics/processes/discrete/interactions/spontaneous_emission.cpp
         physics/processes/interaction_utilities.cpp
         simulation/geometry/boundary/boundary_interactions.cpp
+        simulation/motion/particle_motion.cpp
         simulation/data-collection/particle_collection.cpp
 )
 
