@@ -18,7 +18,7 @@
 
 #include "config/config.h"
 #include "databases/base_database.h"
-#include "particles/particle_type.h"
+#include "particles/particle-types/particle_type.h"
 
 // ParticleDatabase
 //
