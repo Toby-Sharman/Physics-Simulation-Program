@@ -55,12 +55,13 @@ target_sources(Simulation_program PRIVATE
         objects/object-types/box.cpp
         objects/object-types/sphere.cpp
         particles/particle.cpp
+        particles/particle_source.cpp
         particles/particle-types/atom.cpp
         particles/particle-types/photon.cpp
-        particles/particle_source.cpp
         physics/distributions.cpp
         physics/fields/field_solver.cpp
         physics/fields/field_boundary_handling.cpp
+        physics/processes/interaction_utilities.cpp
         physics/processes/continuous/particle_continuous_interactions.cpp
         physics/processes/discrete/core/decay_utilities.cpp
         physics/processes/discrete/core/interaction_channels.cpp
@@ -68,10 +69,12 @@ target_sources(Simulation_program PRIVATE
         physics/processes/discrete/core/interaction_sampling.cpp
         physics/processes/discrete/interactions/photon_absorption.cpp
         physics/processes/discrete/interactions/spontaneous_emission.cpp
-        physics/processes/interaction_utilities.cpp
+        simulation/data-collection/particle_collection.cpp
         simulation/geometry/boundary/boundary_interactions.cpp
         simulation/motion/particle_motion.cpp
-        simulation/data-collection/particle_collection.cpp
+        simulation/stepping/step_events.cpp
+        simulation/stepping/step_manager.cpp
+        simulation/stepping/step_utilities.cpp
 )
 
 # Include directories
@@ -82,6 +85,7 @@ target_include_directories(Simulation_program PRIVATE
         core
         core/linear-algebra
         core/physics
+        core/quantities
         core/quantities/utilities
         core/random
         databases
@@ -94,18 +98,18 @@ target_include_directories(Simulation_program PRIVATE
         particles
         particles/particle-types
         physics
+        physics/fields
         physics/processes
         physics/processes/continuous
         physics/processes/discrete
         physics/processes/discrete/core
         physics/processes/discrete/interactions
-        physics/fields
         simulation
+        simulation/data-collection
         simulation/geometry
         simulation/geometry/boundary
         simulation/motion
         simulation/stepping
-        simulation/data-collection
 )
 
 target_link_libraries(Simulation_program PRIVATE nlohmann_json::nlohmann_json)

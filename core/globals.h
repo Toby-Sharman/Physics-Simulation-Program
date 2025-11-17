@@ -12,6 +12,9 @@
 // Licensed under a Non-Commercial License. See LICENSE file for details.
 //
 
+// TODO: Shift towards splitting the different constants into different headers and migrate the program constants to
+//       config then rework the database directory creation to be definable in that config file
+
 #ifndef PHYSICS_SIMULATION_PROGRAM_GLOBALS_H
 #define PHYSICS_SIMULATION_PROGRAM_GLOBALS_H
 
@@ -45,6 +48,9 @@ class Globals {
                 static constexpr double masslessTolerance = 0;                        // Tolerance for treating particles as massless (in kg)
                 static constexpr double geometryTolerance = 1e-12;                    // Relative/absolute scale for geometry comparisons
                 static constexpr double lorentzGammaLimit = 1e6;                      // Maximum allowed Lorentz factor before clamping
+                static constexpr double timeSynchronisationTolerance = 1e-9;          // Relative tolerance for Particle::synchroniseTime()
+                static constexpr double hyperfineSelectionTolerance = 1e-9;           // Relative tolerance for Atom hyperfine level matching
+                static constexpr double stepLimiterTolerance = 1e-9;                  // Relative tolerance when comparing competing step events
             };
             // Common maths constants to ensure same value is used program wide
             struct Maths {
