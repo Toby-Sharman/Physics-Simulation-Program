@@ -51,6 +51,7 @@ class Globals {
                 static constexpr double timeSynchronisationTolerance = 1e-9;          // Relative tolerance for Particle::synchroniseTime()
                 static constexpr double hyperfineSelectionTolerance = 1e-9;           // Relative tolerance for Atom hyperfine level matching
                 static constexpr double stepLimiterTolerance = 1e-9;                  // Relative tolerance when comparing competing step events
+                static constexpr std::size_t maxWorkerThreads = 0;                    // 0 -> auto-detect (hardware_concurrency) else value = actual thread count set
             };
             // Common maths constants to ensure same value is used program wide
             struct Maths {

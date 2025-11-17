@@ -11,12 +11,12 @@
 //
 
 // Reminder: what includes am I missing? Can I mark any functions nodiscard, noexcept, constexpr?
+// TODO:
+//      Improve compile time
 
 #include <chrono>
-#include <cstdint>
 #include <iomanip>
 #include <iostream>
-#include <memory>
 
 #include "core/linear-algebra/matrix.h"
 #include "core/linear-algebra/vector.h"
@@ -24,10 +24,9 @@
 #include "objects/object.h"
 #include "objects/object_manager.h"
 #include "objects/object-types/box.h"
-#include "objects/object-types/sphere.h"
-#include "particles/particle.h"
+#include "particles/particle_manager.h"
 #include "particles/particle_source.h"
-#include "simulation/step.h"
+#include "simulation/stepping/step_manager.h"
 
 int main() {
     constexpr std::uint64_t masterSeed = 0x123456789ABCDEFull;
@@ -90,9 +89,11 @@ int main() {
 
     source.generateParticles(
         "photon",
-        100,
-        Vector<4>({0,-(25.0/2 + 10),0,0}, "mm"),
-        Vector<4>({1,1,0,0}, "kg m s^-1"),
+        10000,
+        Quantity(0.0, "s"),
+        Vector<3>({-(25.0/2 + 10),0,0}, "mm"),
+        Quantity(1.0, "J"),
+        Vector<3>({1,0,0}, "kg m s^-1"),
         Vector<4>({1.0, 0.0, 0.0, 1.0}) // Right hand circular polarised TODO: Think on units
         );
 
@@ -100,7 +101,7 @@ int main() {
 
     // Simulation loop
     while (!g_particleManager.empty()) {
-        stepAll(g_particleManager.getParticles(), collection, Quantity(1e-13, "s")); // all particles automatically stepped
+        stepAll(collection, Quantity(1e-13, "s")); // all particles automatically stepped
     }
 
     const auto end = std::chrono::steady_clock::now();

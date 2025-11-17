@@ -12,16 +12,20 @@
 
 #include "simulation/stepping/step_manager.h"
 
+#include <algorithm>
 #include <cmath>
 #include <stdexcept>
+#include <thread>
+#include <vector>
 
+#include "core/globals.h"
 #include "core/linear-algebra/vector.h"
+#include "core/random/random_manager.h"
 #include "objects/object_manager.h"
+#include "particles/particle_manager.h"
 #include "physics/processes/interaction_utilities.h"
-#include "physics/processes/continuous/particle_continuous_interactions.h"
 #include "physics/processes/discrete/core/decay_utilities.h"
 #include "physics/processes/discrete/core/interaction_sampling.h"
-#include "particles/particle_manager.h"
 #include "simulation/geometry/boundary/boundary_interactions.h"
 #include "simulation/motion/particle_motion.h"
 #include "simulation/stepping/step_events.h"
@@ -138,7 +142,7 @@ namespace {
     }
 } // namespace
 
-void stepAll(ParticleManager &manager, const Object *detector, const Quantity &dt) {
+void stepAll(const Object *detector, const Quantity &dt) {
     const auto *world = g_objectManager.getActiveWorld("step all particles");
     if (world == nullptr) {
         throw std::runtime_error("Active world is not available while stepping particles");
@@ -147,15 +151,55 @@ void stepAll(ParticleManager &manager, const Object *detector, const Quantity &d
     step_utilities::validateDetector(detector, world);
 
     {
-        auto particleHandle = manager.acquireReadHandle();
+        const auto particleHandle = g_particleManager.acquireReadHandle();
         auto &particles = particleHandle.particles();
+        if (const auto particleCount = particles.size(); particleCount > 0) {
 
-        for (auto &particle : particles) {
-            stepParticle(particle, detector, world, dt);
+            // Ignore warnings about threads; they change based on maxWorkerThreads being 0 OR >= 1
+            constexpr auto requestedThreads = Globals::Constant::Program::maxWorkerThreads;
+            const auto hardwareThreads = std::max<unsigned>(1, std::thread::hardware_concurrency());
+            if (requestedThreads > hardwareThreads) {
+                throw std::runtime_error("Requested worker thread count exceeds hardware_concurrency");
+            }
+            const std::size_t availableThreads = requestedThreads > 0 ? requestedThreads : hardwareThreads;
+            const std::size_t workerCount = std::min<std::size_t>(availableThreads, particleCount);
+
+            const auto runChunk = [&](const std::size_t begin, const std::size_t end, const std::size_t threadIndex) {
+                const auto previousIndex = random_manager::getThreadStreamIndex();
+                random_manager::setThreadStreamIndex(threadIndex);
+                for (std::size_t index = begin; index < end; ++index) {
+                    stepParticle(particles[index], detector, world, dt);
+                }
+                random_manager::setThreadStreamIndex(previousIndex);
+            };
+
+            std::vector<std::thread> workers;
+            workers.reserve(workerCount > 0 ? workerCount - 1 : 0);
+
+            std::size_t nextBegin = 0;
+            const std::size_t baseChunk = particleCount / workerCount;
+            const std::size_t remainder = particleCount % workerCount;
+
+            for (std::size_t workerIndex = 0; workerIndex < workerCount; ++workerIndex) {
+                const std::size_t chunkSize = baseChunk + (workerIndex < remainder ? 1 : 0);
+                const std::size_t chunkEnd = nextBegin + chunkSize;
+                if (workerIndex + 1 == workerCount) {
+                    runChunk(nextBegin, chunkEnd, workerIndex);
+                } else {
+                    workers.emplace_back(runChunk, nextBegin, chunkEnd, workerIndex);
+                }
+                nextBegin = chunkEnd;
+            }
+
+            for (auto &thread : workers) {
+                if (thread.joinable()) {
+                    thread.join();
+                }
+            }
         }
     }
 
-    manager.withExclusiveAccess([](auto &particles) {
+    g_particleManager.withExclusiveAccess([](auto &particles) {
         step_utilities::purgeDeadParticles(particles);
     });
 }

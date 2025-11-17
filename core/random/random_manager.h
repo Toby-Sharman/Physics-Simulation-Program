@@ -38,6 +38,9 @@ namespace random_manager {
     // Override if present, otherwise derived
     [[nodiscard]] std::uint64_t getStreamSeed(Stream stream);
 
+    // Returns the current thread-local stream index override
+    [[nodiscard]] std::size_t getThreadStreamIndex() noexcept;
+
     // Sets the master seed
     //
     // Passing zero falls back to a deterministic constant
@@ -48,8 +51,16 @@ namespace random_manager {
     // Zero values are hashed to avoid an all-zero seed
     void setStreamSeed(Stream stream, std::uint64_t seed) noexcept;
 
+    // Sets the default stream index used by this thread when the index parameter is omitted
+    void setThreadStreamIndex(std::size_t index) noexcept;
+
     // Provides the thread-local RNG engine for the given stream/index pair
-    [[nodiscard]] std::ranlux48& engine(Stream stream, std::size_t streamIndex = 0);
+    [[nodiscard]] std::ranlux48& engine(Stream stream, std::size_t streamIndex);
+
+    // Convenience overload that uses the thread-local index override
+    [[nodiscard]] inline std::ranlux48& engine(Stream stream) {
+        return engine(stream, getThreadStreamIndex());
+    }
 
     // Clears cached thread-local engines so new seeds take effect on the next use
     void resetCachedEngines() noexcept;

@@ -63,6 +63,7 @@ namespace random_manager {
 
         thread_local std::unordered_map<StreamKey, EngineWrapper, StreamKeyHasher> g_threadEngines;
         thread_local std::uint64_t g_cachedSeedVersion = std::numeric_limits<std::uint64_t>::max();
+        thread_local std::size_t g_threadStreamIndex = 0;
 
         std::uint64_t ensureMasterSeed() {
             if (const auto current = g_masterSeedAtomic.load(std::memory_order_acquire); current != 0) {
@@ -144,6 +145,10 @@ namespace random_manager {
         return resolvedStreamSeed(stream);
     }
 
+    std::size_t getThreadStreamIndex() noexcept {
+        return g_threadStreamIndex;
+    }
+
     void setMasterSeed(std::uint64_t seed) noexcept {
         if (seed == 0) {
             seed = k_defaultMasterSeed;
@@ -169,6 +174,10 @@ namespace random_manager {
         g_seedVersion.fetch_add(1, std::memory_order_release);
     }
 
+    void setThreadStreamIndex(const std::size_t index) noexcept {
+        g_threadStreamIndex = index;
+    }
+
     std::ranlux48& engine(const Stream stream, const std::size_t streamIndex) {
         ensureMasterSeed();
         reseedThreadEnginesIfNeeded();
@@ -186,5 +195,6 @@ namespace random_manager {
     void resetCachedEngines() noexcept {
         g_threadEngines.clear();
         g_cachedSeedVersion = std::numeric_limits<std::uint64_t>::max();
+        g_threadStreamIndex = 0;
     }
 }
