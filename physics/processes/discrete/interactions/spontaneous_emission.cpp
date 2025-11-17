@@ -32,107 +32,102 @@ namespace {
 }
 
 namespace discrete_interaction::spontaneous_emission {
-
-bool isApplicable(const Particle&, const Object*) {
-    return false;
-}
-
-std::optional<InteractionChannel> buildChannel(const Particle&, const Object*) {
-    return std::nullopt;
-}
-
-Quantity sampleLength(
-    const Particle& particle,
-    const Object* medium,
-    const InteractionChannel& channel)
-{
-    (void) particle;
-    (void) medium;
-    (void) channel;
-    return Quantity::dimensionless(std::numeric_limits<double>::infinity());
-}
-
-void apply(std::unique_ptr<Particle>& particle, const Object* medium) {
-    if (!particle) {
-        return;
+    bool isApplicable(const Particle &, const Object *) {
+        return false;
     }
 
-    (void) medium;
+    std::optional<InteractionChannel> buildChannel(const Particle &, const Object *) {
+        return std::nullopt;
+    }
 
-    struct ClearClockOnExit {
-        std::unique_ptr<Particle>& handle;
-        ~ClearClockOnExit() {
-            if (handle) {
-                handle->clearDecayClock();
-            }
+    Quantity sampleLength(
+        const Particle &particle,
+        const Object *medium,
+        const InteractionChannel &channel
+    ) {
+        (void) particle;
+        (void) medium;
+        (void) channel;
+        return Quantity::dimensionless(std::numeric_limits<double>::infinity());
+    }
+
+    void apply(std::unique_ptr<Particle> &particle, const Object *medium) {
+        if (!particle) {
+            return;
         }
-    } clearClock{particle};
 
-    if (particle->getType() == "photon") {
-        particle->clearDecayState();
-        return;
-    }
+        (void) medium;
 
-    const Vector<3> direction = sampleIsotropicDirection();
-    const std::string photonType = "photon";
-    if (!g_particleDatabase.contains(photonType)) {
-        logInteractionWarning(k_spontaneousEmissionTag, "Photon definition missing; emission skipped.");
-        particle->clearDecayState();
-        return;
-    }
+        struct ClearClockOnExit {
+            std::unique_ptr<Particle> &handle;
+            ~ClearClockOnExit() { if (handle) { handle->clearDecayClock(); } }
+        } clearClock{particle};
 
-    const auto c = speedOfLight();
-    Quantity photonEnergy;
-    if (particle->hasDecayEnergy()) {
-        static bool loggedTaggedEmission = false;
-        if (!loggedTaggedEmission) {
-            logInteractionWarning(
-                k_spontaneousEmissionTag,
-                "Emitting 10% of stored decay energy (temporary diagnostic scaling)."
-            );
-            loggedTaggedEmission = true;
-        }
-        photonEnergy = particle->getDecayEnergy() * 0.1;
-    } else {
-        const auto restEnergy = particle->getRestMass() * c * c;
-        const auto availableEnergy = particle->getEnergy() - restEnergy;
-        const double energyTolerance = std::max(
-            Globals::Constant::Program::geometryTolerance * std::abs(restEnergy.value),
-            Globals::Constant::Program::geometryTolerance
-        );
-
-        if (availableEnergy.value <= energyTolerance) {
-            logInteractionWarning(
-                k_spontaneousEmissionTag,
-                "Insufficient kinetic energy after tolerance adjustment; emission skipped."
-            );
+        if (particle->getType() == "photon") {
             particle->clearDecayState();
             return;
         }
-        photonEnergy = availableEnergy;
+
+        const Vector<3> direction = sampleIsotropicDirection();
+        const std::string photonType = "photon";
+        if (!g_particleDatabase.contains(photonType)) {
+            logInteractionWarning(k_spontaneousEmissionTag, "Photon definition missing; emission skipped.");
+            particle->clearDecayState();
+            return;
+        }
+
+        const auto c = speedOfLight();
+        Quantity photonEnergy;
+        if (particle->hasDecayEnergy()) {
+            static bool loggedTaggedEmission = false;
+            if (!loggedTaggedEmission) {
+                logInteractionWarning(
+                    k_spontaneousEmissionTag,
+                    "Emitting 10% of stored decay energy (temporary diagnostic scaling)."
+                );
+                loggedTaggedEmission = true;
+            }
+            photonEnergy = particle->getDecayEnergy() * 0.1;
+        }
+        else {
+            const auto restEnergy = particle->getRestMass() * c * c;
+            const auto availableEnergy = particle->getEnergy() - restEnergy;
+            const double energyTolerance = std::max(
+                Globals::Constant::Program::geometryTolerance * std::abs(restEnergy.value),
+                Globals::Constant::Program::geometryTolerance
+            );
+
+            if (availableEnergy.value <= energyTolerance) {
+                logInteractionWarning(
+                    k_spontaneousEmissionTag,
+                    "Insufficient kinetic energy after tolerance adjustment; emission skipped."
+                );
+                particle->clearDecayState();
+                return;
+            }
+            photonEnergy = availableEnergy;
+        }
+
+        if (photonEnergy.value <= 0.0) {
+            logInteractionWarning(k_spontaneousEmissionTag, "Computed photon energy non-positive; emission skipped.");
+            particle->clearDecayState();
+            return;
+        }
+
+        const auto momentumMagnitude = photonEnergy / c;
+        const auto momentumVector = direction * momentumMagnitude;
+
+        auto emittedPhoton = std::make_unique<Photon>(
+            photonType,
+            particle->getTime(),
+            particle->getPosition(),
+            photonEnergy,
+            momentumVector,
+            Vector<4>()
+        );
+        emittedPhoton->setAlive(true);
+        emittedPhoton->clearDecayState();
+
+        particle = std::move(emittedPhoton);
     }
-
-    if (photonEnergy.value <= 0.0) {
-        logInteractionWarning(k_spontaneousEmissionTag, "Computed photon energy non-positive; emission skipped.");
-        particle->clearDecayState();
-        return;
-    }
-
-    const auto momentumMagnitude = photonEnergy / c;
-    const auto momentumVector = direction * momentumMagnitude;
-
-    auto emittedPhoton = std::make_unique<Photon>(
-        photonType,
-        particle->getTime(),
-        particle->getPosition(),
-        photonEnergy,
-        momentumVector,
-        Vector<4>()
-    );
-    emittedPhoton->setAlive(true);
-    emittedPhoton->clearDecayState();
-
-    particle = std::move(emittedPhoton);
-}
-
 } // namespace discrete_interaction::spontaneous_emission
