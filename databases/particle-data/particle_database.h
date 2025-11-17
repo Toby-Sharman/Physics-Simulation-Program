@@ -13,10 +13,12 @@
 #ifndef PHYSICS_SIMULATION_PROGRAM_PARTICLE_DATABASE_H
 #define PHYSICS_SIMULATION_PROGRAM_PARTICLE_DATABASE_H
 
+#include <optional>
 #include <string>
 
 #include "config/config.h"
 #include "databases/base_database.h"
+#include "particles/particle_type.h"
 
 // ParticleDatabase
 //
@@ -32,20 +34,39 @@ struct ParticleDatabase final : BaseDatabase {
         return getQuantityProperty(particle, "rest mass");
     }
 
-    [[nodiscard]] double getCharge(const std::string& particle) const {
-        return getNumericProperty(particle, "charge");
+    [[nodiscard]] Quantity getCharge(const std::string& particle) const {
+        return getQuantityProperty(particle, "charge");
     }
 
-    [[nodiscard]] double getSpin(const std::string& particle) const {
-        return getNumericProperty(particle, "spin");
+    [[nodiscard]] Quantity getSpin(const std::string& particle) const {
+        return getQuantityProperty(particle, "spin");
     }
 
-    [[nodiscard]] std::string getParticleType(const std::string& particle) const {
-        return getStringProperty(particle, "particle type");
+    [[nodiscard]] ParticleType getParticleType(const std::string& particle) const {
+        try {
+            const auto type = getStringProperty(particle, "particle type");
+            if (type == "photon") {
+                return ParticleType::Photon;
+            }
+            if (type == "atom") {
+                return ParticleType::Atom;
+            }
+        } catch (const std::runtime_error&) {
+            // Property missing; fall through to generic classification
+        }
+        return ParticleType::Generic;
     }
 
     [[nodiscard]] Quantity getLifetime(const std::string& particle) const {
         return getQuantityProperty(particle, "lifetime");
+    }
+
+    [[nodiscard]] std::optional<double> getNuclearSpin(const std::string& particle) const {
+        try {
+            return getNumericProperty(particle, "nuclearSpin");
+        } catch (const std::runtime_error&) {
+            return std::nullopt;
+        }
     }
 };
 

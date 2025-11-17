@@ -55,6 +55,8 @@ target_sources(Simulation_program PRIVATE
         objects/object-types/box.cpp
         objects/object-types/sphere.cpp
         particles/particle.cpp
+        particles/particle-types/atom.cpp
+        particles/particle-types/photon.cpp
         particles/particle_source.cpp
         physics/distributions.cpp
         physics/fields/field_solver.cpp
@@ -90,6 +92,7 @@ target_include_directories(Simulation_program PRIVATE
         objects/object-types
         objects/utilities
         particles
+        particles/particle-types
         physics
         physics/processes
         physics/processes/continuous

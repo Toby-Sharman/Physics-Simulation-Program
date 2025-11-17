@@ -2,153 +2,188 @@
   "photon": {
     "symbol": "γ",
     "rest mass": { "value": 0.0, "unit": "eV/c^2" },
-    "charge": 0.0,
-    "spin": 1.0,
-    "particle type": "boson",
+    "charge": { "value": 0.0, "unit": "e" },
+    "spin": { "value": 1.0, "unit": "hbar" },
+    "particle type": "photon",
     "lifetime": { "value": 0.0, "unit": "s" }
   },
   "gluon": {
     "symbol": "g",
     "rest mass": { "value": 0.0, "unit": "eV/c^2" },
-    "charge": 0.0,
-    "spin": 1.0,
+    "charge": { "value": 0.0, "unit": "e" },
+    "spin": { "value": 1.0, "unit": "hbar" },
     "particle type": "boson",
     "lifetime": { "value": 0.0, "unit": "s" }
   },
   "W+": {
     "symbol": "W+",
-    "rest mass": { "value": 80.3692e9, "unit": "eV/c^2" },
-    "charge": 1.0,
-    "spin": 1.0,
+    "rest mass": { "value": 80369200000.0, "unit": "eV/c^2" },
+    "charge": { "value": 1.0, "unit": "e" },
+    "spin": { "value": 1.0, "unit": "hbar" },
     "particle type": "boson",
-    "lifetime": { "value": 3.0e-25, "unit": "s" }
+    "lifetime": { "value": 3e-25, "unit": "s" }
   },
   "W-": {
     "symbol": "W-",
-    "rest mass": { "value": 80.3692e9, "unit": "eV/c^2" },
-    "charge": -1.0,
-    "spin": 1.0,
+    "rest mass": { "value": 80369200000.0, "unit": "eV/c^2" },
+    "charge": { "value": -1.0, "unit": "e" },
+    "spin": { "value": 1.0, "unit": "hbar" },
     "particle type": "boson",
-    "lifetime": { "value": 3.0e-25, "unit": "s" }
+    "lifetime": { "value": 3e-25, "unit": "s" }
   },
   "Z": {
     "symbol": "Z0",
-    "rest mass": { "value": 91.1880e9, "unit": "eV/c^2" },
-    "charge": 0.0,
-    "spin": 1.0,
+    "rest mass": { "value": 91188000000.0, "unit": "eV/c^2" },
+    "charge": { "value": 0.0, "unit": "e" },
+    "spin": { "value": 1.0, "unit": "hbar" },
     "particle type": "boson",
-    "lifetime": { "value": 3.0e-25, "unit": "s" }
+    "lifetime": { "value": 3e-25, "unit": "s" }
   },
   "electron": {
     "symbol": "e-",
-    "rest mass": { "value": 548.579909065e-6, "unit": "u" },
-    "charge": -1.0,
-    "spin": 0.5,
+    "rest mass": { "value": 0.000548579909065, "unit": "u" },
+    "charge": { "value": -1.0, "unit": "e" },
+    "spin": { "value": 0.5, "unit": "hbar" },
     "particle type": "lepton",
     "lifetime": { "value": 0.0, "unit": "s" }
   },
   "muon": {
     "symbol": "μ-",
-    "rest mass": { "value": 0.1134289259 , "unit": "u" },
-    "charge": -1.0,
-    "spin": 0.5,
+    "rest mass": { "value": 0.1134289259, "unit": "u" },
+    "charge": { "value": -1.0, "unit": "e" },
+    "spin": { "value": 0.5, "unit": "hbar" },
     "particle type": "lepton",
-    "lifetime": { "value": 2.1969811e-6, "unit": "s" }
+    "lifetime": { "value": 2.1969811e-06, "unit": "s" }
   },
   "tau": {
     "symbol": "τ-",
-    "rest mass": { "value": 1776.93e6, "unit": "eV/c^2" },
-    "charge": -1.0,
-    "spin": 0.5,
+    "rest mass": { "value": 1776930000.0, "unit": "eV/c^2" },
+    "charge": { "value": -1.0, "unit": "e" },
+    "spin": { "value": 0.5, "unit": "hbar" },
     "particle type": "lepton",
     "lifetime": { "value": 2.903e-13, "unit": "s" }
   },
   "electron neutrino": {
     "symbol": "ν_e",
     "rest mass": { "value": 0.0, "unit": "eV/c^2" },
-    "charge": 0.0,
-    "spin": 0.5,
+    "charge": { "value": 0.0, "unit": "e" },
+    "spin": { "value": 0.5, "unit": "hbar" },
     "particle type": "lepton",
     "lifetime": { "value": 0.0, "unit": "s" }
   },
   "muon neutrino": {
     "symbol": "ν_μ",
     "rest mass": { "value": 0.0, "unit": "eV/c^2" },
-    "charge": 0.0,
-    "spin": 0.5,
+    "charge": { "value": 0.0, "unit": "e" },
+    "spin": { "value": 0.5, "unit": "hbar" },
     "particle type": "lepton",
     "lifetime": { "value": 0.0, "unit": "s" }
   },
   "tau neutrino": {
     "symbol": "ν_τ",
     "rest mass": { "value": 0.0, "unit": "eV/c^2" },
-    "charge": 0.0,
-    "spin": 0.5,
+    "charge": { "value": 0.0, "unit": "e" },
+    "spin": { "value": 0.5, "unit": "hbar" },
     "particle type": "lepton",
     "lifetime": { "value": 0.0, "unit": "s" }
   },
   "proton": {
     "symbol": "p",
     "rest mass": { "value": 1.007276466621, "unit": "u" },
-    "charge": 1.0,
-    "spin": 0.5,
+    "charge": { "value": 1.0, "unit": "e" },
+    "spin": { "value": 0.5, "unit": "hbar" },
     "particle type": "baryon",
     "lifetime": { "value": 0.0, "unit": "s" }
   },
   "neutron": {
     "symbol": "n",
     "rest mass": { "value": 1.00866491595, "unit": "u" },
-    "charge": 0.0,
-    "spin": 0.5,
+    "charge": { "value": 0.0, "unit": "e" },
+    "spin": { "value": 0.5, "unit": "hbar" },
     "particle type": "baryon",
     "lifetime": { "value": 880.2, "unit": "s" }
   },
   "Rb85": {
+    "symbol": "Rb-85",
+    "rest mass": { "value": 84.9117893, "unit": "u" },
+    "mass": { "value": 84.9117893, "unit": "u" },
+    "charge": { "value": 0.0, "unit": "e" },
+    "spin": { "value": 0.5, "unit": "hbar" },
+    "particle type": "atom",
+    "lifetime": { "value": 0.0, "unit": "s" },
     "nuclearSpin": 2.5,
-    "mass": {"value": 84.9117893, "unit": "u"},
-    "D1_wavelength": {"value": 794.979, "unit": "nm"},
-    "D1_lifetime": {"value": 27e-9, "unit": "s"},
-    "D2_wavelength": {"value": 780.241, "unit": "nm"},
-    "D2_lifetime": {"value": 27e-9, "unit": "s"}
+    "D1_wavelength": { "value": 794.979, "unit": "nm" },
+    "D1_lifetime": { "value": 2.7e-08, "unit": "s" },
+    "D2_wavelength": { "value": 780.241, "unit": "nm" },
+    "D2_lifetime": { "value": 2.7e-08, "unit": "s" }
   },
   "Rb87": {
+    "symbol": "Rb-87",
+    "rest mass": { "value": 86.9091805, "unit": "u" },
+    "mass": { "value": 86.9091805, "unit": "u" },
+    "charge": { "value": 0.0, "unit": "e" },
+    "spin": { "value": 0.5, "unit": "hbar" },
+    "particle type": "atom",
+    "lifetime": { "value": 0.0, "unit": "s" },
     "nuclearSpin": 1.5,
-    "mass": {"value": 86.9091805, "unit": "u"},
-    "D1_wavelength": {"value": 794.978, "unit": "nm"},
-    "D1_lifetime": {"value": 27e-9, "unit": "s"},
-    "D2_wavelength": {"value": 780.241, "unit": "nm"},
-    "D2_lifetime": {"value": 27e-9, "unit": "s"}
+    "D1_wavelength": { "value": 794.978, "unit": "nm" },
+    "D1_lifetime": { "value": 2.7e-08, "unit": "s" },
+    "D2_wavelength": { "value": 780.241, "unit": "nm" },
+    "D2_lifetime": { "value": 2.7e-08, "unit": "s" }
   },
   "Cs133": {
+    "symbol": "Cs-133",
+    "rest mass": { "value": 132.90545196, "unit": "u" },
+    "mass": { "value": 132.90545196, "unit": "u" },
+    "charge": { "value": 0.0, "unit": "e" },
+    "spin": { "value": 0.5, "unit": "hbar" },
+    "particle type": "atom",
+    "lifetime": { "value": 0.0, "unit": "s" },
     "nuclearSpin": 3.5,
-    "mass": {"value": 132.90545196, "unit": "u"},
-    "D1_wavelength": {"value": 894.592, "unit": "nm"},
-    "D1_lifetime": {"value": 34.7e-9, "unit": "s"},
-    "D2_wavelength": {"value": 852.347, "unit": "nm"},
-    "D2_lifetime": {"value": 30.5e-9, "unit": "s"}
+    "D1_wavelength": { "value": 894.592, "unit": "nm" },
+    "D1_lifetime": { "value": 3.47e-08, "unit": "s" },
+    "D2_wavelength": { "value": 852.347, "unit": "nm" },
+    "D2_lifetime": { "value": 3.05e-08, "unit": "s" }
   },
   "K39": {
+    "symbol": "K-39",
+    "rest mass": { "value": 38.96370668, "unit": "u" },
+    "mass": { "value": 38.96370668, "unit": "u" },
+    "charge": { "value": 0.0, "unit": "e" },
+    "spin": { "value": 0.5, "unit": "hbar" },
+    "particle type": "atom",
+    "lifetime": { "value": 0.0, "unit": "s" },
     "nuclearSpin": 1.5,
-    "mass": {"value": 38.96370668, "unit": "u"},
-    "D1_wavelength": {"value": 770.108, "unit": "nm"},
-    "D1_lifetime": {"value": 26.7e-9, "unit": "s"},
-    "D2_wavelength": {"value": 766.701, "unit": "nm"},
-    "D2_lifetime": {"value": 26.7e-9, "unit": "s"}
+    "D1_wavelength": { "value": 770.108, "unit": "nm" },
+    "D1_lifetime": { "value": 2.67e-08, "unit": "s" },
+    "D2_wavelength": { "value": 766.701, "unit": "nm" },
+    "D2_lifetime": { "value": 2.67e-08, "unit": "s" }
   },
   "K41": {
+    "symbol": "K-41",
+    "rest mass": { "value": 40.96182526, "unit": "u" },
+    "mass": { "value": 40.96182526, "unit": "u" },
+    "charge": { "value": 0.0, "unit": "e" },
+    "spin": { "value": 0.5, "unit": "hbar" },
+    "particle type": "atom",
+    "lifetime": { "value": 0.0, "unit": "s" },
     "nuclearSpin": 1.5,
-    "mass": {"value": 40.96182526, "unit": "u"},
-    "D1_wavelength": {"value": 770.108, "unit": "nm"},
-    "D1_lifetime": {"value": 26.7e-9, "unit": "s"},
-    "D2_wavelength": {"value": 766.701, "unit": "nm"},
-    "D2_lifetime": {"value": 26.7e-9, "unit": "s"}
+    "D1_wavelength": { "value": 770.108, "unit": "nm" },
+    "D1_lifetime": { "value": 2.67e-08, "unit": "s" },
+    "D2_wavelength": { "value": 766.701, "unit": "nm" },
+    "D2_lifetime": { "value": 2.67e-08, "unit": "s" }
   },
   "gas": {
-    "symbol": "THIS PARTICLE IS NOT FOR ACTUAL USE",
+    "symbol": "gas",
     "rest mass": { "value": 1, "unit": "u" },
-    "charge": 0.0,
-    "spin": 0.5,
-    "particle type": "baryon",
-    "lifetime": { "value": 27e-9, "unit": "s" }
+    "charge": { "value": 0.0, "unit": "e" },
+    "spin": { "value": 0.5, "unit": "hbar" },
+    "particle type": "atom",
+    "lifetime": { "value": 1e-15, "unit": "s" },
+    "nuclearSpin": 0.5,
+    "D1_wavelength": { "value": 800.0, "unit": "nm" },
+    "D1_lifetime": { "value": 3e-08, "unit": "s" },
+    "D2_wavelength": { "value": 780.0, "unit": "nm" },
+    "D2_lifetime": { "value": 3e-08, "unit": "s" }
   }
 }
