@@ -14,10 +14,35 @@
 
 #include <algorithm>
 #include <cmath> // For std::abs and std::clamp ignore warning
+#include <format>
 #include <limits>
+#include <optional>
 
 #include "core/globals.h"
 #include "physics/processes/interaction_utilities.h"
+
+namespace {
+    std::optional<Vector<3>> safeIntersection(
+        const Object* object,
+        const Vector<3>& origin,
+        const Vector<3>& displacement
+    ) {
+        try {
+            return object->worldIntersection(origin, displacement);
+        }
+        catch (const std::exception& error) {
+            logInteractionWarning(
+                "BoundaryIntersection",
+                std::format(
+                    "Skipped intersection with '{}' after tolerance spill (likely grazing hit): {}",
+                    object ? object->getName() : "unknown object",
+                    error.what()
+                )
+            );
+            return std::nullopt;
+        }
+    }
+}
 
 bool particleBoundaryConditions(
     const Object* world,
@@ -71,13 +96,15 @@ bool particleBoundaryConditions(
     };
 
     if (!startMedium->contains(endPosition)) {
-        const auto intersection = startMedium->worldIntersection(startPosition, displacement);
-        considerCandidate(startMedium, intersection - startPosition);
+        if (const auto intersection = safeIntersection(startMedium, startPosition, displacement)) {
+            considerCandidate(startMedium, *intersection - startPosition);
+        }
     }
 
     if (nextObject != nullptr && !nextObject->contains(startPosition)) {
-        const auto intersection = nextObject->worldIntersection(endPosition, -displacement);
-        considerCandidate(nextObject, intersection - startPosition);
+        if (const auto intersection = safeIntersection(nextObject, endPosition, -displacement)) {
+            considerCandidate(nextObject, *intersection - startPosition);
+        }
     }
 
     if (best.surface == nullptr) {
