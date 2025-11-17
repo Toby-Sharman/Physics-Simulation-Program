@@ -155,6 +155,26 @@ struct [[nodiscard]] Unit {
         return Unit{0, 0, 0, 0, 0, 0, 1};
     }
 
+    // Energy Unit dimension factory
+    [[nodiscard]] static constexpr Unit energyDimension() noexcept {
+        return Unit{2, 1, -2, 0, 0, 0, 0};
+    }
+
+    // Momentum Unit dimension factory
+    [[nodiscard]] static constexpr Unit momentumDimension() noexcept {
+        return Unit{1, 1, -1, 0, 0, 0, 0};
+    }
+
+    // Angular momentum Unit dimension factory
+    [[nodiscard]] static constexpr Unit angularMomentumDimension() noexcept {
+        return Unit{2, 1, -1, 0, 0, 0, 0};
+    }
+
+    // Electric charge Unit dimension factory
+    [[nodiscard]] static constexpr Unit electricChargeDimension() noexcept {
+        return Unit{0, 0, 1, 1, 0, 0, 0};
+    }
+
     // Inverse volume Unit dimension factory
     [[nodiscard]] static constexpr Unit inverseVolumeDimension() noexcept {
         return Unit{-3, 0, 0, 0, 0, 0, 0};
@@ -198,6 +218,26 @@ struct [[nodiscard]] Unit {
     // Inverse volume Unit dimension check
     [[nodiscard]] static constexpr bool hasInverseVolumeDimension(const Unit& unit) noexcept {
         return unit == inverseVolumeDimension();
+    }
+
+    // Energy Unit dimension check
+    [[nodiscard]] static constexpr bool hasEnergyDimension(const Unit& unit) noexcept {
+        return unit == energyDimension();
+    }
+
+    // Momentum Unit dimension check
+    [[nodiscard]] static constexpr bool hasMomentumDimension(const Unit& unit) noexcept {
+        return unit == momentumDimension();
+    }
+
+    // Angular momentum Unit dimension check
+    [[nodiscard]] static constexpr bool hasAngularMomentumDimension(const Unit& unit) noexcept {
+        return unit == angularMomentumDimension();
+    }
+
+    // Electric charge Unit dimension check
+    [[nodiscard]] static constexpr bool hasElectricChargeDimension(const Unit& unit) noexcept {
+        return unit == electricChargeDimension();
     }
 
     // Constructor method from array
@@ -386,9 +426,9 @@ struct UnitInfo {
         {"Hz",  {1.0,  Unit(0,  0,  -1, 0,  0, 0, 0)}}, // Hertz
         {"N",   {1.0,  Unit(1,  1,  -2, 0,  0, 0, 0)}}, // Newton
         {"Pa",  {1.0,  Unit(-1, 1,  -2, 0,  0, 0, 0)}}, // Pascal
-        {"J",   {1.0,  Unit(2,  1,  -2, 0,  0, 0, 0)}}, // Joule
+        {"J",   {1.0,  Unit::energyDimension()}},                         // Joule
         {"W",   {1.0,  Unit(2,  1,  -3, 0,  0, 0, 0)}}, // Watt
-        {"C",   {1.0,  Unit(0,  0,  1,  1,  0, 0, 0)}}, // Coulomb
+        {"C",   {1.0,  Unit::electricChargeDimension()}},                 // Coulomb
         {"V",   {1.0,  Unit(2,  1,  -3, -1, 0, 0, 0)}}, // Volt
         {"F",   {1.0,  Unit(-2, -1, 4,  2,  0, 0, 0)}}, // Farad
         {"Ω",   {1.0,  Unit(2,  1,  -3, -2, 0, 0, 0)}}, // Ohm
@@ -404,12 +444,15 @@ struct UnitInfo {
         {"kat", {1.0,  Unit(0,  0,  -1, 0,  0, 1, 0)}}, // Katal
 
         // Non-SI units
-        {"eV",  {PhysConst::e,  Unit(2, 1, -2, 0, 0, 0, 0)}}, // ElectronVolt
-        {"u",   {PhysConst::u,  Unit::massDimension()}},                        // Atomic mass unit
-        {"Da",  {PhysConst::Da, Unit::massDimension()}},                        // Dalton
+        {"eV",  {PhysConst::e,    Unit::energyDimension()}},               // ElectronVolt
+        {"u",   {PhysConst::u,    Unit::massDimension()}},                 // Atomic mass unit
+        {"Da",  {PhysConst::Da,   Unit::massDimension()}},                 // Dalton
+        {"e",   {PhysConst::e,    Unit::electricChargeDimension()}},       // Elementary charge
+        {"hbar",{PhysConst::hbar, Unit::angularMomentumDimension()}},      // Reduced Planck constant
+        {"ℏ",   {PhysConst::hbar, Unit::angularMomentumDimension()}},      // Reduced Planck constant symbol
 
-        {"min", {60.0,          Unit::timeDimension()}},                        // Minute
-        {"hr",  {3600.0,        Unit::timeDimension()}},                        // Hour
+        {"min", {60.0,          Unit::timeDimension()}},                   // Minute
+        {"hr",  {3600.0,        Unit::timeDimension()}},                   // Hour
     };
     return table;
 }

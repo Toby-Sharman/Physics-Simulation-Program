@@ -361,10 +361,10 @@ struct std::formatter<Quantity, CharT> : formatter<double, CharT> {
         {"massless tolerance", {ProgramConst::masslessTolerance, Unit::massDimension()}}, // Massless tolerance in kg
 
         {"c",    {PhysConst::c,    Unit(1, 0, -1, 0,  0,  0, 0)}}, // Speed of light in vacuum
-        {"e",    {PhysConst::e,    Unit(0, 0, 1,  1,  0,  0, 0)}}, // Elementary electric charge
-        {"h",    {PhysConst::h,    Unit(2, 1, -1, 0,  0,  0, 0)}}, // Planck constant
-        {"hbar", {PhysConst::hbar, Unit(2, 1, -1, 0,  0,  0, 0)}}, // Reduced Planck constant
-        {"ℏ",    {PhysConst::hbar, Unit(2, 1, -1, 0,  0,  0, 0)}}, // Reduced Planck constant
+        {"e",    {PhysConst::e,    Unit::electricChargeDimension()}},                // Elementary electric charge
+        {"h",    {PhysConst::h,    Unit::angularMomentumDimension()}},               // Planck constant
+        {"hbar", {PhysConst::hbar, Unit::angularMomentumDimension()}},               // Reduced Planck constant
+        {"ℏ",    {PhysConst::hbar, Unit::angularMomentumDimension()}},               // Reduced Planck constant
         {"mu0",  {PhysConst::mu0,  Unit(1, 1, -2, -2, 0,  0, 0)}}, // Vacuum permeability
         {"k_b",  {PhysConst::k_b,  Unit(2, 1, -2, 0,  -1, 0, 0)}}  // Boltzmann constant
     };
