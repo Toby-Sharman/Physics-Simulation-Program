@@ -12,5 +12,6 @@
 void moveParticle(Particle& particle, const Quantity& dt, const Vector<3>& displacement) {
     const auto updatedPosition = particle.getPosition() + displacement;
     const auto updatedTime = particle.getTime() + dt;
-    particle.setPosition(updatedTime, updatedPosition);
+    particle.setTime(updatedTime);
+    particle.setPosition(updatedPosition);
 }

@@ -25,6 +25,7 @@
 #include "core/quantities/units.h"
 #include "databases/material-data/material_database.h"
 #include "databases/particle-data/particle_database.h"
+#include "particles/particle-types/atom.h"
 #include "physics/distributions.h"
 #include "physics/processes/interaction_utilities.h"
 #include "physics/processes/discrete/core/decay_utilities.h"
@@ -133,7 +134,7 @@ namespace discrete_interaction::photon_absorption {
         }
 
         static bool warnedNonAtomicMaterial = false;
-        if (g_particleDatabase.getCategory(material) != ParticleKind::Atom) {
+        if (g_particleDatabase.getParticleType(material) != ParticleType::Atom) {
             if (!warnedNonAtomicMaterial) {
                 logInteractionWarning(
                     k_photonAbsorptionTag,

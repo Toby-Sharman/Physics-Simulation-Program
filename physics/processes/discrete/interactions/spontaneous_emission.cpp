@@ -21,6 +21,7 @@
 
 #include "core/globals.h"
 #include "databases/particle-data/particle_database.h"
+#include "particles/particle-types/photon.h"
 #include "physics/distributions.h"
 #include "physics/processes/interaction_utilities.h"
 

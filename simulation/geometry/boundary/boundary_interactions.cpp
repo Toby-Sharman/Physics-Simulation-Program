@@ -168,5 +168,5 @@ void processBoundaryResponse(Particle& particle,
     updatedPosition[0] -= correction[0];
     updatedPosition[1] -= correction[1];
     updatedPosition[2] -= correction[2];
-    particle.setPosition(particle.getTime(), updatedPosition);
+    particle.setPosition(updatedPosition);
 }
