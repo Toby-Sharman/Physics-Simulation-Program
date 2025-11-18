@@ -1,11 +1,11 @@
 # Physics Simulation Program
 
+The current main goal is to simulate OPMs (Optically pumped magnetometers) and as such interactions included may well be
+limited to what is relevant to them.
+
 Simulate particle movement, objects, and some simple physical interactions. The focus is on low energy particle physics, 
 i.e. non-relativistic or pure quantum mechanical (interactions and other physical effects can be based in these but the 
 focus is for a more general closer analogy to real life macroscopic interactions).
-
-All particle and object attributes are stored as a `Quantity` struct data type that combines a value and a unit.
-For operations involving quantities, **the unit of the left hand operand is conserved**.
 
 There is no preservation of unit context, since the program tracks units in terms of their SI dimensions and 
 factor/scale to base SI units (m, kg, s, A, K, mol, cd). The unit dimensions are stored as integers and an error will be
@@ -16,36 +16,37 @@ relevant attributes. These databases are defined in a user readable format `.jso
 with the `json_to_bin.cpp` tool. To read the JSON files `nlohmann_json` is used and can be auto installed if not already 
 by commenting out a section of the `CMakeLists.txt` file.
 
+For reasonable computation time multithreading and Monte Carlo techniques are employed and as such provided is a 
+deterministic random generation method is provided via `random_manager`. This is thread safe and allows for different 
+streams different purposes, e.g. separate stream for interactions as thermal velocity sampling.
+
 ---
 
 ## Physics
 
-Movement has relativistic considerations.
-
-Interaction probability from optical depth (or mean free path = 1/optical depth), via the optical depth = number density x cross-section x distance, P = 1 - 
-e^(-optical depth)
-
-### Natural unit usage
-
-Do I still bother with any natural units?
-
-- Speed of light (c)
-- Elementary charge (e)
-- Planck constant (ℏ)
+Discrete interactions are handled based on calculating interaction lengths and from them then determining the 
+interaction to occur based on. Currently, the interaction selector is not properly implemented due a lack of interaction
+types not requiring it.
 
 ### Physical constants
-All physical constant are from [CODATA recommended values of the fundamental physical
-constants: 2022](https://tsapps.nist.gov/publication/get_pdf.cfm?pub_id=958143)
+
+All physical constants are from [CODATA recommended values of the fundamental physical constants: 2022](https://tsapps.nist.gov/publication/get_pdf.cfm?pub_id=958143).
+
+Current particle and material database data are nonsensical and are not to be taken as accurate values.
 
 ---
 
 ## Particles
 
-Construct **individual particles** or a **bunch as a source**
+It is recommended to construct particles via a source object and not individually so they can be properly added to the 
+particle manager. Current particle source allows for variation in some attributes like momentum and position but this is
+not yet well implemented so should be treated with great care to ensure constructed particles are realistic.
 
-Can be auto created based on standard particle attributes defined in the particle database
+### Supported particle types
 
-Photon momenta stored as a Stoke's vector
+- Photon
+- Atom (has support for hyperfine levels but needs testing)
+- Generic (not recommended for use)
 
 ---
 
@@ -57,15 +58,22 @@ of the parent. To test the correct layout use `root object->printHierarchy()` to
 handling for if the layout of objects extends outside a parent or intersects with another object so care must be taken 
 in objects lest there be unforeseen consequences**.
 
+For semantic reasons the highest level object is typically referred to as the world object and must be referred to the 
+object manager else it will not be properly linked into the step loop.
+
 ### Supported object types
+
 - Box
 - Sphere
 
 ### Construction
 
-Construction is done by either `construct<object type>(...)` or `Object pointer->addChild<object type>(...)`. 
-Construction returns pointers for minimal overhead and better lifetime management. For more intuitive construction there 
-are tag wrappers for each attribute:
+Construction is done by either `construct<object type>(...)` or `Object pointer->addChild<object type>(...)`. Using 
+construct requires a parent argument to be assigned and if addChild is called it requires a lack of parent argument. 
+**Do not use construct sans a parent argument lest it not be picked up by the object manager and linked into
+the stepping loop.** Currently, with the new object manager the world object should be created with the `createWorld` 
+method of the object manager. Construction returns pointers for minimal overhead and better lifetime management. For 
+more intuitive construction there are tag wrappers for each attribute:
 - `parent(...)` defaults no `nullptr`
 - `name(...)` defaults to `"Unknown"`
 - `position(...)` defaults to the origin/centre of parent object
@@ -83,10 +91,43 @@ defined too.
 
 ---
 
+## Simulation loop
+
+There is a `stepAll(...)` function that will advance particles by either the given time or by the default value in 
+`globals.h`. Particles will attempt to advance by the entire time step just undergoing continuous processes but the step
+may be limited by different discrete processes, such as interactions, decays, and boundary collisions. After a limiter 
+is determined the particle will advance by the interaction length, undergoing the implemented continuous processes, and 
+once finished complete that discrete interaction. Currently, after the step limiter limits the effective travel time it 
+will be attempted to finish the rest of the step on the resultant stuff from the interaction, but this may well change 
+with better handling of particles post interaction to aid in better handling of interactions that would produce multiple
+particles. Particles that reach either a specified collector, where they will be logged, or outside the world object are 
+removed from the simulation.
+
+Boundary collisions has a different implementation to other discrete interactions since it is a guarantee to occur not a
+likelihood.
+
+The `stepAll(...)` function should be slotted in a loop to step until all particles are removed. Later this will be 
+implemented as standard with some option to add a limit on either program run time or simulation time (_this is a rough 
+plan and may well change_).
+
+### Supported processes
+
+- Continuous
+  - Particle movement under momentum only (has relativistic considerations)
+- Discrete
+  - Boundary collisions
+  - Photon absorption
+  - Spontaneous emission
+
+---
+
 ## Improvements to make
 
 - Readd templated type for matrices for easier creation of rotation matrices and minor overhead improvement
   - Will require rework of asMatrix function in TransformationMatrix
+- Split `globals.h` into separate constant files for maths and physics and a config file for program related. Then also 
+update the way that the database binaries location is allocated to be in the new config and not done via the 
+`CMakeLists.txt`
 - For transformations between objects add lazy computation
 - Add renormalisation for matrices after operations to reduce numerical drift
 - For computing displacement vector it will be the same across many particles so lazy computation could be good, have an 
@@ -103,14 +144,11 @@ emission)
 ## Documentation
 
 At the top of each file is the name of the project, the file, author, creation date, a brief description of what is in
-file, and legal/license information.
+file, and legal/licence information.
 
-Verbose commenting in headers and in source files any relevant comments to describe algorithms that aren't immediately
-clear.
-
-Comments in headers will focus on describing what the code is for, how it is used, and its limitations. Where relevant
-there may also be comments on algorithms/logic if the implemented logic is peculiar, or that the approach is notable
-to how the code is used.
+Main description of how stuff functions should be in the headers not in the source files except in the case where an 
+object/function/other is limited to just the source file and it that case there may be description there for its 
+functionality.
 
 Classes will keep a general description of all of their methods and an example of usage. For methods in classes
 there will be a brief description of what the method does but any important details will be kept in a class wide comment
@@ -121,19 +159,19 @@ documentation will be described in the parent class as to lend to variant logic 
 
 ---
 
-## License
+## Licence
 
-This project is licensed under a Non-Commercial License.
+This project is licensed under a Non-Commercial Licence.
 
-You may use, modify, and share this software for non-commercial purposes only,
-including academic research, personal projects, or teaching.
+You may use, modify, and share this software for non-commercial purposes only, including academic research, personal 
+projects, or teaching.
 
-Commercial use, including selling or incorporating it into commercial products,
-is strictly prohibited without prior written permission.
+Commercial use, including selling or incorporating it into commercial products, is strictly prohibited without prior 
+written permission.
 
-Proper attribution must be given to the original author. If using this software in research,
-please acknowledge the author and/or cite the repository:
+Proper attribution must be given to the original author. If using this software in research, please acknowledge the 
+author and/or cite the repository:
 
 https://github.com/Toby-Sharman/Physics-Simulation-Program
 
-See the full [LICENSE](LICENSE) file for complete terms.
+See the full [LICENCE](LICENCE) file for complete terms.
