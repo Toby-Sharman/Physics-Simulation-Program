@@ -1,0 +1,19 @@
+# OS metadata
+.DS_Store
+
+# IDE/editor settings
+*.iml
+.idea/
+.vscode/
+
+# CMake
+cmake-build-*/
+
+# Build directory
+Build/
+
+# Generated configuration
+config/config.h
+
+# Personal files
+Notes
