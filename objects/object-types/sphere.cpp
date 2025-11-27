@@ -19,7 +19,7 @@
 #include <stdexcept>
 #include <string>
 
-#include "core/globals.h"
+#include "config/program_config.h"
 #include "core/quantities/quantity.h"
 
 void Sphere::setRadius(const Quantity& radius) {
@@ -34,7 +34,7 @@ void Sphere::setRadius(const Quantity& radius) {
 }
 
 bool Sphere::isVolumeless() const noexcept {
-    constexpr auto tolerance = Globals::Constant::Program::geometryTolerance;
+    constexpr auto tolerance = config::program::geometryTolerance;
     return m_radius.abs().value <= tolerance;
 }
 
@@ -44,7 +44,7 @@ bool Sphere::contains(const Vector<3>& worldPoint) const {
     }
 
     const auto localRadius = worldToLocalPoint(worldPoint).length();
-    const auto radiusSlack = m_radius.abs() * Globals::Constant::Program::geometryTolerance;
+    const auto radiusSlack = m_radius.abs() * config::program::geometryTolerance;
 
     return localRadius <= (m_radius + radiusSlack);
 }
@@ -60,7 +60,7 @@ Vector<3> Sphere::localIntersection(const Vector<3> &startLocalPoint, const Vect
         ));
     }
 
-    constexpr auto tolerance = Globals::Constant::Program::geometryTolerance;
+    constexpr auto tolerance = config::program::geometryTolerance;
 
     const auto a = stepLength * stepLength;
     const auto b = 2.0 * startLocalPoint.dot(localDisplacement);

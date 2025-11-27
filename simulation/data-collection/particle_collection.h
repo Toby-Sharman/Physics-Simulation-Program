@@ -16,14 +16,14 @@
 #include <memory>
 #include <string_view>
 
-#include "core/globals.h"
+#include "config/path_config.h"
 #include "objects/object.h"
 #include "particles/particle.h"
 
 // Log the particle's energy when it intersects the detector volume, deleting it afterwards
 void logEnergyIfInside(std::unique_ptr<Particle>& particle,
                        const Object* detector,
-                       const std::string_view &baseFolder = Globals::Constant::Program::outputFolder,
-                       const std::string_view &baseFilename = Globals::Constant::Program::filenamePrefix);
+                       const std::string_view &baseFolder = config::paths::outputDirectory,
+                       const std::string_view &baseFilename = config::paths::filenamePrefix);
 
 #endif //PHYSICS_SIMULATION_PROGRAM_PARTICLE_COLLECTION_H

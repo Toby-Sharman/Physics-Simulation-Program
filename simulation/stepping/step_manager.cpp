@@ -18,7 +18,7 @@
 #include <thread>
 #include <vector>
 
-#include "core/globals.h"
+#include "config/program_config.h"
 #include "core/linear-algebra/vector.h"
 #include "core/random/random_manager.h"
 #include "objects/object_manager.h"
@@ -156,7 +156,7 @@ void stepAll(const Object *detector, const Quantity &dt) {
         if (const auto particleCount = particles.size(); particleCount > 0) {
 
             // Ignore warnings about threads; they change based on maxWorkerThreads being 0 OR >= 1
-            constexpr auto requestedThreads = Globals::Constant::Program::maxWorkerThreads;
+            constexpr auto requestedThreads = config::program::maxWorkerThreads;
             const auto hardwareThreads = std::max<unsigned>(1, std::thread::hardware_concurrency());
             if (requestedThreads > hardwareThreads) {
                 throw std::runtime_error("Requested worker thread count exceeds hardware_concurrency");

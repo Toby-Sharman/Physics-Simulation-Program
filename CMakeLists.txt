@@ -22,6 +22,48 @@ endif()
 set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release" "RelWithDebInfo" "MinSizeRel")
 
 # -------------------------
+# Build/output locations (pulled from config/path_config.h)
+# -------------------------
+set(PATH_CONFIG_FILE "${CMAKE_SOURCE_DIR}/config/path_config.h")
+if(NOT EXISTS "${PATH_CONFIG_FILE}")
+    message(FATAL_ERROR "Missing config/path_config.h; please create it with path definitions.")
+endif()
+
+function(read_path_constant OUT_VAR CONST_NAME)
+    file(STRINGS "${PATH_CONFIG_FILE}" _line REGEX "inline constexpr std::string_view ${CONST_NAME} = \"")
+    if(NOT _line)
+        message(FATAL_ERROR "Could not find constant '${CONST_NAME}' in ${PATH_CONFIG_FILE}")
+    endif()
+    string(REGEX MATCH "\"([^\"]+)\"" _match "${_line}")
+    if(NOT CMAKE_MATCH_1)
+        message(FATAL_ERROR "Failed to parse value for '${CONST_NAME}' in ${PATH_CONFIG_FILE}")
+    endif()
+    set(${OUT_VAR} "${CMAKE_MATCH_1}" PARENT_SCOPE)
+endfunction()
+
+read_path_constant(PROGRAM_BUILD_DIR "buildDirectory")
+read_path_constant(PROGRAM_OUTPUT_DIR "outputDirectory")
+read_path_constant(PROGRAM_DATABASE_DIR "databaseDirectory")
+read_path_constant(MATERIAL_DATABASE_PATH "materialDatabasePath")
+read_path_constant(PARTICLE_DATABASE_PATH "particleDatabasePath")
+
+# Normalize build directory against project root, then others against build directory
+if(NOT IS_ABSOLUTE "${PROGRAM_BUILD_DIR}")
+    cmake_path(ABSOLUTE_PATH PROGRAM_BUILD_DIR BASE_DIRECTORY "${CMAKE_SOURCE_DIR}" NORMALIZE)
+endif()
+
+foreach(_var IN ITEMS PROGRAM_OUTPUT_DIR PROGRAM_DATABASE_DIR MATERIAL_DATABASE_PATH PARTICLE_DATABASE_PATH)
+    if(NOT IS_ABSOLUTE "${${_var}}")
+        cmake_path(ABSOLUTE_PATH ${_var} BASE_DIRECTORY "${PROGRAM_BUILD_DIR}" NORMALIZE)
+    endif()
+endforeach()
+
+file(MAKE_DIRECTORY "${PROGRAM_BUILD_DIR}")
+file(MAKE_DIRECTORY "${PROGRAM_OUTPUT_DIR}")
+file(MAKE_DIRECTORY "${PROGRAM_DATABASE_DIR}")
+file(MAKE_DIRECTORY "${PROGRAM_BUILD_DIR}/Tools")
+
+# -------------------------
 # External dependencies
 # -------------------------
 # Used to convert readable json files to binaries
@@ -112,6 +154,12 @@ target_include_directories(Simulation_program PRIVATE
         simulation/stepping
 )
 
+set_target_properties(Simulation_program PROPERTIES
+        RUNTIME_OUTPUT_DIRECTORY "${PROGRAM_BUILD_DIR}"
+        ARCHIVE_OUTPUT_DIRECTORY "${PROGRAM_BUILD_DIR}"
+        LIBRARY_OUTPUT_DIRECTORY "${PROGRAM_BUILD_DIR}"
+)
+
 target_link_libraries(Simulation_program PRIVATE nlohmann_json::nlohmann_json)
 
 # -------------------------
@@ -124,13 +172,8 @@ set(JSON_FILES
 )
 
 # Directories
-set(DB_BUILD_DIR "${CMAKE_BINARY_DIR}/Databases")
+set(DB_BUILD_DIR "${PROGRAM_DATABASE_DIR}")
 file(MAKE_DIRECTORY "${DB_BUILD_DIR}")
-
-set(CONFIG_DIR "${CMAKE_SOURCE_DIR}/config")
-file(MAKE_DIRECTORY "${CONFIG_DIR}")
-set(CONFIG_FILE "${CONFIG_DIR}/config.h")
-set(CONFIG_INCLUDE_GUARD "PHYSICS_SIMULATION_PROGRAM_CONFIG_H")
 
 # json_to_bin helper
 add_executable(json_to_bin EXCLUDE_FROM_ALL databases/json_to_bin.cpp)
@@ -153,11 +196,10 @@ target_link_libraries(json_to_bin PRIVATE nlohmann_json::nlohmann_json)
 
 # Put the built json_to_bin binary in build/tools/
 set_target_properties(json_to_bin PROPERTIES
-        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/Tools"
+        RUNTIME_OUTPUT_DIRECTORY "${PROGRAM_BUILD_DIR}/Tools"
 )
 
 set(BIN_FILES "")
-set(DB_PATH_DEFINES "")
 
 foreach(JSON_FILE IN LISTS JSON_FILES)
     # Absolute path to the source JSON
@@ -165,7 +207,18 @@ foreach(JSON_FILE IN LISTS JSON_FILES)
 
     get_filename_component(FILE_NAME "${JSON_FILE}" NAME)
     string(REPLACE ".json" ".bin" BIN_NAME "${FILE_NAME}")
-    set(BIN_FILE "${DB_BUILD_DIR}/${BIN_NAME}")
+    # Use user-defined paths when available
+    if(FILE_NAME STREQUAL "material_database.json")
+        set(BIN_FILE "${MATERIAL_DATABASE_PATH}")
+    elseif(FILE_NAME STREQUAL "particle_database.json")
+        set(BIN_FILE "${PARTICLE_DATABASE_PATH}")
+    else()
+        set(BIN_FILE "${DB_BUILD_DIR}/${BIN_NAME}")
+    endif()
+
+    # Ensure target directory exists
+    get_filename_component(BIN_DIR "${BIN_FILE}" DIRECTORY)
+    file(MAKE_DIRECTORY "${BIN_DIR}")
 
     add_custom_command(
             OUTPUT "${BIN_FILE}"
@@ -175,17 +228,7 @@ foreach(JSON_FILE IN LISTS JSON_FILES)
     )
 
     list(APPEND BIN_FILES "${BIN_FILE}")
-
-    # For config.h
-    file(RELATIVE_PATH REL_BIN_PATH "${CONFIG_DIR}" "${BIN_FILE}")
-    get_filename_component(FILE_NAME_WE "${JSON_FILE}" NAME_WE)
-    string(TOUPPER "${FILE_NAME_WE}" FILE_NAME_UPPER)
-    set(DB_DEFINE_NAME "${FILE_NAME_UPPER}_PATH")
-    set(DB_PATH_DEFINES "${DB_PATH_DEFINES}#define ${DB_DEFINE_NAME} \"${REL_BIN_PATH}\"\n")
 endforeach()
-
-# Write config.h with include guard - Could be better to write with \n but it the below is more legible
-file(WRITE "${CONFIG_FILE}" "#ifndef ${CONFIG_INCLUDE_GUARD}\n#define ${CONFIG_INCLUDE_GUARD}\n\n${DB_PATH_DEFINES}\n#endif // ${CONFIG_INCLUDE_GUARD}")
 
 # Custom target to group JSON conversion
 add_custom_target(generate_databases ALL DEPENDS ${BIN_FILES})
@@ -193,4 +236,4 @@ add_custom_target(generate_databases ALL DEPENDS ${BIN_FILES})
 add_dependencies(Simulation_program generate_databases)
 
 # Include config in case it ends up in an odd directory or isn't included in the standard directory list
-target_include_directories(Simulation_program PRIVATE "${CONFIG_DIR}")
+target_include_directories(Simulation_program PRIVATE "${CMAKE_SOURCE_DIR}/config")

@@ -17,6 +17,7 @@
 #include <string>
 #include <utility>
 
+#include "config/program_config.h"
 #include "core/linear-algebra/vector.h"
 #include "core/quantities/quantity.h"
 
@@ -134,7 +135,7 @@ class [[nodiscard]] Particle {
         // Time/interaction bookkeeping
         void pruneInteractionAndDecayProcesses(); // Sort out interaction length and decay time for if <= 0
         // Ensure time step advancement is within tolerance and not skewed by step limiters
-        void synchroniseTime(const Quantity& expectedTime, double toleranceFactor = Globals::Constant::Program::timeSynchronisationTolerance);
+        void synchroniseTime(const Quantity& expectedTime, double toleranceFactor = config::program::timeSynchronisationTolerance);
 
         // Lorentz factor method
         [[nodiscard]] Quantity gamma() const;

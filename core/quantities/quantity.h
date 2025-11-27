@@ -23,6 +23,8 @@
 #include <unordered_map>
 
 #include "units.h"
+#include "config/program_config.h"
+#include "constants/physics.h"
 #include "core/quantities//utilities/unit_utilities.h"
 
 // Quantity
@@ -354,19 +356,17 @@ struct std::formatter<Quantity, CharT> : formatter<double, CharT> {
 
 // Table of some common physical constants
 [[nodiscard]] inline const std::unordered_map<std::string_view, Quantity>& quantityTable() {
-    using PhysConst = Globals::Constant::Physics;
-    using ProgramConst = Globals::Constant::Program;
     static const std::unordered_map<std::string_view, Quantity> table = {
-        {"time step",          {ProgramConst::timeStep,          Unit::timeDimension()}}, // Time step for simulation in seconds
-        {"massless tolerance", {ProgramConst::masslessTolerance, Unit::massDimension()}}, // Massless tolerance in kg
+        {"time step",          {config::program::timeStep,          Unit::timeDimension()}}, // Time step for simulation in seconds
+        {"massless tolerance", {config::program::masslessTolerance, Unit::massDimension()}}, // Massless tolerance in kg
 
-        {"c",    {PhysConst::c,    Unit(1, 0, -1, 0,  0,  0, 0)}}, // Speed of light in vacuum
-        {"e",    {PhysConst::e,    Unit::electricChargeDimension()}},                // Elementary electric charge
-        {"h",    {PhysConst::h,    Unit::angularMomentumDimension()}},               // Planck constant
-        {"hbar", {PhysConst::hbar, Unit::angularMomentumDimension()}},               // Reduced Planck constant
-        {"ℏ",    {PhysConst::hbar, Unit::angularMomentumDimension()}},               // Reduced Planck constant
-        {"mu0",  {PhysConst::mu0,  Unit(1, 1, -2, -2, 0,  0, 0)}}, // Vacuum permeability
-        {"k_b",  {PhysConst::k_b,  Unit(2, 1, -2, 0,  -1, 0, 0)}}  // Boltzmann constant
+        {"c",    {constants::physics::c,    Unit(1, 0, -1, 0,  0,  0, 0)}}, // Speed of light in vacuum
+        {"e",    {constants::physics::e,    Unit::electricChargeDimension()}},                // Elementary electric charge
+        {"h",    {constants::physics::h,    Unit::angularMomentumDimension()}},               // Planck constant
+        {"hbar", {constants::physics::hbar, Unit::angularMomentumDimension()}},               // Reduced Planck constant
+        {"ℏ",    {constants::physics::hbar, Unit::angularMomentumDimension()}},               // Reduced Planck constant
+        {"mu0",  {constants::physics::mu0,  Unit(1, 1, -2, -2, 0,  0, 0)}}, // Vacuum permeability
+        {"k_b",  {constants::physics::k_b,  Unit(2, 1, -2, 0,  -1, 0, 0)}}  // Boltzmann constant
     };
     return table;
 }

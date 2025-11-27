@@ -12,8 +12,5 @@ cmake-build-*/
 # Build directory
 Build/
 
-# Generated configuration
-config/config.h
-
 # Personal files
 Notes

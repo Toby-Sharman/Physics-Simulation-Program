@@ -19,7 +19,7 @@
 #include <stdexcept>
 #include <string>
 
-#include "core/globals.h"
+#include "config/program_config.h"
 #include "core/quantities/quantity.h"
 
 void Box::setSize(const Vector<3> &size) {
@@ -39,7 +39,7 @@ void Box::setSize(const Vector<3> &size) {
 }
 
 bool Box::isVolumeless() const noexcept {
-    constexpr auto tolerance = Globals::Constant::Program::geometryTolerance;
+    constexpr auto tolerance = config::program::geometryTolerance;
     return std::ranges::any_of(m_size, [](const Quantity& axis) {
         return axis.abs().value <= tolerance;
     });
@@ -52,7 +52,7 @@ bool Box::contains(const Vector<3>& worldPoint) const {
 
     const auto local = worldToLocalPoint(worldPoint);
     const auto halfSize = this->m_size * 0.5;
-    constexpr auto tolerance = Globals::Constant::Program::geometryTolerance;
+    constexpr auto tolerance = config::program::geometryTolerance;
 
     for (std::size_t i = 0; i < 3; ++i) {
         if (local[i].abs() > halfSize[i] + halfSize[i].abs() * tolerance) {
@@ -74,7 +74,7 @@ Vector<3> Box::localIntersection(const Vector<3>& startLocalPoint, const Vector<
         ));
     }
     const Vector<3> halfSize = this->m_size * 0.5;
-    constexpr auto relativeTolerance = Globals::Constant::Program::geometryTolerance;
+    constexpr auto relativeTolerance = config::program::geometryTolerance;
     const auto absoluteTolerance = displacementLength * relativeTolerance;
 
     auto segmentEntry = 0.0; // Earliest parameter in [0, 1] where the ray enters every slab

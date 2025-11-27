@@ -16,6 +16,7 @@
 #include <limits>
 #include <stdexcept>
 
+#include "config/program_config.h"
 #include "physics/processes/interaction_utilities.h"
 #include "physics/processes/continuous/particle_continuous_interactions.h"
 #include "physics/processes/discrete/core/interaction_process_registry.h"
@@ -48,7 +49,7 @@ namespace {
         const double difference = candidateDt.value - baseDt;
         const double magnitude = std::max(std::abs(baseDt), std::abs(candidateDt.value));
         const double tolerance = std::max(
-            magnitude * Globals::Constant::Program::stepLimiterTolerance,
+            magnitude * config::program::stepLimiterTolerance,
             std::numeric_limits<double>::epsilon()
         );
 

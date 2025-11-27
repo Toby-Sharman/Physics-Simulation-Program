@@ -16,7 +16,7 @@
 #include <optional>
 #include <string>
 
-#include "config/config.h"
+#include "config/path_config.h"
 #include "databases/base_database.h"
 #include "particles/particle-types/particle_type.h"
 
@@ -71,6 +71,6 @@ struct ParticleDatabase final : BaseDatabase {
 };
 
 // Create a reusable instance of the particle database
-inline ParticleDatabase g_particleDatabase{PARTICLE_DATABASE_PATH};
+inline ParticleDatabase g_particleDatabase{std::string(config::paths::particleDatabasePath)};
 
 #endif //PHYSICS_SIMULATION_PROGRAM_PARTICLE_DATABASE_H

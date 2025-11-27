@@ -20,7 +20,7 @@
 #include <string_view>
 #include <unordered_map>
 
-#include "core/globals.h"
+#include "constants/physics.h"
 
 // Prefix
 //
@@ -411,7 +411,6 @@ struct UnitInfo {
 // SI dimensionless units like radians and degrees are neglected
 //   - Unsure of implication on lumen and lux FIXME
 [[nodiscard]] inline const std::unordered_map<std::string_view, UnitInfo>& unitTable() {
-    using PhysConst = Globals::Constant::Physics;
     static const std::unordered_map<std::string_view, UnitInfo> table = {
         // Base SI units (except kg -> g)
         {"m",   {1.0,  Unit::lengthDimension()}},              // Metre
@@ -444,12 +443,12 @@ struct UnitInfo {
         {"kat", {1.0,  Unit(0,  0,  -1, 0,  0, 1, 0)}}, // Katal
 
         // Non-SI units
-        {"eV",  {PhysConst::e,    Unit::energyDimension()}},               // ElectronVolt
-        {"u",   {PhysConst::u,    Unit::massDimension()}},                 // Atomic mass unit
-        {"Da",  {PhysConst::Da,   Unit::massDimension()}},                 // Dalton
-        {"e",   {PhysConst::e,    Unit::electricChargeDimension()}},       // Elementary charge
-        {"hbar",{PhysConst::hbar, Unit::angularMomentumDimension()}},      // Reduced Planck constant
-        {"ℏ",   {PhysConst::hbar, Unit::angularMomentumDimension()}},      // Reduced Planck constant symbol
+        {"eV",  {constants::physics::e,    Unit::energyDimension()}},          // ElectronVolt
+        {"u",   {constants::physics::u,    Unit::massDimension()}},            // Atomic mass unit
+        {"Da",  {constants::physics::Da,   Unit::massDimension()}},            // Dalton
+        {"e",   {constants::physics::e,    Unit::electricChargeDimension()}},  // Elementary charge
+        {"hbar",{constants::physics::hbar, Unit::angularMomentumDimension()}}, // Reduced Planck constant
+        {"ℏ",   {constants::physics::hbar, Unit::angularMomentumDimension()}}, // Reduced Planck constant symbol
 
         {"min", {60.0,          Unit::timeDimension()}},                   // Minute
         {"hr",  {3600.0,        Unit::timeDimension()}},                   // Hour

@@ -1,6 +1,6 @@
 //
 // Physics Simulation Program
-// File: globals.h
+// File: particle_source.h
 // Created by Tobias Sharman on 17/09/2025.
 //
 // Description:

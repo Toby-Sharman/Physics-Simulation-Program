@@ -18,7 +18,7 @@
 #include <limits>
 #include <optional>
 
-#include "core/globals.h"
+#include "config/program_config.h"
 #include "physics/processes/interaction_utilities.h"
 
 namespace {
@@ -57,7 +57,7 @@ bool particleBoundaryConditions(
     }
 
     const auto originalLength = displacement.length();
-    if (originalLength.value <= Globals::Constant::Program::geometryTolerance) {
+    if (originalLength.value <= config::program::geometryTolerance) {
         return false;
     }
 
@@ -95,33 +95,63 @@ bool particleBoundaryConditions(
         }
     };
 
-    if (!startMedium->contains(endPosition)) {
-        if (const auto intersection = safeIntersection(startMedium, startPosition, displacement)) {
-            considerCandidate(startMedium, *intersection - startPosition);
+    const Object* targetSurface = nextObject ? nextObject : startMedium;
+    constexpr double tol = config::program::geometryTolerance;
+    const auto localStart = targetSurface->worldToLocalPoint(startPosition);
+    const auto localDisp = targetSurface->worldToLocalDirection(displacement);
+
+    auto tryHit = [&](const Object* surface) -> std::optional<Object::RayHit> {
+        if (!surface) { return std::nullopt; }
+        const auto ls = surface->worldToLocalPoint(startPosition);
+        const auto ld = surface->worldToLocalDirection(displacement);
+        return surface->localRaycast(ls, ld, tol);
+    };
+
+    if (const auto hit = tryHit(targetSurface)) {
+        const double clampedT = std::clamp(hit->t, 0.0, 1.0);
+        dt = dt * clampedT;
+        displacement = displacement * clampedT;
+        event.surface = targetSurface;
+        event.intersection = targetSurface->localToWorldPoint(hit->point);
+        event.mediumAfter = nextObject;
+        return true;
+    }
+
+    if (targetSurface != startMedium) {
+        if (const auto hit = tryHit(startMedium)) {
+            const double clampedT = std::clamp(hit->t, 0.0, 1.0);
+            dt = dt * clampedT;
+            displacement = displacement * clampedT;
+            event.surface = startMedium;
+            event.intersection = startMedium->localToWorldPoint(hit->point);
+            event.mediumAfter = nextObject;
+            return true;
         }
     }
 
-    if (nextObject != nullptr && !nextObject->contains(startPosition)) {
-        if (const auto intersection = safeIntersection(nextObject, endPosition, -displacement)) {
-            considerCandidate(nextObject, *intersection - startPosition);
+    // If the medium changed but no hit was found, reflect at the start point with zero travel
+    if (nextObject != nullptr) {
+        static int logged = 0;
+        if (logged < 5) {
+            ++logged;
+            logInteractionWarning(
+                "BoundaryIntersection",
+                std::format(
+                    "Medium changed from '{}' to '{}' but no intersection found; reflecting at start.",
+                    startMedium ? startMedium->getName() : "unknown",
+                    nextObject ? nextObject->getName() : "unknown"
+                )
+            );
         }
+        dt.value = 0.0;
+        displacement = displacement * 0.0;
+        event.surface = startMedium;
+        event.intersection = startPosition;
+        event.mediumAfter = nextObject;
+        return true;
     }
 
-    if (best.surface == nullptr) {
-        return false;
-    }
-
-    if (const auto bestLength = best.displacement.length(); bestLength.value <= Globals::Constant::Program::geometryTolerance) {
-        return false;
-    }
-
-    dt = dt * best.fraction;
-    displacement = best.displacement;
-
-    event.surface = best.surface;
-    event.intersection = startPosition + displacement;
-    event.mediumAfter = nextObject;
-    return true;
+    return false;
 }
 
 void processBoundaryResponse(Particle& particle,
@@ -129,7 +159,7 @@ void processBoundaryResponse(Particle& particle,
     const Vector<3>& eventDisplacement,
     const Quantity& travelledDistance)
 {
-    constexpr double geometryTolerance = Globals::Constant::Program::geometryTolerance;
+    constexpr double geometryTolerance = config::program::geometryTolerance;
 
     if (event.surface == nullptr || !particle.isReflective() || travelledDistance.value <= 0.0) {
         return;

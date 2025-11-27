@@ -19,7 +19,7 @@
 #include <random>
 #include <stdexcept>
 
-#include "core/globals.h"
+#include "constants/maths.h"
 #include "core/quantities/units.h"
 #include "core/random/random_manager.h"
 
@@ -80,7 +80,7 @@ Vector<3> sampleThermalVelocity(const Quantity& temperature, const Quantity& par
 Vector<3> sampleIsotropicDirection() {
     auto& engine = random_manager::engine(random_manager::Stream::SourceSampling);
     thread_local std::uniform_real_distribution cosineDistribution(-1.0, 1.0);
-    thread_local std::uniform_real_distribution azimuthalDistribution(0.0, 2.0 * Globals::Constant::Maths::pi);
+    thread_local std::uniform_real_distribution azimuthalDistribution(0.0, 2.0 * constants::math::pi);
 
     const double cosTheta = cosineDistribution(engine);
     const double sinTheta = std::sqrt(std::max(0.0, 1.0 - cosTheta * cosTheta)); // Derive from cos(Θ) to preserve unit length

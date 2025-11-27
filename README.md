@@ -94,9 +94,10 @@ defined too.
 ## Simulation loop
 
 There is a `stepAll(...)` function that will advance particles by either the given time or by the default value in 
-`globals.h`. Particles will attempt to advance by the entire time step just undergoing continuous processes but the step
-may be limited by different discrete processes, such as interactions, decays, and boundary collisions. After a limiter 
-is determined the particle will advance by the interaction length, undergoing the implemented continuous processes, and 
+`config/program_config.h`. Output/database locations and default filenames are configured in `config/path_config.h`. 
+Particles will attempt to advance by the entire time step just undergoing continuous processes but the step may be 
+limited by different discrete processes, such as interactions, decays, and boundary collisions. After a limiter is 
+determined the particle will advance by the interaction length, undergoing the implemented continuous processes, and 
 once finished complete that discrete interaction. Currently, after the step limiter limits the effective travel time it 
 will be attempted to finish the rest of the step on the resultant stuff from the interaction, but this may well change 
 with better handling of particles post interaction to aid in better handling of interactions that would produce multiple
@@ -125,9 +126,6 @@ plan and may well change_).
 
 - Readd templated type for matrices for easier creation of rotation matrices and minor overhead improvement
   - Will require rework of asMatrix function in TransformationMatrix
-- Split `globals.h` into separate constant files for maths and physics and a config file for program related. Then also 
-update the way that the database binaries location is allocated to be in the new config and not done via the 
-`CMakeLists.txt`
 - For transformations between objects add lazy computation
 - Add renormalisation for matrices after operations to reduce numerical drift
 - For computing displacement vector it will be the same across many particles so lazy computation could be good, have an 

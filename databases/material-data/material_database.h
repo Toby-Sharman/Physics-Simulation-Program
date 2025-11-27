@@ -13,7 +13,9 @@
 #ifndef PHYSICS_SIMULATION_PROGRAM_MATERIAL_DATABASE_H
 #define PHYSICS_SIMULATION_PROGRAM_MATERIAL_DATABASE_H
 
-#include "config/config.h"
+#include <string>
+
+#include "config/path_config.h"
 #include "databases/base_database.h"
 
 // MaterialDatabase
@@ -32,6 +34,6 @@ struct MaterialDatabase final : BaseDatabase {
 };
 
 // Create a reusable instance of the material database
-inline MaterialDatabase g_materialDatabase{MATERIAL_DATABASE_PATH};
+inline MaterialDatabase g_materialDatabase{std::string(config::paths::materialDatabasePath)};
 
 #endif //PHYSICS_SIMULATION_PROGRAM_MATERIAL_DATABASE_H

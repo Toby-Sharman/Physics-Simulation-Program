@@ -17,7 +17,7 @@
 #include <iostream>
 #include <stdexcept>
 
-#include "core/globals.h"
+#include "config/program_config.h"
 #include "core/quantities/units.h"
 
 const Quantity& speedOfLight() {
@@ -66,6 +66,6 @@ Quantity lorentzGammaFromSpeed(const Quantity& speed, const Quantity& c) {
     const double clampedBeta = std::clamp(beta, 0.0, 1.0);
     const double oneMinusBetaSq = std::max(1e-12, 1.0 - clampedBeta * clampedBeta);
     const double gammaValue = 1.0 / std::sqrt(oneMinusBetaSq);
-    constexpr double gammaLimit = Globals::Constant::Program::lorentzGammaLimit;
+    constexpr double gammaLimit = config::program::lorentzGammaLimit;
     return Quantity::dimensionless(std::min(gammaValue, gammaLimit));
 }

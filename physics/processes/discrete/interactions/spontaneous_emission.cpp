@@ -19,7 +19,7 @@
 #include <string>
 #include <string_view>
 
-#include "core/globals.h"
+#include "config/program_config.h"
 #include "databases/particle-data/particle_database.h"
 #include "particles/particle-types/photon.h"
 #include "physics/distributions.h"
@@ -93,8 +93,8 @@ namespace discrete_interaction::spontaneous_emission {
             const auto restEnergy = particle->getRestMass() * c * c;
             const auto availableEnergy = particle->getEnergy() - restEnergy;
             const double energyTolerance = std::max(
-                Globals::Constant::Program::geometryTolerance * std::abs(restEnergy.value),
-                Globals::Constant::Program::geometryTolerance
+                config::program::geometryTolerance * std::abs(restEnergy.value),
+                config::program::geometryTolerance
             );
 
             if (availableEnergy.value <= energyTolerance) {

@@ -15,7 +15,7 @@
 #include <cmath>  // For std::abs ignore warning
 #include <utility>
 
-#include "core/globals.h"
+#include "config/program_config.h"
 #include "databases/particle-data/particle_database.h"
 
 namespace {
@@ -102,7 +102,7 @@ bool Atom::selectHyperfineLevel(const double F, const double mF, const bool exci
     if (this->m_hyperfineLevels.empty()) {
         return false;
     }
-    constexpr double tolerance = Globals::Constant::Program::hyperfineSelectionTolerance;
+    constexpr double tolerance = config::program::hyperfineSelectionTolerance;
     for (std::size_t i = 0; i < this->m_hyperfineLevels.size(); ++i) {
         if (const auto& level = this->m_hyperfineLevels[i];
             std::abs(level.totalAngularMomentum - F) < tolerance &&
