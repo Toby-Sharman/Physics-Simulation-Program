@@ -17,7 +17,7 @@
 
 namespace config::program {
     inline constexpr std::size_t maxWorkerThreads = 0;           // 0 -> auto-detect (hardware_concurrency) else value = actual thread count set
-Å
+
     inline constexpr double timeStep = 1e-15;                    // Increment of time in each step of the program (in seconds)
     inline constexpr double masslessTolerance = 0;               // Tolerance for treating particles as massless (in kg)
     inline constexpr double geometryTolerance = 1e-10;           // Relative/absolute scale for geometry comparisons
