@@ -9,8 +9,11 @@
 // Copyright (c) 2025, Tobias Sharman
 // Licensed under a Non-Commercial License. See LICENSE file for details
 //
+
 #ifndef PHYSICS_SIMULATION_PROGRAM_SPHERE_H
 #define PHYSICS_SIMULATION_PROGRAM_SPHERE_H
+
+#include <optional>
 
 #include "core/linear-algebra/vector.h"
 #include "objects/object.h"
@@ -52,7 +55,7 @@ class Sphere final : public Object {
         // Local intersection method
         //
         // Compute an intersection in local coordinates given a start point and displacement
-        [[nodiscard]] Vector<3> localIntersection(const Vector<3>& startLocalPoint, const Vector<3>& localDisplacement) const override;
+        [[nodiscard]] std::optional<Vector<3>> localIntersection(const Vector<3>& startLocalPoint, const Vector<3>& localDisplacement) const override;
 
         // Local normal method
         //

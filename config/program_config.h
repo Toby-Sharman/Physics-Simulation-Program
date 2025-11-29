@@ -21,6 +21,8 @@ namespace config::program {
     inline constexpr double timeStep = 1e-15;                    // Increment of time in each step of the program (in seconds)
     inline constexpr double masslessTolerance = 0;               // Tolerance for treating particles as massless (in kg)
     inline constexpr double geometryTolerance = 1e-10;           // Relative/absolute scale for geometry comparisons
+    inline constexpr double boundaryFallbackScale = 5.0;         // Multiplier on geometryTolerance for no-hit step shrink
+    inline constexpr double boundaryEpsilonScale = 1e-6;         // Fraction of travelledDistance used for post-hit nudging
     inline constexpr double lorentzGammaLimit = 1e6;             // Maximum allowed Lorentz factor before clamping
     inline constexpr double timeSynchronisationTolerance = 1e-9; // Relative tolerance for Particle::synchroniseTime()
     inline constexpr double hyperfineSelectionTolerance = 1e-9;  // Relative tolerance for Atom hyperfine level matching

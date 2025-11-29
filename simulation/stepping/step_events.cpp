@@ -141,6 +141,7 @@ StepEvent determineStepEvent(
     BoundaryEvent boundaryEvent{};
     const bool hitBoundary = preStep.medium != nullptr &&
                              particleBoundaryConditions(
+                                 particle,
                                  world,
                                  preStep.medium,
                                  preStep.position,

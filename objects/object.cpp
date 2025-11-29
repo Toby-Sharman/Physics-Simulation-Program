@@ -104,11 +104,16 @@ void Object::setNumberDensity(const Quantity numberDensity) {
     return nullptr;
 }
 
-Vector<3> Object::worldIntersection(const Vector<3>& startWorldPoint, const Vector<3>& worldDisplacement) const {
+std::optional<Vector<3>> Object::worldIntersection(const Vector<3>& startWorldPoint, const Vector<3>& worldDisplacement) const {
     const auto localStart = worldToLocalPoint(startWorldPoint);
     const auto localDisplacement = worldToLocalDirection(worldDisplacement);
     const auto intersectionLocal = localIntersection(localStart, localDisplacement);
-    return localToWorldPoint(intersectionLocal);
+
+    if (!intersectionLocal) {
+        return std::nullopt;
+    }
+
+    return localToWorldPoint(*intersectionLocal);
 }
 
 void Object::printHierarchy(const std::size_t indent) const {

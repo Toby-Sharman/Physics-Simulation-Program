@@ -19,12 +19,17 @@
 #include "particles/particle.h"
 
 struct BoundaryEvent {
+    const Object* mediumBefore = nullptr;
+    const Object* mediumAfter = nullptr;
     const Object* surface = nullptr;
     Vector<3> intersection;
-    const Object* mediumAfter = nullptr;
+    Vector<3> normal;
+    bool hasNormal = false;
+    bool nudgeIntoMediumAfter = false;
 };
 
-bool particleBoundaryConditions(const Object* world,
+bool particleBoundaryConditions(const Particle& particle,
+    const Object* world,
     const Object* startMedium,
     const Vector<3>& startPosition,
     Vector<3>& displacement,

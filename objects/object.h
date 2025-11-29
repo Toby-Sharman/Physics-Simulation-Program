@@ -17,6 +17,7 @@
 #include <cstddef> // For std::size_t ignore warning
 #include <format>
 #include <memory>
+#include <optional>
 #include <stdexcept>
 #include <string>
 #include <string_view>
@@ -188,12 +189,12 @@ class Object {
         // Local intersection method
         //
         // Compute an intersection in local coordinates given a start point and displacement
-        [[nodiscard]] virtual Vector<3> localIntersection(const Vector<3>& startLocalPoint, const Vector<3>& localDisplacement) const = 0;
+        [[nodiscard]] virtual std::optional<Vector<3>> localIntersection(const Vector<3>& startLocalPoint, const Vector<3>& localDisplacement) const = 0;
 
         // World intersection method
         //
         // Compute an intersection in world coordinates given a start point and displacement
-        [[nodiscard]] Vector<3> worldIntersection(const Vector<3>& startWorldPoint, const Vector<3>& worldDisplacement) const;
+        [[nodiscard]] std::optional<Vector<3>> worldIntersection(const Vector<3>& startWorldPoint, const Vector<3>& worldDisplacement) const;
 
         // Local normal method
         //

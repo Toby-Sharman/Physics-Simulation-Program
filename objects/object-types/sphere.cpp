@@ -20,7 +20,25 @@
 #include <string>
 
 #include "config/program_config.h"
-#include "core/quantities/quantity.h"
+
+namespace {
+    constexpr bool withinSegment(const double t) {
+        constexpr double tolerance = config::program::geometryTolerance;
+        return t >= -tolerance && t <= 1.0 + tolerance;
+    }
+
+    constexpr double clamp01(const double t) {
+        if (t < 0.0) {
+            return 0.0;
+        }
+
+        if (t > 1.0) {
+            return 1.0;
+        }
+
+        return t;
+    }
+} // namespace
 
 void Sphere::setRadius(const Quantity& radius) {
     if (!Unit::hasLengthDimension(radius.unit)) {
@@ -43,71 +61,44 @@ bool Sphere::contains(const Vector<3>& worldPoint) const {
         return false;
     }
 
-    const auto localRadius = worldToLocalPoint(worldPoint).length();
-    const auto radiusSlack = m_radius.abs() * config::program::geometryTolerance;
+    constexpr double tolerance = config::program::geometryTolerance;
 
-    return localRadius <= (m_radius + radiusSlack);
+    const auto localRadius = worldToLocalPoint(worldPoint).length();
+    const auto radiusSlack = m_radius.abs() * tolerance;
+
+    return localRadius <= m_radius + radiusSlack;
 }
 
-Vector<3> Sphere::localIntersection(const Vector<3> &startLocalPoint, const Vector<3> &localDisplacement) const {
-    const auto stepLength = localDisplacement.length();
-    if (stepLength.value == 0.0) {
-        throw std::runtime_error(std::format(
-            "Sphere '{}' cannot compute intersection because displacement length is zero (start = {}, displacement = {})",
-            m_name,
-            startLocalPoint,
-            localDisplacement
-        ));
-    }
-
+std::optional<Vector<3>> Sphere::localIntersection(const Vector<3> &startLocalPoint, const Vector<3> &localDisplacement) const {
     constexpr auto tolerance = config::program::geometryTolerance;
 
-    const auto a = stepLength * stepLength;
-    const auto b = 2.0 * startLocalPoint.dot(localDisplacement);
-    const auto c = startLocalPoint.dot(startLocalPoint) - this->m_radius * this->m_radius;
+    const double a = localDisplacement.dot(localDisplacement).value;
+    const double b = 2.0 * startLocalPoint.dot(localDisplacement).value;
+    const double c = startLocalPoint.dot(startLocalPoint).value - this->m_radius.value * this->m_radius.value;
 
-    const auto bRatio = b / a; // Dimensionless
-    const auto cRatio = c / a; // Dimensionless
+    if (std::abs(a) <= tolerance) {
+        return std::nullopt;
+    }
 
-    auto discriminant = bRatio.value * bRatio.value - 4.0 * cRatio.value;
-    if (discriminant < -std::max(std::abs(discriminant), 1.0) * tolerance) {
-        throw std::runtime_error(std::format(
-            "Sphere '{}' intersection discriminant is negative (value = {}, start = {}, displacement = {})",
-            m_name,
-            discriminant,
-            startLocalPoint,
-            localDisplacement
-        ));
+    double discriminant = b * b - 4.0 * a * c;
+    if (discriminant < -std::abs(discriminant) * tolerance) {
+        return std::nullopt;
     }
     discriminant = std::max(discriminant, 0.0);
 
     const double sqrtDisc = std::sqrt(discriminant);
-    const double tEntry = (-bRatio.value - sqrtDisc) * 0.5;
-    const double tExit = (-bRatio.value + sqrtDisc) * 0.5;
+    const double tEntry = (-b - sqrtDisc) / (2.0 * a);
+    const double tExit = (-b + sqrtDisc) / (2.0 * a);
 
-    const auto withinSegment = [](const double t) {
-        return t >= -tolerance && t <= 1.0 + tolerance;
-    };
-
-    // Deal with numeric imprecision
-    const auto clamp01 = [](const double t) {
-        return std::max(0.0, std::min(1.0, t));
-    };
-
-    double t = 0.0;
+    double t = std::numeric_limits<double>::infinity();
     if (withinSegment(tEntry)) {
         t = clamp01(tEntry);
     } else if (withinSegment(tExit)) {
         t = clamp01(tExit);
-    } else {
-        throw std::runtime_error(std::format(
-            "Sphere '{}' intersection parameter not in [0,1]: tEntry = {}, tExit = {} (start = {}, displacement = {})",
-            m_name,
-            tEntry,
-            tExit,
-            startLocalPoint,
-            localDisplacement
-        ));
+    }
+
+    if (!std::isfinite(t)) {
+        return std::nullopt;
     }
 
     return startLocalPoint + localDisplacement * t;
@@ -115,8 +106,13 @@ Vector<3> Sphere::localIntersection(const Vector<3> &startLocalPoint, const Vect
 
 Vector<3> Sphere::localNormal(const Vector<3> &localPoint) const {
     if (isVolumeless()) {
+        std::cout
+        << std::format("Degenerate (point-like) objects like {} do not have a meaningful surface normal",
+            this->m_name)
+        << std::endl;
         return {0.0, 0.0, 0.0};
     }
+
     return localPoint.unitVector(); // Outward unit vector
 }
 

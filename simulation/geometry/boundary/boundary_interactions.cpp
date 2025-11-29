@@ -13,38 +13,102 @@
 #include "simulation/geometry/boundary/boundary_interactions.h"
 
 #include <algorithm>
-#include <cmath> // For std::abs and std::clamp ignore warning
-#include <format>
-#include <limits>
 #include <optional>
 
 #include "config/program_config.h"
 #include "physics/processes/interaction_utilities.h"
 
 namespace {
-    std::optional<Vector<3>> safeIntersection(
-        const Object* object,
-        const Vector<3>& origin,
-        const Vector<3>& displacement
+    constexpr double geometryTolerance = config::program::geometryTolerance;
+    constexpr double fallbackScale = config::program::boundaryFallbackScale;
+    constexpr double epsilonScale = config::program::boundaryEpsilonScale;
+
+    struct IntersectionData {
+        Vector<3> point;
+        double fraction = 0.0;
+        Vector<3> normal;
+        bool hasNormal = false;
+    };
+
+    std::optional<IntersectionData> computeIntersection(
+        const Object* surface,
+        const Vector<3>& startWorld,
+        const Vector<3>& displacementWorld
     ) {
-        try {
-            return object->worldIntersection(origin, displacement);
-        }
-        catch (const std::exception& error) {
-            logInteractionWarning(
-                "BoundaryIntersection",
-                std::format(
-                    "Skipped intersection with '{}' after tolerance spill (likely grazing hit): {}",
-                    object ? object->getName() : "unknown object",
-                    error.what()
-                )
-            );
+        const auto localStart = surface->worldToLocalPoint(startWorld);
+        const auto localDisplacement = surface->worldToLocalDirection(displacementWorld);
+        const auto intersectionLocal = surface->localIntersection(localStart, localDisplacement);
+
+        if (!intersectionLocal) {
             return std::nullopt;
         }
+
+        const auto dispNorm2 = localDisplacement.lengthSquared().value;
+        if (dispNorm2 <= geometryTolerance * geometryTolerance) {
+            return std::nullopt;
+        }
+
+        const auto deltaLocal = *intersectionLocal - localStart;
+
+        IntersectionData result{};
+        result.point = surface->localToWorldPoint(*intersectionLocal);
+        result.fraction = std::clamp(deltaLocal.dot(localDisplacement).value / dispNorm2, 0.0, 1.0);
+
+        if (const auto localNormal = surface->localNormal(*intersectionLocal);
+            localNormal.length().value > geometryTolerance) {
+            result.normal = surface->localToWorldDirection(localNormal);
+            result.hasNormal = true;
+        }
+
+        return result;
     }
-}
+
+    std::optional<Vector<3>> normaliseDirection(const Vector<3>& candidate) {
+        const auto length = candidate.length();
+        if (length.value <= 0.0) {
+            return std::nullopt;
+        }
+
+        return candidate / std::max(length.value, geometryTolerance);
+    }
+
+    std::optional<Vector<3>> selectWorldNormal(
+        const BoundaryEvent& event,
+        const Vector<3>& eventDisplacement,
+        const Particle& particle
+    ) {
+        if (event.hasNormal) {
+            if (const auto normal = normaliseDirection(event.normal)) {
+                return normal;
+            }
+        }
+
+        const auto localIntersection = event.surface->worldToLocalPoint(event.intersection);
+        const auto localNormal = event.surface->localNormal(localIntersection);
+        if (const auto normal = normaliseDirection(event.surface->localToWorldDirection(localNormal))) {
+            return normal;
+        }
+
+        if (const auto normal = normaliseDirection(-eventDisplacement)) {
+            logInteractionWarning("BoundaryResponse",
+                "Degenerate surface normal; used displacement direction");
+            return normal;
+        }
+
+        if (const auto normal = normaliseDirection(particle.getMomentum())) {
+            logInteractionWarning("BoundaryResponse",
+                "Degenerate surface normal; used incoming momentum for boundary response");
+            return normal;
+        }
+
+        logInteractionWarning("BoundaryResponse",
+            "Failed to determine fallback normal; boundary response skipped");
+        return std::nullopt;
+    }
+} // namespace
 
 bool particleBoundaryConditions(
+    const Particle& particle,
     const Object* world,
     const Object* startMedium,
     const Vector<3>& startPosition,
@@ -56,102 +120,68 @@ bool particleBoundaryConditions(
         return false;
     }
 
-    const auto originalLength = displacement.length();
-    if (originalLength.value <= config::program::geometryTolerance) {
+    if (displacement.lengthSquared().value <= geometryTolerance * geometryTolerance) {
         return false;
     }
 
     const auto endPosition = startPosition + displacement;
-    if (startMedium->contains(endPosition)) {
+    const Object* endMedium = world->findObjectContaining(endPosition);
+
+    if (startMedium == endMedium) {
         return false;
     }
 
-    const auto nextObject = world->findObjectContaining(endPosition);
-    if (startMedium == nextObject && nextObject != nullptr) {
-        return false;
-    }
-
-    struct Candidate {
-        Quantity fraction = Quantity::dimensionless(std::numeric_limits<double>::infinity());
-        Vector<3> displacement{};
-        const Object* surface = nullptr;
-    }
-
-    best{Quantity::dimensionless(std::numeric_limits<double>::infinity()), displacement, nullptr};
-
-    const auto considerCandidate = [&](const Object* surface, const Vector<3>& truncatedDisplacement) {
-        const auto truncatedLength = truncatedDisplacement.length();
-        if (truncatedLength.value <= Globals::Constant::Program::geometryTolerance) {
-            return;
+    std::optional<IntersectionData> bestHit;
+    const Object* hitSurface = nullptr;
+    for (const Object* surface : {startMedium, endMedium}) {
+        if (surface == nullptr) {
+            continue;
         }
 
-        auto fractionOfOriginalLength = truncatedLength / originalLength;
-        fractionOfOriginalLength.value = std::clamp(fractionOfOriginalLength.value, 0.0, 1.0);
-
-        if (fractionOfOriginalLength.value < best.fraction.value) {
-            best.fraction = fractionOfOriginalLength;
-            best.displacement = truncatedDisplacement;
-            best.surface = surface;
-        }
-    };
-
-    const Object* targetSurface = nextObject ? nextObject : startMedium;
-    constexpr double tol = config::program::geometryTolerance;
-    const auto localStart = targetSurface->worldToLocalPoint(startPosition);
-    const auto localDisp = targetSurface->worldToLocalDirection(displacement);
-
-    auto tryHit = [&](const Object* surface) -> std::optional<Object::RayHit> {
-        if (!surface) { return std::nullopt; }
-        const auto ls = surface->worldToLocalPoint(startPosition);
-        const auto ld = surface->worldToLocalDirection(displacement);
-        return surface->localRaycast(ls, ld, tol);
-    };
-
-    if (const auto hit = tryHit(targetSurface)) {
-        const double clampedT = std::clamp(hit->t, 0.0, 1.0);
-        dt = dt * clampedT;
-        displacement = displacement * clampedT;
-        event.surface = targetSurface;
-        event.intersection = targetSurface->localToWorldPoint(hit->point);
-        event.mediumAfter = nextObject;
-        return true;
-    }
-
-    if (targetSurface != startMedium) {
-        if (const auto hit = tryHit(startMedium)) {
-            const double clampedT = std::clamp(hit->t, 0.0, 1.0);
-            dt = dt * clampedT;
-            displacement = displacement * clampedT;
-            event.surface = startMedium;
-            event.intersection = startMedium->localToWorldPoint(hit->point);
-            event.mediumAfter = nextObject;
-            return true;
+        if (const auto candidate = computeIntersection(surface, startPosition, displacement)) {
+            if (!bestHit.has_value() || candidate->fraction < bestHit->fraction) {
+                bestHit = candidate;
+                hitSurface = surface;
+            }
         }
     }
 
-    // If the medium changed but no hit was found, reflect at the start point with zero travel
-    if (nextObject != nullptr) {
-        static int logged = 0;
-        if (logged < 5) {
-            ++logged;
-            logInteractionWarning(
-                "BoundaryIntersection",
-                std::format(
-                    "Medium changed from '{}' to '{}' but no intersection found; reflecting at start.",
-                    startMedium ? startMedium->getName() : "unknown",
-                    nextObject ? nextObject->getName() : "unknown"
-                )
-            );
+    if (!bestHit.has_value()) {
+        // Fallback: trim step slightly to avoid getting stuck on boundary ambiguity
+        // Scale the step so the move is roughly a few geometry tolerances long
+        const double stepLength = displacement.length().value;
+        constexpr double targetLength = geometryTolerance * fallbackScale;
+
+        double fallbackTolerance = 0.0;
+        if (stepLength > geometryTolerance) {
+            fallbackTolerance = std::min(1.0, targetLength / stepLength);
         }
-        dt.value = 0.0;
-        displacement = displacement * 0.0;
+
+        dt = dt * fallbackTolerance;
+        displacement = displacement * fallbackTolerance;
         event.surface = startMedium;
-        event.intersection = startPosition;
-        event.mediumAfter = nextObject;
+        event.intersection = startPosition + displacement;
+        event.mediumBefore = startMedium;
+        event.mediumAfter = particle.isReflective() ? startMedium : endMedium;
+        event.normal = Vector<3>();
+        event.hasNormal = false;
+        event.nudgeIntoMediumAfter = !particle.isReflective();
         return true;
     }
 
-    return false;
+    double clampedTolerance = std::clamp(bestHit->fraction, 0.0, 1.0);
+    clampedTolerance = std::max(clampedTolerance, geometryTolerance);
+    dt = dt * clampedTolerance;
+    displacement = displacement * clampedTolerance;
+
+    event.surface = hitSurface;
+    event.intersection = bestHit->point;
+    event.mediumBefore = startMedium;
+    event.mediumAfter = particle.isReflective() ? startMedium : endMedium;
+    event.normal = bestHit->normal;
+    event.hasNormal = bestHit->hasNormal;
+    event.nudgeIntoMediumAfter = !particle.isReflective();
+    return true;
 }
 
 void processBoundaryResponse(Particle& particle,
@@ -159,71 +189,34 @@ void processBoundaryResponse(Particle& particle,
     const Vector<3>& eventDisplacement,
     const Quantity& travelledDistance)
 {
-    constexpr double geometryTolerance = config::program::geometryTolerance;
-
-    if (event.surface == nullptr || !particle.isReflective() || travelledDistance.value <= 0.0) {
+    if (event.surface == nullptr || travelledDistance.value <= 0.0) {
         return;
     }
 
-    const auto localIntersection = event.surface->worldToLocalPoint(event.intersection);
-    const auto localNormal = event.surface->localNormal(localIntersection);
-    Vector<3> worldNormal;
-    const auto tryAssignUnitNormal = [&](const Vector<3>& candidate) -> bool {
-        const auto length = candidate.length();
-        if (length.value <= geometryTolerance) {
-            return false;
-        }
-        worldNormal = candidate / length;
-        return true;
-    };
+    const auto worldNormalOpt = selectWorldNormal(event, eventDisplacement, particle);
 
-    bool haveNormal = false;
-    if (localNormal.length().value > geometryTolerance) {
-        const auto surfaceNormalWorld = event.surface->localToWorldDirection(localNormal);
-        haveNormal = tryAssignUnitNormal(surfaceNormalWorld);
-    }
-
-    if (!haveNormal) {
-        if (tryAssignUnitNormal(-eventDisplacement)) {
-            haveNormal = true;
-            logInteractionWarning("BoundaryResponse",
-                "Degenerate surface normal; used displacement direction for reflection.");
-        }
-    }
-
-    if (!haveNormal) {
-        if (tryAssignUnitNormal(particle.getMomentum())) {
-            haveNormal = true;
-            logInteractionWarning("BoundaryResponse",
-                "Degenerate surface normal; used incoming momentum for reflection.");
-        }
-    }
-
-    if (!haveNormal) {
-        logInteractionWarning("BoundaryResponse",
-            "Failed to determine fallback normal; particle reflection skipped.");
+    if (!worldNormalOpt.has_value()) {
         return;
     }
 
-    particle.reflectMomentumAcrossNormal(worldNormal);
+    const auto& worldNormal = *worldNormalOpt;
 
-    auto epsilon = travelledDistance * 1e-6;
+    auto epsilon = travelledDistance * epsilonScale;
     if (epsilon.value <= geometryTolerance) {
-        epsilon = Quantity(geometryTolerance, epsilon.unit);
+        epsilon = Quantity(geometryTolerance, travelledDistance.unit);
     }
 
-    const auto displacementDirection = eventDisplacement.dot(worldNormal);
-    double sign = displacementDirection.value >= 0.0 ? 1.0 : -1.0;
-    if (std::abs(displacementDirection.value) <= geometryTolerance) {
-        const auto momentumDot = particle.getMomentum().dot(worldNormal);
-        sign = momentumDot.value <= 0.0 ? 1.0 : -1.0;
+    const auto displacementDot = eventDisplacement.dot(worldNormal).value;
+
+    if (particle.isReflective()) {
+        particle.reflectMomentumAcrossNormal(worldNormal);
+        const double sign = displacementDot >= 0.0 ? -1.0 : 1.0;
+        particle.setPosition(particle.getPosition() + worldNormal * (epsilon * sign));
+        return;
     }
 
-    const auto correction = worldNormal * (epsilon * sign);
-
-    auto updatedPosition = particle.getPosition();
-    updatedPosition[0] -= correction[0];
-    updatedPosition[1] -= correction[1];
-    updatedPosition[2] -= correction[2];
-    particle.setPosition(updatedPosition);
+    if (event.nudgeIntoMediumAfter) {
+        const double sign = displacementDot >= 0.0 ? 1.0 : -1.0;
+        particle.setPosition(particle.getPosition() + worldNormal * (epsilon * sign));
+    }
 }

@@ -13,6 +13,8 @@
 #ifndef PHYSICS_SIMULATION_PROGRAM_BOX_H
 #define PHYSICS_SIMULATION_PROGRAM_BOX_H
 
+#include <optional>
+
 #include "core/linear-algebra/vector.h"
 #include "objects/object.h"
 
@@ -51,7 +53,7 @@ class Box final : public Object {
         // Local intersection method
         //
         // Compute an intersection in local coordinates given a start point and displacement
-        [[nodiscard]] Vector<3> localIntersection(const Vector<3>& startLocalPoint, const Vector<3>& localDisplacement) const override;
+        [[nodiscard]] std::optional<Vector<3>> localIntersection(const Vector<3>& startLocalPoint, const Vector<3>& localDisplacement) const override;
 
         // Local normal method
         //
