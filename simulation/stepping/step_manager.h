@@ -16,10 +16,14 @@
 #include "core/quantities/quantity.h"
 #include "objects/object.h"
 
-// All particle advancement
-//
-// Advance every particle by dt; particles logged inside the detector are removed afterwards
-void stepAll(
+// Advance simulation until the global clock reaches targetTime (inclusive, within tolerance)
+void stepUntilTime(
+    const Object* detector,
+    const Quantity& targetTime,
+    const Quantity& dt = quantityTable().at("time step"));
+
+// Advance simulation until all particles have been removed
+void stepUntilEmpty(
     const Object* detector,
     const Quantity& dt = quantityTable().at("time step"));
 

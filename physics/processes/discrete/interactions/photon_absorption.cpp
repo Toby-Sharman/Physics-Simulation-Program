@@ -103,22 +103,24 @@ namespace discrete_interaction::photon_absorption {
         return meanFreePath * opticalDepth;
     }
 
-    void apply(std::unique_ptr<Particle> &particle, const Object *medium) {
-        if (!particle) { return; }
+    void apply(std::unique_ptr<Particle> &particle, const Object *medium, SpawnQueue &spawned) {
+        if (!particle) {
+            return;
+        }
 
         if (particle->getType() != "photon" || !particle->getAlive()) {
-            logInteractionWarning(k_photonAbsorptionTag, "Invalid particle state; interaction skipped.");
+            logInteractionWarning(k_photonAbsorptionTag, "Invalid particle state; interaction skipped");
             return;
         }
 
         if (medium == nullptr) {
-            logInteractionWarning(k_photonAbsorptionTag, "Medium not available; photon left unchanged.");
+            logInteractionWarning(k_photonAbsorptionTag, "Medium not available; photon left unchanged");
             return;
         }
 
         const auto &material = medium->getMaterial();
         if (material.empty()) {
-            logInteractionWarning(k_photonAbsorptionTag, "Material not specified; photon left unchanged.");
+            logInteractionWarning(k_photonAbsorptionTag, "Material not specified; photon left unchanged");
             return;
         }
 
@@ -126,7 +128,7 @@ namespace discrete_interaction::photon_absorption {
             logInteractionWarning(
                 k_photonAbsorptionTag,
                 std::format(
-                    "No particle definition for material '{}'; photon left unchanged.",
+                    "No particle definition for material '{}'; photon left unchanged",
                     material
                 )
             );
@@ -139,7 +141,7 @@ namespace discrete_interaction::photon_absorption {
                 logInteractionWarning(
                     k_photonAbsorptionTag,
                     std::format(
-                        "Material '{}' is not categorized as an atom; photon left unchanged.",
+                        "Material '{}' is not categorized as an atom; photon left unchanged",
                         material
                     )
                 );
@@ -153,7 +155,7 @@ namespace discrete_interaction::photon_absorption {
             logInteractionWarning(
                 k_photonAbsorptionTag,
                 std::format(
-                    "Non-positive rest mass for particle '{}'; photon left unchanged.",
+                    "Non-positive rest mass for particle '{}'; photon left unchanged",
                     material
                 )
             );
@@ -167,7 +169,7 @@ namespace discrete_interaction::photon_absorption {
             logInteractionWarning(
                 k_photonAbsorptionTag,
                 std::format(
-                    "Thermal velocity sampling failed: {}; photon left unchanged.",
+                    "Thermal velocity sampling failed: {}; photon left unchanged",
                     error.what()
                 )
             );
@@ -190,13 +192,13 @@ namespace discrete_interaction::photon_absorption {
         totalEnergy += incidentEnergy;
 
         if (!std::isfinite(totalEnergy.value)) {
-            logInteractionWarning(k_photonAbsorptionTag, "Combined energy not finite; photon left unchanged.");
+            logInteractionWarning(k_photonAbsorptionTag, "Combined energy not finite; photon left unchanged");
             return;
         }
 
         for (std::size_t axis = 0; axis < 3; ++axis) {
             if (!std::isfinite(matterMomentum[axis].value)) {
-                logInteractionWarning(k_photonAbsorptionTag, "Combined momentum not finite; photon left unchanged.");
+                logInteractionWarning(k_photonAbsorptionTag, "Combined momentum not finite; photon left unchanged");
                 return;
             }
         }
@@ -217,6 +219,9 @@ namespace discrete_interaction::photon_absorption {
             absorbedAtom->clearDecayClock();
         }
 
-        particle = std::move(absorbedAtom);
+        spawned.push_back(std::move(absorbedAtom));
+        if (particle) {
+            particle->setAlive(false);
+        }
     }
 } // namespace discrete_interaction::photon_absorption

@@ -13,6 +13,7 @@
 #ifndef PHYSICS_SIMULATION_PROGRAM_PHOTON_ABSORPTION_H
 #define PHYSICS_SIMULATION_PROGRAM_PHOTON_ABSORPTION_H
 
+#include <memory>
 #include <optional>
 
 #include "objects/object.h"
@@ -31,7 +32,7 @@ namespace discrete_interaction::photon_absorption {
 
     // Apply photon absorption by validating the photon/medium pair, sampling the atom's thermal motion, and replacing
     // the photon with an excited state carrying the photon's stored energy
-    void apply(std::unique_ptr<Particle> &particle, const Object *medium);
+    void apply(std::unique_ptr<Particle> &particle, const Object *medium, SpawnQueue &spawned);
 } // namespace discrete_interaction::photon_absorption
 
 #endif //PHYSICS_SIMULATION_PROGRAM_PHOTON_ABSORPTION_H

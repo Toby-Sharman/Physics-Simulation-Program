@@ -114,6 +114,7 @@ target_sources(Simulation_program PRIVATE
         simulation/data-collection/particle_collection.cpp
         simulation/geometry/boundary/boundary_interactions.cpp
         simulation/motion/particle_motion.cpp
+        simulation/simulation_clock.cpp
         simulation/stepping/step_events.cpp
         simulation/stepping/step_manager.cpp
         simulation/stepping/step_utilities.cpp

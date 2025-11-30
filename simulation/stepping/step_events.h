@@ -19,7 +19,10 @@
 #include "core/quantities/quantity.h"
 #include "objects/object.h"
 #include "particles/particle.h"
+#include "physics/processes/discrete/core/interaction_process.h"
 #include "simulation/geometry/boundary/boundary_interactions.h"
+
+using SpawnQueue = discrete_interaction::SpawnQueue;
 
 // Step limiter ordering used when candidate events compete for the next step; higher values win for ties on dt
 enum class StepLimiter : int {
@@ -47,7 +50,7 @@ struct StepEvent {
 };
 
 // Apply a deferred discrete interaction process (if any) using the medium resolved from the world
-void applyDiscreteInteraction(std::unique_ptr<Particle>& particle, const Object* world);
+void applyDiscreteInteraction(std::unique_ptr<Particle>& particle, const Object* world, SpawnQueue& spawned);
 
 // Evaluate all candidate limiters and return the next step event capped by the highest-priority limiter
 StepEvent determineStepEvent(
@@ -58,6 +61,10 @@ StepEvent determineStepEvent(
     );
 
 // Execute any secondary effects once a discrete limiter actually fires (decay/interaction bookkeeping)
-void processDiscreteLimiterEvent(std::unique_ptr<Particle>& particle, StepLimiter limiter, const Object* world);
+void processDiscreteLimiterEvent(
+    std::unique_ptr<Particle>& particle,
+    StepLimiter limiter,
+    const Object* world,
+    SpawnQueue& spawned);
 
 #endif //PHYSICS_SIMULATION_PROGRAM_STEP_EVENTS_H

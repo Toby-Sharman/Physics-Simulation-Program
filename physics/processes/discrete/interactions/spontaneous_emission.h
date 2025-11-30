@@ -30,7 +30,7 @@ namespace discrete_interaction::spontaneous_emission {
 
     // Promote an excited atom into a photon using any stored decay energy (or kinetic energy as a fallback), sampling
     // an isotropic emission direction TODO: Proper handling
-    void apply(std::unique_ptr<Particle> &particle, const Object *medium);
+    void apply(std::unique_ptr<Particle> &particle, const Object *medium, SpawnQueue &spawned);
 } // namespace discrete_interaction::spontaneous_emission
 
 #endif //PHYSICS_SIMULATION_PROGRAM_SPONTANEOUS_EMISSION_H

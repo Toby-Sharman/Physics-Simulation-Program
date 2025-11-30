@@ -104,14 +104,15 @@ namespace {
     }
 } // namespace
 
-void applyDiscreteInteraction(std::unique_ptr<Particle> &particle, const Object *world) {
+void applyDiscreteInteraction(std::unique_ptr<Particle> &particle, const Object *world, SpawnQueue &spawned) {
     if (!particle) {
         return;
     }
+
     const Object *medium = step_utilities::resolveMediumIfAvailable(world, particle->getPosition());
 
     if (const auto *process = particle->getPendingInteractionProcess()) {
-        process->apply(particle, medium);
+        process->apply(particle, medium, spawned);
     }
 }
 
@@ -179,18 +180,22 @@ StepEvent determineStepEvent(
     return event;
 }
 
-void processDiscreteLimiterEvent(std::unique_ptr<Particle> &particle, const StepLimiter limiter, const Object *world) {
+void processDiscreteLimiterEvent(std::unique_ptr<Particle> &particle, const StepLimiter limiter, const Object *world, SpawnQueue &spawned) {
     if (!particle) { return; }
     switch (limiter) {
         case StepLimiter::Interaction: {
-            applyDiscreteInteraction(particle, world);
+            applyDiscreteInteraction(particle, world, spawned);
             particle->clearInteractionLength();
             break;
         }
         case StepLimiter::Decay: {
             static const auto *decayProcess = discrete_interaction::findInteractionProcess("Spontaneous emission");
             const Object *medium = step_utilities::resolveMediumIfAvailable(world, particle->getPosition());
-            if (decayProcess != nullptr) { decayProcess->apply(particle, medium); }
+
+            if (decayProcess != nullptr) {
+                decayProcess->apply(particle, medium, spawned);
+            }
+
             particle->clearInteractionLength();
             break;
         }

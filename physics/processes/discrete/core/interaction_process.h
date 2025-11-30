@@ -16,12 +16,15 @@
 #include <memory>
 #include <optional>
 #include <string_view>
+#include <vector>
 
 #include "core/quantities/quantity.h"
 #include "objects/object.h"
 #include "particles/particle.h"
 
 namespace discrete_interaction {
+    using SpawnQueue = std::vector<std::unique_ptr<Particle>>;
+
     class InteractionProcess {
         public:
             struct Channel {
@@ -52,10 +55,12 @@ namespace discrete_interaction {
                 const Channel& channel
                 ) const = 0;
 
-            // Applies the discrete process and updates the particle state accordingly
-            //
-            // Later will need better handling for proper particle creation and deletion in derived TODO
-            virtual void apply(std::unique_ptr<Particle>& particle, const Object* medium) const = 0;
+            // Applies the discrete process and updates the particle state accordingly (this could be deletion and
+            // creation of new particles)
+            virtual void apply(
+                std::unique_ptr<Particle>& particle,
+                const Object* medium,
+                SpawnQueue& spawned) const = 0;
     };
 
     using InteractionChannel = InteractionProcess::Channel;

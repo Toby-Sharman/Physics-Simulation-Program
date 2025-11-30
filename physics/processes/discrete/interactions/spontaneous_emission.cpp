@@ -51,7 +51,7 @@ namespace discrete_interaction::spontaneous_emission {
         return Quantity::dimensionless(std::numeric_limits<double>::infinity());
     }
 
-    void apply(std::unique_ptr<Particle> &particle, const Object *medium) {
+    void apply(std::unique_ptr<Particle> &particle, const Object *medium, SpawnQueue &spawned) {
         if (!particle) {
             return;
         }
@@ -71,7 +71,7 @@ namespace discrete_interaction::spontaneous_emission {
         const Vector<3> direction = sampleIsotropicDirection();
         const std::string photonType = "photon";
         if (!g_particleDatabase.contains(photonType)) {
-            logInteractionWarning(k_spontaneousEmissionTag, "Photon definition missing; emission skipped.");
+            logInteractionWarning(k_spontaneousEmissionTag, "Photon definition missing; emission skipped");
             particle->clearDecayState();
             return;
         }
@@ -83,7 +83,7 @@ namespace discrete_interaction::spontaneous_emission {
             if (!loggedTaggedEmission) {
                 logInteractionWarning(
                     k_spontaneousEmissionTag,
-                    "Emitting 10% of stored decay energy (temporary diagnostic scaling)."
+                    "Emitting 10% of stored decay energy (temporary diagnostic scaling)"
                 );
                 loggedTaggedEmission = true;
             }
@@ -100,7 +100,7 @@ namespace discrete_interaction::spontaneous_emission {
             if (availableEnergy.value <= energyTolerance) {
                 logInteractionWarning(
                     k_spontaneousEmissionTag,
-                    "Insufficient kinetic energy after tolerance adjustment; emission skipped."
+                    "Insufficient kinetic energy after tolerance adjustment; emission skipped"
                 );
                 particle->clearDecayState();
                 return;
@@ -109,7 +109,7 @@ namespace discrete_interaction::spontaneous_emission {
         }
 
         if (photonEnergy.value <= 0.0) {
-            logInteractionWarning(k_spontaneousEmissionTag, "Computed photon energy non-positive; emission skipped.");
+            logInteractionWarning(k_spontaneousEmissionTag, "Computed photon energy non-positive; emission skipped");
             particle->clearDecayState();
             return;
         }
@@ -128,6 +128,9 @@ namespace discrete_interaction::spontaneous_emission {
         emittedPhoton->setAlive(true);
         emittedPhoton->clearDecayState();
 
-        particle = std::move(emittedPhoton);
+        spawned.push_back(std::move(emittedPhoton));
+        if (particle) {
+            particle->setAlive(false);
+        }
     }
 } // namespace discrete_interaction::spontaneous_emission

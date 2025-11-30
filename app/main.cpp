@@ -29,12 +29,12 @@
 #include "simulation/stepping/step_manager.h"
 
 int main() {
-    constexpr std::uint64_t masterSeed = 0x123456789ABCDEFull;
-    random_manager::setMasterSeed(masterSeed);
-    random_manager::setStreamSeed(random_manager::Stream::DiscreteInteractions, masterSeed + 1);
-    random_manager::setStreamSeed(random_manager::Stream::ThermalVelocities, masterSeed + 2);
-    random_manager::setStreamSeed(random_manager::Stream::SourceSampling, masterSeed + 3);
-    random_manager::resetCachedEngines();
+    // constexpr std::uint64_t masterSeed = 0x123456789ABCDEFull;
+    // random_manager::setMasterSeed(masterSeed);
+    // random_manager::setStreamSeed(random_manager::Stream::DiscreteInteractions, masterSeed + 1);
+    // random_manager::setStreamSeed(random_manager::Stream::ThermalVelocities, masterSeed + 2);
+    // random_manager::setStreamSeed(random_manager::Stream::SourceSampling, masterSeed + 3);
+    // random_manager::resetCachedEngines();
 
     // Objects
     /* Not to scale
@@ -100,9 +100,7 @@ int main() {
     const auto start = std::chrono::steady_clock::now();
 
     // Simulation loop
-    while (!g_particleManager.empty()) {
-        stepAll(collection, Quantity(1e-13, "s")); // all particles automatically stepped
-    }
+    stepUntilEmpty(collection, Quantity(1e-13, "s"));
 
     const auto end = std::chrono::steady_clock::now();
 

@@ -28,6 +28,7 @@
 namespace {
     using discrete_interaction::InteractionProcess;
     using discrete_interaction::InteractionChannel;
+    using discrete_interaction::SpawnQueue;
 
     class PhotonAbsorptionProcess final : public InteractionProcess {
         public:
@@ -55,8 +56,8 @@ namespace {
                 return discrete_interaction::photon_absorption::sampleLength(particle, medium, channel);
             }
 
-            void apply(std::unique_ptr<Particle>& particle, const Object* medium) const override {
-                discrete_interaction::photon_absorption::apply(particle, medium);
+            void apply(std::unique_ptr<Particle>& particle, const Object* medium, SpawnQueue& spawned) const override {
+                discrete_interaction::photon_absorption::apply(particle, medium, spawned);
             }
     };
 
@@ -86,8 +87,8 @@ namespace {
                 return discrete_interaction::spontaneous_emission::sampleLength(particle, medium, channel);
             }
 
-            void apply(std::unique_ptr<Particle>& particle, const Object* medium) const override {
-                discrete_interaction::spontaneous_emission::apply(particle, medium);
+            void apply(std::unique_ptr<Particle>& particle, const Object* medium, SpawnQueue& spawned) const override {
+                discrete_interaction::spontaneous_emission::apply(particle, medium, spawned);
             }
     };
 } // namespace
