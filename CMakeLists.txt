@@ -44,6 +44,8 @@ endfunction()
 read_path_constant(PROGRAM_BUILD_DIR "buildDirectory")
 read_path_constant(PROGRAM_OUTPUT_DIR "outputDirectory")
 read_path_constant(PROGRAM_DATABASE_DIR "databaseDirectory")
+read_path_constant(MATERIAL_DATABASE_JSON "materialDatabaseJson")
+read_path_constant(PARTICLE_DATABASE_JSON "particleDatabaseJson")
 read_path_constant(MATERIAL_DATABASE_PATH "materialDatabasePath")
 read_path_constant(PARTICLE_DATABASE_PATH "particleDatabasePath")
 
@@ -166,10 +168,10 @@ target_link_libraries(Simulation_program PRIVATE nlohmann_json::nlohmann_json)
 # -------------------------
 # JSON -> BIN conversion + config.h auto-update
 # -------------------------
-# JSON files
+# JSON files (configured in config/path_config.h)
 set(JSON_FILES
-        databases/material-data/material_database.json
-        databases/particle-data/particle_database.json
+        "${MATERIAL_DATABASE_JSON}"
+        "${PARTICLE_DATABASE_JSON}"
 )
 
 # Directories
@@ -203,10 +205,13 @@ set_target_properties(json_to_bin PROPERTIES
 set(BIN_FILES "")
 
 foreach(JSON_FILE IN LISTS JSON_FILES)
-    # Absolute path to the source JSON
-    set(JSON_FILE_ABS "${CMAKE_SOURCE_DIR}/${JSON_FILE}")
+    # Absolute path to the source JSON (resolve relative to project root)
+    set(JSON_FILE_ABS "${JSON_FILE}")
+    if(NOT IS_ABSOLUTE "${JSON_FILE_ABS}")
+        cmake_path(ABSOLUTE_PATH JSON_FILE_ABS BASE_DIRECTORY "${CMAKE_SOURCE_DIR}" NORMALIZE)
+    endif()
 
-    get_filename_component(FILE_NAME "${JSON_FILE}" NAME)
+    get_filename_component(FILE_NAME "${JSON_FILE_ABS}" NAME)
     string(REPLACE ".json" ".bin" BIN_NAME "${FILE_NAME}")
     # Use user-defined paths when available
     if(FILE_NAME STREQUAL "material_database.json")

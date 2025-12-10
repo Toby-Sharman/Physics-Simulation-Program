@@ -16,10 +16,13 @@
 #include <string_view>
 
 namespace config::paths {
-    // Paths may be absolute or relative to this config directory.
+    // Paths may be absolute; relative values are interpreted by the build system
     inline constexpr std::string_view buildDirectory = "Build";
     inline constexpr std::string_view outputDirectory = "Output";
     inline constexpr std::string_view databaseDirectory = "Databases";
+
+    inline constexpr std::string_view materialDatabaseJson = "databases/material-data/material_database.json";
+    inline constexpr std::string_view particleDatabaseJson = "databases/particle-data/particle_database.json";
 
     inline constexpr std::string_view materialDatabasePath = "Databases/material_database.bin";
     inline constexpr std::string_view particleDatabasePath = "Databases/particle_database.bin";
