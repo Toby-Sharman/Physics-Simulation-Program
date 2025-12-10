@@ -22,6 +22,9 @@
 #include <optional>
 #include <unordered_map>
 
+#include "particles/particle-types/atom.h"
+#include "particles/particle-types/photon.h"
+
 namespace {
     // Per-detector logging state so we only create folders/files once per run
     struct DetectorLogContext {
@@ -137,7 +140,15 @@ void logEnergyIfInside(
 
     std::scoped_lock lock(context->mutex);
     if (auto *stream = getStreamLocked(*context, particle->getType())) {
-        *stream << particle->getEnergy() << "\n";
+        *stream << particle->getEnergy();
+
+        if (const auto *atom = dynamic_cast<const Atom*>(particle.get())) {
+            *stream << "," << atom->getPolarisation();
+        } else if (const auto *photon = dynamic_cast<const Photon*>(particle.get())) {
+            *stream << "," << photon->getPolarisation();
+        }
+
+        *stream << "\n";
         particle.reset();
     }
 }

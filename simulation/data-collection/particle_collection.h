@@ -20,7 +20,7 @@
 #include "objects/object.h"
 #include "particles/particle.h"
 
-// Log the particle's energy when it intersects the detector volume, deleting it afterwards
+// Log the particle's energy (and polarisation when available) when it intersects the detector volume, deleting it afterwards
 void logEnergyIfInside(std::unique_ptr<Particle>& particle,
                        const Object* detector,
                        const std::string_view &baseFolder = config::paths::outputDirectory,
